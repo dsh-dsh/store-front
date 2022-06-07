@@ -1,15 +1,39 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+<div>
+    <router-view></router-view>
+    <Toast position="bottom-right" />
+</div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
+import Toast from 'primevue/toast';
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    Toast
+  },
+  data() {
+    return {
+    }
+  },
+  computed: {
+    documents() {
+      return this.$store.state.documents
+    },
+    message() {
+      return this.$store.state.message
+    }
+  },
+  mounted() {
+    this.$store.dispatch('installToast', this.$toast)
+    this.$store.dispatch('getToken')
+    this.$store.dispatch('getWorkShops')
+    this.$store.dispatch('getUnits')
+    this.$store.dispatch('getProjects')
+    this.$store.dispatch('getStorages')
+    this.$store.dispatch('getItems')
+    this.$store.dispatch('getUsers')
+    this.$store.dispatch('getCompanies')
   }
 }
 </script>
@@ -21,6 +45,6 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  /* margin-top: 60px; */
 }
 </style>
