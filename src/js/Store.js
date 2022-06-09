@@ -1,6 +1,5 @@
 import { createStore } from 'vuex';
 import { router } from './Routes';
-// import { config } from '@/utils/config';
 
 const host = "http://localhost:8081";
 
@@ -25,6 +24,17 @@ async function post(url, headers, body ) {
 
   }
 
+  async function put(url, headers, body ) {
+	return fetch(host + url, {
+		method: 'PUT',
+		headers: headers,
+		body: JSON.stringify(body)
+	})
+	.then(res => res.json())
+	.then(data => data.data);
+
+	}
+
   function handleGetResponce(response, context) {
 	// let res = response.json;
 	// if (res.error) {
@@ -34,7 +44,7 @@ async function post(url, headers, body ) {
 	// 	return res.data;
 	// }
 	// console.log(config)
-	context.state.toast?.add({severity:'info', summary: 'Info Message', detail:'Message Content', life: 3000});
+	context.state.toast?.add({severity:'info', summary: 'Info Message', detail:'Message Content', life: 1000});
 	return response;
   }
 
@@ -60,7 +70,8 @@ const Store = createStore({
 			item: "",
 			items: [],
 			users: [],
-			companies: []
+			companies: [],
+			success: 0,
 		}
     },
 
@@ -115,6 +126,9 @@ const Store = createStore({
 		setItems (state, res) {
 			state.items = res;
 		},
+		setSuccess (state) {
+			state.success++;
+		},
     },
 
     actions: {
@@ -163,7 +177,7 @@ const Store = createStore({
 			context.commit('getToken')
 		}, 
 		getMessage(context, message) {
-			context.state.toast?.add({severity:'error', summary: 'Info Message', detail: message, life: 3000})
+			context.state.toast?.add({severity:'error', summary: 'Info Message', detail: message, life: 1000})
 		},
 		installToast(context, toast) {
 			context.commit('installToast', toast)
@@ -181,9 +195,10 @@ const Store = createStore({
 			context.commit('setItems', response)
 		},
 		async updateDocument(context, body) {
-			let headers = {'Content-Type': 'application/json' }
-			const response = await post('/api/v1/auth/login', headers, body)
-			context.commit('setUser', response)
+			let request = {'item_doc_dto': body};
+			let headers = {'Content-Type': 'application/json', 'Authorization': context.state.token };
+			const response = await put('/api/v1/docs', headers, request);
+			if(response == 'ok') { context.commit('setSuccess'); }
 		},
     }
 })

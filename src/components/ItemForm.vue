@@ -138,10 +138,7 @@ export default {
         item() {
             return this.$store.state.item
         }
-    },
-    // mounted() {
-    //     this.$store.dispatch('getItem', {date: this.date, itemId: this.id})
-    // }
+    }
 }
 </script>
 

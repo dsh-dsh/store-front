@@ -8,14 +8,16 @@
   <MainMenu />
   <div class="content">
 	<div>
-		<Dialog v-model:visible="displayDocument" :style="{width: '80vw'}" :modal="true">
-			<template #header>
-				<h3>{{this.header}}</h3>
-			</template>
-      <Document :docId="docId" />
+		<Dialog v-model:visible="displayDocument" :style="{width: '80vw'}" :modal="true"  :showHeader="showDialogHeader">
+      <div v-if="docRedactor">
+        <DocRedactor :docId="docId" :type="type"/>
+      </div>
+      <div v-else>
+        <Document :docId="docId" @open-update-doc="openUpdateDocumentRedactor" @open-copy-doc="openCopyDocumentRedactor" />
+      </div>
       <template #footer>
-          <Button label="Закрыть" icon="pi pi-times" @click="closeDocument" class="p-button-text"/>
-          <Button label="Сохранить" icon="pi pi-check" @click="saveDocument" autofocus />
+        <Button label="Закрыть" icon="pi pi-times" @click="closeDocument" class="p-button-sm p-button-secondary p-button-text"/>
+        <Button v-if="docRedactor" label="Сохранить" icon="pi pi-check" @click="saveDocument" class="p-button-sm p-button-rounded p-button-secondary" autofocus />
       </template>
     </Dialog>
 	</div>
@@ -43,7 +45,7 @@
           <Column field="author.name" header="Автор" />
           <Column :exportable="false" style="min-width:8rem">
             <template #body="{data}">
-                <Button icon="pi pi-pencil" class="p-button-rounded p-button-secondary p-button-outlined mr-2" @click="openDocumentButton(data)" />
+                <Button icon="pi pi-pencil" class="p-button-rounded p-button-secondary p-button-outlined mr-2" @click="openUpdateDocumentRedactor(data)" />
             </template>
           </Column>
           <template #paginatorstart>
@@ -65,6 +67,7 @@ import Column from 'primevue/column';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import DocTabs from '@/components/DocTabs';
+import DocRedactor from '@/components/DocRedactor.vue';
 import Document from '@/components/Document.vue';
 import MainMenu from '@/components/MainMenu.vue';
 import Toolbar from 'primevue/toolbar';
@@ -77,6 +80,7 @@ export default {
       Button,
       Dialog,
       DocTabs,
+      DocRedactor,
       Document,
       MainMenu,
       Toolbar
@@ -88,8 +92,11 @@ export default {
       return {
         displayDocument: false,
         docId: 0,
+        type: String,
         header: String,
-        selectedProduct: null
+        selectedProduct: null,
+        showDialogHeader: false,
+        docRedactor: Boolean
       };
     },
     computed: {
@@ -98,34 +105,47 @@ export default {
       },
       document() {
         return this.$store.state.document
+      },
+      success() {
+        return this.$store.state.success
       }
+
     },
     mounted() {
       this.$store.dispatch('getDocuments', this.filter)
     },
     watch: {
-      filter (val) {
+      filter(val) {
         this.$store.dispatch('getDocuments', val)
+      },
+      success() {
+        this.$store.dispatch('getDocuments', this.filter)
       }
     },
 	methods: {
 		openDocument(value) {
+      this.docRedactor = false;
 			this.docId = value.data.id;
-			this.header = "Документ " + value.data.type + " № " + value.data.number + " от " + value.data.time;
 			this.displayDocument = true;
 		},
-		openDocumentButton(value) {
+		openUpdateDocumentRedactor(value) {
+      this.docRedactor = true;
 			this.docId = value.id;
-			this.header = "Документ " + value.type + " № " + value.number + " от " + value.time;
+      this.type = 'update';
+			this.displayDocument = true;
+		},
+		openCopyDocumentRedactor(value) {
+      this.docRedactor = true;
+			this.docId = value.id;
+      this.type = 'copy';
 			this.displayDocument = true;
 		},
 		closeDocument() {
 			this.displayDocument = false;
 		},
 		saveDocument() {
-      // console.log(this.document)
 			this.displayDocument = false;
-      // this.$store.dispatch('updateDocument', JSON.stringify(this.document))		
+      this.$store.dispatch('updateDocument', this.document)		
     },
     logout() {
       this.$store.dispatch('logout');

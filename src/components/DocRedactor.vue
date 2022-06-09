@@ -1,0 +1,447 @@
+<template> 
+    <br><br>
+    <div v-if="doc.author && doc.project">
+      <div class="formgrid grid">
+        <div class="field col-12 md:col-4">
+          <label for="number" class="label">Номер</label><br>
+          <InputText id="number" type="text" class="p-inputtext-sm input" v-model="doc.number" />
+        </div>
+        <div class="field col-12 md:col-4">
+          <label for="time" class="label">Дата</label><br>
+          <Calendar id="time" v-model="doc.time" :showTime="true" :showSeconds="true" dateFormat="dd.mm.yy" />
+        </div>
+        <div class="field col-12 md:col-4">
+          <label for="author" class="label">Автор</label><br>
+          <div class="p-inputgroup">
+            <InputText id="author" type="text" class="p-inputtext-sm" v-model="doc.author.name" />
+            <Button icon="pi pi-check" class="p-button-warning" @click="onAuthorClick"/>
+          </div>
+        </div>
+        <div class="field col-12 md:col-4">
+          <label for="project" class="label">Проект</label><br>
+          <Dropdown id="project" class="input" v-model="selectedProject" :options="projects" optionLabel="name" placeholder="Проект" @change="onProjectChange" />
+        </div>
+        <div class="field col-12 md:col-4">
+          <div v-if="doc.storage_from">
+            <label for="storageFrom" class="label">со склада</label><br>
+            <div class="p-inputgroup">
+              <InputText id="storageFrom" type="text" class="p-inputtext-sm" v-model="doc.storage_from.name" />
+              <Button icon="pi pi-check" class="p-button-warning" @click="onStorageFromClick"/>
+            </div>
+          </div>
+        </div>
+        <div class="field col-12 md:col-4">
+          <div v-if="doc.storage_to">
+          <label for="storageTo" class="label">на склад</label><br>
+            <div class="p-inputgroup">
+              <InputText id="storageTo" type="text" class="p-inputtext-sm" v-model="doc.storage_to.name" />
+              <Button icon="pi pi-check" class="p-button-warning" @click="onStorageToClick"/>
+            </div>
+          </div>
+        </div>
+        
+        <div class="field col-12 md:col-4">
+          <div v-if="doc.recipient">
+            <label for="recipient" class="label">Получатель</label><br>
+            <div class="p-inputgroup">
+              <InputText id="recipient" type="text" class="p-inputtext-sm" v-model="doc.recipient.name" />
+              <Button icon="pi pi-check" class="p-button-warning" @click="onRecipientClick"/>
+            </div>
+          </div>
+        </div>
+        <div class="field col-12 md:col-4">
+          <div v-if="doc.supplier">
+            <label for="supplier" class="label">Отправитель</label><br>
+            <div class="p-inputgroup">
+              <InputText id="supplier" type="text" class="p-inputtext-sm" v-model="doc.supplier.name" />
+              <Button icon="pi pi-check" class="p-button-warning" @click="onSupplierClick"/>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="doc.check_info">
+      <Divider align="left">
+        <div class="inline-flex align-items-center">
+          <i class="pi pi-user mr-2"></i>
+          информация из чека ККМ
+        </div>
+      </Divider>
+      <div class="formgrid grid">
+        <div class="field col-12 md:col-3">
+          <label for="waiter" class="label">официант</label><br>
+          <InputText id="waiter" type="text" class="p-inputtext-sm mr-1" v-model="doc.check_info.waiter" />
+        </div>
+        <div class="field col-12 md:col-3">
+          <label for="check_number" class="label">номер чека</label><br>
+          <InputText id="check_number" type="text" class="p-inputtext-sm mr-1" v-model="doc.check_info.check_number" />
+        </div>
+        <div class="field col-12 md:col-3">
+          <label for="cash_register_number" class="label">номер кассы</label><br>
+          <InputText id="cash_register_number" type="text" class="p-inputtext-sm mr-1" v-model="doc.check_info.cash_register_number" />
+        </div>
+        <div class="field col-12 md:col-3">
+          <label for="amount_received" class="label">получено</label><br>
+          <InputText id="amount_received" type="text" class="p-inputtext-sm mr-1" v-model="doc.check_info.amount_received" />
+        </div>
+        <div class="field col-12 md:col-3">
+          <label for="table_number" class="label">стол</label><br>
+          <InputText id="table_number" type="text" class="p-inputtext-sm mr-1" v-model="doc.check_info.table_number" />
+        </div>
+        <div class="field col-12 md:col-3">
+          <label for="guest_number" class="label">гость</label><br>
+          <InputText id="guest_number" type="text" class="p-inputtext-sm mr-1" v-model="doc.check_info.guest_number" />
+        </div>
+        <div class="field col-12 md:col-3">
+          <label for="kkm_check_time" class="label">время</label><br>
+          <Calendar id="kkm_check_time" v-model="doc.check_info.date_time" :showTime="true" :showSeconds="true" dateFormat="dd.mm.yy" />
+        </div>
+        <div class="field col-12 md:col-3">
+        </div>
+        <div class="field col-12 md:col-2">
+          <label for="isReturn" class="label">возврат</label>
+          <InputSwitch id="isReturn" v-model="doc.check_info.is_return" /> 
+        </div>
+        <div class="field col-12 md:col-2">
+          <label for="isKKMChecked" class="label">пробит</label>
+          <InputSwitch id="isKKMChecked" v-model="doc.check_info.is_KKM_checked" /> 
+        </div>
+        <div class="field col-12 md:col-2">
+          <label for="is_Paid" class="label">оплачен</label>
+          <InputSwitch id="is_Paid" v-model="doc.check_info.is_payed" /> 
+        </div>
+        <div class="field col-12 md:col-2">
+          <label for="isPayedByCard" class="label">эквайринг</label>
+          <InputSwitch id="isPayedByCard" v-model="doc.check_info.is_payed_by_card" /> 
+        </div>
+        <div class="field col-12 md:col-2">
+          <label for="isDelivery" class="label">доставка</label>
+          <InputSwitch id="isDelivery" v-model="doc.check_info.is_delivery" /> 
+        </div>
+      </div>
+    </div>
+
+    <div v-if="doc.amount">
+      <div class="field col-12 md:col-12">
+        <label for="amount" class="label">сумма</label><br>
+        <InputText id="amount" type="text" class="p-inputtext-sm mr-1" v-model="doc.amount" />
+      </div>
+    </div>
+    <div v-if="doc.doc_items">
+      <Button icon="pi pi-plus" @click="onAddItemClick" class="p-button-text p-button-rounded" />
+      <DataTable :value="doc.doc_items" editMode="cell" @cell-edit-init="onCellEditInit" 
+          @cell-edit-complete="onCellEditComplete" class="p-datatable-sm editable-cells-table" responsiveLayout="scroll">
+        <Column field="item_name" header="Наименование" key="item_name">
+          <template #editor="{ data, field }">
+            <InputText v-model="data[field]" autofocus/>
+            <Button icon="pi pi-check" class="p-button-warning" @click="onItemClick"/>
+          </template>
+        </Column>
+        <Column field="quantity" header="Количество" key="quantity">
+          <template #editor="{ data, field }">
+            <InputText v-model="data[field]" autofocus />
+          </template>
+        </Column>
+        <Column field="price" header="Цена" key="price">
+          <template #editor="{ data, field }">
+            <InputText v-model="data[field]" autofocus />
+          </template>
+        </Column>
+        <Column field="discount" header="Скидка" key="discount">
+          <template #editor="{ data, field }">
+            <InputText v-model="data[field]" autofocus />
+          </template>
+        </Column>
+        <ColumnGroup type="footer">
+          <Row>
+              <Column footer="сумма:" :colspan="3" footerStyle="text-align:right" />
+              <Column :footer="totalAmount" />
+          </Row>
+        </ColumnGroup>
+      </DataTable> 
+    </div>  
+
+  <OverlayPanel ref="opUsers">
+    <DataTable :value="users" v-model:selection="selectedUsers" selectionMode="single" 
+        :paginator="true" :rows="5" @rowSelect="onUserSelect" responsiveLayout="scroll" >
+        <Column field="name" header="Name" sortable style="width: 60%"/>
+        <Column field="email" header="email" sortable style="width: 40%"></Column>
+    </DataTable>
+  </OverlayPanel>
+  <OverlayPanel ref="opCompanies">
+    <DataTable :value="companies" v-model:selection="selectedCompany" selectionMode="single" 
+        :paginator="true" :rows="5" @rowSelect="onCompanySelect" responsiveLayout="scroll" >
+        <Column field="name" header="Name" sortable style="width: 60%"/>
+        <Column field="inn" header="email" sortable style="width: 40%"></Column>
+    </DataTable>
+  </OverlayPanel>
+  <OverlayPanel ref="opStorage">
+    <DataTable :value="storages" v-model:selection="selectedStorage" selectionMode="single" 
+        :paginator="true" :rows="5" @rowSelect="onStorageSelect" responsiveLayout="scroll" >
+        <Column field="name" header="Name" sortable />
+    </DataTable>
+  </OverlayPanel>
+  <OverlayPanel ref="opItems">
+    <DataTable :value="items" v-model:selection="selectedItem" selectionMode="single" 
+        :paginator="true" :rows="5" @rowSelect="onItemSelect" responsiveLayout="scroll" >
+        <Column field="name" header="Name" sortable />
+    </DataTable>
+  </OverlayPanel>
+
+</template>
+
+<script>
+import Calendar from 'primevue/calendar';
+import InputText from 'primevue/inputtext';
+import Dropdown from 'primevue/dropdown';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import InputSwitch from 'primevue/inputswitch';
+import ColumnGroup from 'primevue/columngroup';     //optional for column grouping
+import Row from 'primevue/row'; 
+import Button from 'primevue/button';
+import OverlayPanel from 'primevue/overlaypanel';
+import Divider from 'primevue/divider';
+import {FilterMatchMode} from 'primevue/api';
+export default {
+    name: 'DocContent',
+    components: {
+        Calendar,
+        InputText,
+        Dropdown,
+        DataTable,
+        Column,
+        InputSwitch,
+        ColumnGroup,
+        Row,
+        Button,
+        OverlayPanel,
+        Divider
+    },
+    props: {
+        docId: Number,
+        type: String
+    },
+    data() {
+        return {
+            time: "2022.05.23 14:00:15",
+            time24: "05/20/2022",
+            foo: 'bar',
+            selectedProject: null,
+            selectedStorageFrom: null,
+            selectedStorageTo: null,
+            is_hold: true,
+            selectedRow: null,
+            selectedUsers: null,
+            selectedRecipient: null,
+            selectedSupplier: null,
+
+            companyType: null,
+            selectedCompany: null,
+
+            storageType: null,
+            selectedStorage: null,
+
+            selectedItem: null,
+            currentField: null,
+            currentData: null,
+            itemSelectType: String,
+            filters: {
+                'name': {value: null, matchMode: FilterMatchMode.CONTAINS}
+            }
+        };
+    },
+    computed: {
+        doc() {
+          return this.$store.state.document
+        },
+        projects() {
+          return this.$store.state.projects
+        },
+        storages() {
+          return this.$store.state.storages
+        },
+        users() {
+          return this.$store.state.users;
+        },
+        companies() {
+          return this.$store.state.companies;
+        },
+        items() {
+          return this.$store.state.items;
+        },
+        totalAmount() {
+          let total = 0;
+          for(let item of this.doc.doc_items) {
+              total += (item.price * item.quantity) - item.discount;
+          }
+          return this.formatCurrency(total);
+        }
+    },
+    mounted() {
+      this.$store.dispatch('getDocument', this.docId);
+    },
+    watch: {
+      doc(value) {
+        if(value.storage_from) {
+          this.selectedStorageFrom = value.storage_from.id
+        }
+        if(value.storage_to) {
+          this.selectedStorageTo = value.storage_to.id
+        }
+        this.selectedProject = value.project.id
+      },
+    },
+    methods: {
+      onProjectChange(event) {
+        this.doc.project = event.value;
+      },
+      onStorageFromChange(event) {
+        this.doc.storage_from = event.value;
+      },
+      onStorageToChange(event) {
+        this.doc.storage_to = event.value;
+      },
+      onCellEditComplete(event) {
+        let { data, newValue, field } = event;
+        if(field != 'item_name') {
+          data[field] = newValue;
+        }
+      },
+      formatCurrency(value) {
+        return value.toLocaleString('re-RU', {style: 'currency', currency: 'RUB'});
+      },
+      onAuthorClick(event) {
+        this.$refs.opUsers.toggle(event);
+      },
+      onUserSelect(event) {
+        this.doc.author = event.data;
+        this.$refs.opUsers.hide();
+      },
+      onRecipientClick(event) {
+        this.companyType = 'recipient';
+        this.$refs.opCompanies.toggle(event);
+      },
+      onSupplierClick(event) {
+        this.companyType = 'supplier';
+        this.$refs.opCompanies.toggle(event);
+      },
+      onCompanySelect(event) {
+        if(this.companyType == 'recipient') {
+          this.doc.recipient = event.data;
+        } else {
+          this.doc.supplier = event.data;
+        }
+        this.$refs.opCompanies.hide();
+      },
+      onStorageFromClick(event) {
+        this.storageType = 'storageFrom';
+        this.$refs.opStorage.toggle(event);
+      },
+      onStorageToClick(event) {
+        this.storageType = 'storageTo';
+        this.$refs.opStorage.toggle(event);
+      },
+      onStorageSelect(event) {
+        if(this.storageType == 'storageFrom') {
+          this.doc.storage_from = event.data;
+        } else {
+          this.doc.storage_to = event.data;
+        }
+        this.$refs.opStorage.hide();
+      },
+      onItemClick(event) {
+        this.itemSelectType = 'update';
+        this.$refs.opItems.toggle(event);
+      },
+      onAddItemClick(event) {
+        this.itemSelectType = 'add';
+        this.$refs.opItems.toggle(event);
+      },
+      onCellEditInit(event) {
+        let { data, field } = event;
+        if(field == "item_name") {
+          this.currentField = field;
+          this.currentData = data;
+        }
+      },
+      onItemSelect(event) {
+        if(this.itemSelectType == 'update') {
+          this.updateItem(event.data.id, event.data.name);
+        } else {
+          this.addItem(event.data.id, event.data.name);
+        }
+        this.$refs.opItems.hide();
+      },
+      updateItem(item_id, item_name){
+        this.currentData['item_name'] = item_name;
+        this.currentData['item_id'] = item_id;
+      },
+      addItem(item_id, item_name) {
+          this.doc.doc_items.push(new Item(this.doc.id, item_id, item_name, 0.0, 0.0, 0.0, 0.0,));
+      }
+      
+    }
+}
+
+class Item {
+    document_id = 0;
+    item_id = 0;
+    item_name = "";
+    quantity = 0.0;
+    price = 0.0;
+    discount = 0.0;
+    quantity_fact = 0.0;
+    constructor(document_id, item_id, item_name, quantity, price, discount, quantity_fact) {
+        this.document_id = document_id;
+        this.item_id = item_id;
+        this.item_name = item_name;
+        this.quantity = quantity;
+        this.price = price;
+        this.discount = discount;
+        this.quantity_fact = quantity_fact;
+    }
+}
+
+</script>
+
+<style scoped>
+  .buttonContainer {
+    display: flex;
+    margin: 8px;
+  }
+  .column {
+    display: flex;
+    flex-direction: column;
+  }
+  .row {
+    display: flex;
+  }
+  .border {
+    border: 1px solid #dee2e6;
+    border-radius: 3px;
+  }
+  .true-icon {
+	color: green;
+  }
+  .false-icon {
+	color: red;
+  }
+  .b {
+      font-weight: bold;
+  }
+  .mr-1 {
+	margin: 0px 10px 0px 0px;
+  }
+  .label {
+    margin: 0px 0px 5px 0px;
+    display: inline-block;
+  }
+  .input {
+    width: 200 px;
+  }
+  .field {
+    margin: 0px 0px 5px 0px;
+  }
+</style>
