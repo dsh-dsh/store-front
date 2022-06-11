@@ -34,6 +34,7 @@ export default {
     this.$store.dispatch('getItems')
     this.$store.dispatch('getUsers')
     this.$store.dispatch('getCompanies')
+    this.$store.dispatch('getDocTypes')
   }
 }
 </script>

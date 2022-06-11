@@ -78,43 +78,36 @@
             </div>
             <div class="col-12 md:col-2 center">
                 <p>возврат </p>
-                <div v-if="doc.check_info.is_return">
-                    <img src="../../dist/imgs/v.png" class="ml-2" />
-                </div>
+                <img  v-if="doc.check_info.is_return" src="../../dist/img/v.png" class="ml-2" />
+                <img  v-else src="../../dist/img/o.png" class="ml-2" />
             </div>
             <div class="col-12 md:col-2 center">
                 <p>пробит </p>
-                <div v-if="doc.check_info.is_KKM_checked">
-                    <img src="../../dist/imgs/v.png" class="ml-2" />
-                </div>
+                <img  v-if="doc.check_info.is_KKM_checked" src="../../dist/img/v.png" class="ml-2" />
+                <img  v-else src="../../dist/img/o.png" class="ml-2" />
             </div>
             <div class="col-12 md:col-2 center">
                 <p>оплачен </p>
-                <div v-if="doc.check_info.is_payed">
-                    <img src="../../dist/imgs/v.png" class="ml-2" />
-                </div>
+                <img  v-if="doc.check_info.is_payed" src="../../dist/img/v.png" class="ml-2" />
+                <img  v-else src="../../dist/img/o.png" class="ml-2" />
             </div>
             <div class="col-12 md:col-2 center">
                 <p>эквайринг </p>
-                <div v-if="doc.check_info.is_payed_by_card">
-                    <img src="../../dist/imgs/v.png" class="ml-2" />
-                </div>
+                <img  v-if="doc.check_info.is_payed_by_card" src="../../dist/img/v.png" class="ml-2" />
+                <img  v-else src="../../dist/img/o.png" class="ml-2" />
             </div>
             <div class="col-12 md:col-2 center">
                 <p>доставка </p>
-                <div v-if="doc.check_info.is_delivery">
-                    <img src="../../dist/imgs/v.png" class="ml-2" />
-                </div>
+                <img  v-if="doc.check_info.is_delivery" src="../../dist/img/v.png" class="ml-2" />
+                <img  v-else src="../../dist/img/o.png" class="ml-2" />
             </div>
         </div>
         </div>
         <div v-if="doc.amount">
         <div class="field col-12 md:col-12">
             <label for="amount" class="label">сумма</label><br>
-            <!-- <InputText id="amount" type="text" class="p-inputtext-sm mr-1" v-model="doc.amount" /> -->
         </div>
     </div>
-
     <br>
 
     <div v-if="doc.doc_items">
@@ -189,7 +182,7 @@ export default {
         },
     },
     mounted() {
-        this.$store.dispatch('getDocument', this.docId);
+        this.$store.dispatch('getDocument', [this.docId, ""]);
     },
 }
 </script>
@@ -204,7 +197,6 @@ export default {
     margin: 5px 0px;
     padding: 5px 10px;
     background-color: rgb(247, 243, 238);
-    /* background-color: rgb(116, 120, 122); */
     border-radius: 5px
   }
   .sm {

@@ -26,6 +26,7 @@ export default {
                 { name: "Все",            path: ''         },
                 { name: "Приходные",      path: 'posting' },
                 { name: "Складские",      path: 'store'   },
+                { name: "Заявки",         path: 'request'   },
                 { name: "Кассовые",       path: 'order'   },
                 { name: "Чеки",           path: 'check'   },
                 { name: "Инвентаризации", path: 'invent'  },

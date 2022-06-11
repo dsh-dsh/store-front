@@ -7,22 +7,9 @@
   <div class="conteiner">
   <MainMenu />
   <div class="content">
-	<div>
-		<Dialog v-model:visible="displayDocument" :style="{width: '80vw'}" :modal="true"  :showHeader="showDialogHeader">
-      <div v-if="docRedactor">
-        <DocRedactor :docId="docId" :type="type"/>
-      </div>
-      <div v-else>
-        <Document :docId="docId" @open-update-doc="openUpdateDocumentRedactor" @open-copy-doc="openCopyDocumentRedactor" />
-      </div>
-      <template #footer>
-        <Button label="Закрыть" icon="pi pi-times" @click="closeDocument" class="p-button-sm p-button-secondary p-button-text"/>
-        <Button v-if="docRedactor" label="Сохранить" icon="pi pi-check" @click="saveDocument" class="p-button-sm p-button-rounded p-button-secondary" autofocus />
-      </template>
-    </Dialog>
-	</div>
-    <div class="buttonContainer">
+    <div class="flex justify-content-between mb-2">
       <DocTabs :filter="filter" />
+      <Button label="Новый документ" @click="chooseDocType" class="p-button-rounded p-button-secondary p-button-outlined" />
     </div>
     <div>
       <div class="border">
@@ -31,6 +18,16 @@
           paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
           :rowsPerPageOptions="[10,20,50]" responsiveLayout="scroll"
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords}">
+          <template #empty>
+            <div class="flex justify-content-center">
+              <p>Журнал пуст</p>
+            </div>
+          </template>
+          <template #loading>
+            <div class="flex justify-content-center">
+              <i class="pi pi-spin pi-spinner" style="font-size: 2rem">
+            </i></div>
+          </template>
           <Column field="is_hold" header="" dataType="boolean">
             <template #body="{data}">
               <i class="pi" :class="{'true-icon pi-check-circle': data.is_hold, 'false-icon pi-circle': !data.is_hold}"></i>
@@ -59,6 +56,23 @@
     </div>
   </div>
   </div>
+  <Dialog v-model:visible="displayDocument" :style="{width: '80vw'}" :modal="true"  :showHeader="showDialogHeader">
+    <div v-if="docRedactor">
+      <DocRedactor :docId="docId" :type="type" :docType="docType"/>
+    </div>
+    <div v-else>
+      <Document :docId="docId" @open-update-doc="openUpdateDocumentRedactor" @open-copy-doc="openCopyDocumentRedactor" />
+    </div>
+    <template #footer>
+      <Button label="Закрыть" icon="pi pi-times" @click="closeDocument" class="p-button-sm p-button-secondary p-button-text"/>
+      <Button v-if="docRedactor" label="Сохранить" icon="pi pi-check" @click="saveDocument" class="p-button-sm p-button-rounded p-button-secondary" autofocus />
+    </template>
+  </Dialog>
+  <OverlayPanel ref="opDocTypes">
+    <div v-for="docType in docTypes" :key="docType">
+     <Button class="p-button-secondary p-button-text" @click="addNewDocByType(docType.name)">{{docType.name}}</Button>
+    </div>
+  </OverlayPanel>
 </template>
 
 <script>
@@ -71,6 +85,7 @@ import DocRedactor from '@/components/DocRedactor.vue';
 import Document from '@/components/Document.vue';
 import MainMenu from '@/components/MainMenu.vue';
 import Toolbar from 'primevue/toolbar';
+import OverlayPanel from 'primevue/overlaypanel';
 
 export default {
     name: 'DocContent',
@@ -83,7 +98,8 @@ export default {
       DocRedactor,
       Document,
       MainMenu,
-      Toolbar
+      Toolbar,
+      OverlayPanel
     },
     props: {
         filter: String,
@@ -96,7 +112,8 @@ export default {
         header: String,
         selectedProduct: null,
         showDialogHeader: false,
-        docRedactor: Boolean
+        docRedactor: Boolean,
+        docType: null 
       };
     },
     computed: {
@@ -108,6 +125,9 @@ export default {
       },
       success() {
         return this.$store.state.success
+      },
+      docTypes() {
+        return this.$store.state.docTypes
       }
 
     },
@@ -128,6 +148,13 @@ export default {
 			this.docId = value.data.id;
 			this.displayDocument = true;
 		},
+    openNewDocument(value) {
+      this.docRedactor = true;
+			this.docType = value;
+			this.docId = 0;
+      this.type = 'add';
+			this.displayDocument = true;
+    },
 		openUpdateDocumentRedactor(value) {
       this.docRedactor = true;
 			this.docId = value.id;
@@ -145,13 +172,48 @@ export default {
 		},
 		saveDocument() {
 			this.displayDocument = false;
-      this.$store.dispatch('updateDocument', this.document)		
+      this.document.time = formatDate(this.document.time);
+      if(this.document.check_info) {
+        this.document.check_info.date_time = formatDate(this.document.check_info.date_time);
+      }
+      if(this.type == 'update') {
+        this.$store.dispatch('updateDocument', this.document);
+      }	else {
+        this.document.id = 0;
+        this.$store.dispatch('addDocument', this.document);
+      }	
     },
     logout() {
       this.$store.dispatch('logout');
+    },
+    chooseDocType(event) {
+        this.$refs.opDocTypes.toggle(event);
+    },
+    addNewDocByType(type) {
+      console.log(type)
+      this.openNewDocument(type)
+      this.$refs.opDocTypes.hide();
     }
 	}
 }
+
+function setLidingNull(val) {
+  if(val < 10) {
+    return "0" + val;
+  } else {
+    return val;
+  }
+}
+
+function formatDate(date) {
+  if(typeof(date) === "object") { 
+  let strDate = setLidingNull(date.getDate()) + "." + setLidingNull(date.getMonth()+1) + "." + date.getFullYear() + " " 
+      + setLidingNull(date.getHours()) + ":" + setLidingNull(date.getMinutes()) + ":" + setLidingNull(date.getSeconds());
+    return strDate;
+  }
+  return date;
+}
+
 </script>
 <style scoped>
   .top-menu {
@@ -176,13 +238,16 @@ export default {
     border-radius: 3px;
   }
   .true-icon {
-	color: green;
+    color: green;
   }
   .false-icon {
-	color: red;
+    color: red;
   }
   .mr-2 {
-	margin: 0px 20px 0px 0px;
+    margin: 0px 20px 0px 0px;
+  }
+  .mb-2 {
+    margin-bottom: 20px;
   }
   .logout {
     font-weight: bold;

@@ -1,18 +1,26 @@
 <template> 
     <br><br>
     <div v-if="doc.author && doc.project">
+
       <div class="formgrid grid">
-        <div class="field col-12 md:col-4">
-          <label for="number" class="label">Номер</label><br>
-          <InputText id="number" type="text" class="p-inputtext-sm input" v-model="doc.number" />
+        <div class="field col-12 md:col-12">
+          <h4 class="mb-2">Документ  {{ doc.doc_type }}</h4>
         </div>
-        <div class="field col-12 md:col-4">
-          <label for="time" class="label">Дата</label><br>
+        <div class="field col-12 md:col-5 flex justify-content-between numberdatecard">
+          <div class="mt-3 mb-3">
+          <!-- <label for="number" class="label">Номер</label><br> -->
+          <InputText id="number" type="text" class="p-inputtext smallinput" v-model="doc.number" />
+          </div>
+          <div class="mt-3 mb-3">
+          <!-- <label for="time" class="label">Дата</label><br> -->
           <Calendar id="time" v-model="doc.time" :showTime="true" :showSeconds="true" dateFormat="dd.mm.yy" />
+          </div>
         </div>
+        <div class="field col-12 md:col-6"></div>
+
         <div class="field col-12 md:col-4">
           <label for="author" class="label">Автор</label><br>
-          <div class="p-inputgroup">
+          <div class="p-inputgroup"> 
             <InputText id="author" type="text" class="p-inputtext-sm" v-model="doc.author.name" />
             <Button icon="pi pi-check" class="p-button-warning" @click="onAuthorClick"/>
           </div>
@@ -21,12 +29,14 @@
           <label for="project" class="label">Проект</label><br>
           <Dropdown id="project" class="input" v-model="selectedProject" :options="projects" optionLabel="name" placeholder="Проект" @change="onProjectChange" />
         </div>
+        <div class="field col-12 md:col-4"></div>
+
         <div class="field col-12 md:col-4">
           <div v-if="doc.storage_from">
             <label for="storageFrom" class="label">со склада</label><br>
             <div class="p-inputgroup">
-              <InputText id="storageFrom" type="text" class="p-inputtext-sm" v-model="doc.storage_from.name" />
-              <Button icon="pi pi-check" class="p-button-warning" @click="onStorageFromClick"/>
+              <InputText id="storageFrom" type="text" class="p-inputtext-sm" v-model="doc.storage_from.name" :disabled="disabledStorageFrom" />
+              <Button icon="pi pi-check" class="p-button-warning" @click="onStorageFromClick" :disabled="disabledStorageFrom" />
             </div>
           </div>
         </div>
@@ -34,13 +44,23 @@
           <div v-if="doc.storage_to">
           <label for="storageTo" class="label">на склад</label><br>
             <div class="p-inputgroup">
-              <InputText id="storageTo" type="text" class="p-inputtext-sm" v-model="doc.storage_to.name" />
-              <Button icon="pi pi-check" class="p-button-warning" @click="onStorageToClick"/>
+              <InputText id="storageTo" type="text" class="p-inputtext-sm" v-model="doc.storage_to.name" :disabled="disabledStorageTo" />
+              <Button icon="pi pi-check" class="p-button-warning" @click="onStorageToClick" :disabled="disabledStorageTo"/>
             </div>
           </div>
         </div>
-        
-        <div class="field col-12 md:col-4">
+        <div class="field col-12 md:col-4"></div>
+
+        <div v-if="doc.doc_type == 'Поступление'" class="field col-12 md:col-4">
+          <div v-if="doc.supplier">
+            <label for="supplier" class="label">Поставщик</label><br>
+            <div class="p-inputgroup">
+              <InputText id="supplier" type="text" class="p-inputtext-sm" v-model="doc.supplier.name" :disabled="disabledSupplier" />
+              <Button icon="pi pi-check" class="p-button-warning" @click="onSupplierClick"/>
+            </div>
+          </div>
+        </div>
+        <div v-if="doc.doc_type == 'Поступление'" class="field col-12 md:col-4">
           <div v-if="doc.recipient">
             <label for="recipient" class="label">Получатель</label><br>
             <div class="p-inputgroup">
@@ -49,15 +69,8 @@
             </div>
           </div>
         </div>
-        <div class="field col-12 md:col-4">
-          <div v-if="doc.supplier">
-            <label for="supplier" class="label">Отправитель</label><br>
-            <div class="p-inputgroup">
-              <InputText id="supplier" type="text" class="p-inputtext-sm" v-model="doc.supplier.name" />
-              <Button icon="pi pi-check" class="p-button-warning" @click="onSupplierClick"/>
-            </div>
-          </div>
-        </div>
+        <div v-if="doc.doc_type == 'Поступление'" class="field col-12 md:col-4"></div>
+
       </div>
     </div>
 
@@ -148,6 +161,11 @@
             <InputText v-model="data[field]" autofocus />
           </template>
         </Column>
+        <Column field="amount" header="Сумма" key="amount">
+          <template #editor="{ data, field }">
+            <InputText v-model="data[field]" autofocus />
+          </template>
+        </Column>
         <Column field="discount" header="Скидка" key="discount">
           <template #editor="{ data, field }">
             <InputText v-model="data[field]" autofocus />
@@ -155,13 +173,12 @@
         </Column>
         <ColumnGroup type="footer">
           <Row>
-              <Column footer="сумма:" :colspan="3" footerStyle="text-align:right" />
+              <Column footer="сумма:" :colspan="4" footerStyle="text-align:right" />
               <Column :footer="totalAmount" />
           </Row>
         </ColumnGroup>
       </DataTable> 
     </div>  
-
   <OverlayPanel ref="opUsers">
     <DataTable :value="users" v-model:selection="selectedUsers" selectionMode="single" 
         :paginator="true" :rows="5" @rowSelect="onUserSelect" responsiveLayout="scroll" >
@@ -188,7 +205,6 @@
         <Column field="name" header="Name" sortable />
     </DataTable>
   </OverlayPanel>
-
 </template>
 
 <script>
@@ -221,29 +237,30 @@ export default {
     },
     props: {
         docId: Number,
-        type: String
+        type: String,
+        docType: String
     },
     data() {
         return {
-            time: "2022.05.23 14:00:15",
-            time24: "05/20/2022",
-            foo: 'bar',
             selectedProject: null,
             selectedStorageFrom: null,
+            disabledStorageFrom: false,
             selectedStorageTo: null,
+            disabledStorageTo: false,
             is_hold: true,
             selectedRow: null,
             selectedUsers: null,
             selectedRecipient: null,
+            disabledRecipient: false,
             selectedSupplier: null,
+            disabledSupplier: false,
 
             companyType: null,
             selectedCompany: null,
-
             storageType: null,
             selectedStorage: null,
-
             selectedItem: null,
+
             currentField: null,
             currentData: null,
             itemSelectType: String,
@@ -274,13 +291,14 @@ export default {
         totalAmount() {
           let total = 0;
           for(let item of this.doc.doc_items) {
-              total += (item.price * item.quantity) - item.discount;
+              total += item.amount - item.discount;
           }
           return this.formatCurrency(total);
         }
     },
     mounted() {
-      this.$store.dispatch('getDocument', this.docId);
+      console.log("docType - ", this.docType)
+      this.$store.dispatch('getDocument', [this.docId, this.docType]);
     },
     watch: {
       doc(value) {
@@ -289,6 +307,13 @@ export default {
         }
         if(value.storage_to) {
           this.selectedStorageTo = value.storage_to.id
+        }
+        if(value.doc_type == "Поступление" || value.doc_type == "Оприходование") {
+          console.log(value)
+          this.disabledStorageFrom = true;
+        }
+        if(value.doc_type == "Списание" || value.doc_type == "Чек ККМ") {
+          this.disabledStorageTo = true;
         }
         this.selectedProject = value.project.id
       },
@@ -307,6 +332,11 @@ export default {
         let { data, newValue, field } = event;
         if(field != 'item_name') {
           data[field] = newValue;
+        }
+        if(field === 'quantity' || field === 'price' || field === 'discount') {
+          data['amount'] = data['price'] * data['quantity'];
+        } else if(field === 'amount') {
+          data['price'] = data['amount'] / data['quantity'];
         }
       },
       formatCurrency(value) {
@@ -423,16 +453,25 @@ class Item {
     border-radius: 3px;
   }
   .true-icon {
-	color: green;
+    color: green;
   }
   .false-icon {
-	color: red;
+    color: red;
   }
   .b {
-      font-weight: bold;
+    font-weight: bold;
   }
   .mr-1 {
-	margin: 0px 10px 0px 0px;
+    margin: 0px 10px 0px 0px;
+  }
+  .mb-2 {
+    margin-bottom: 5px;
+  }
+  .mb-3 {
+    margin-bottom: 10px;
+  }
+  .mt-3 {
+    margin-top: 10px;
   }
   .label {
     margin: 0px 0px 5px 0px;
@@ -442,6 +481,19 @@ class Item {
     width: 200 px;
   }
   .field {
-    margin: 0px 0px 5px 0px;
+    margin: 0px 0px 10px 0px;
+  }
+  .smallinput {
+    width: 100px;
+  }
+  .numberdatecard {
+    padding: 20px 20px 20px 20px;
+    background-color: rgb(147, 175, 177);
+    /* background-color: rgb(100, 132, 133); */
+    /* background-color: rgb(247, 243, 238); */
+    border-radius: 5px;
+  }
+  h4 {
+    color: rgb(96, 125, 139);
   }
 </style>
