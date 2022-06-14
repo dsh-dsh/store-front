@@ -14,7 +14,7 @@
     <div>
       <div class="border">
         <DataTable :value="documents" @row-click="openDocument" class="p-datatable-sm" stripedRows :paginator="true" :rows="10"
-          v-model:selection="selectedProduct" selectionMode="single"
+          v-model:selection="selectedProduct" selectionMode="single" sortField="time" :sortOrder="1"
           paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
           :rowsPerPageOptions="[10,20,50]" responsiveLayout="scroll"
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords}">
@@ -30,19 +30,30 @@
           </template>
           <Column field="is_hold" header="" dataType="boolean">
             <template #body="{data}">
-              <i class="pi" :class="{'true-icon pi-check-circle': data.is_hold, 'false-icon pi-circle': !data.is_hold}"></i>
+              <i class="pi" :class="{'true-icon pi-check-circle': data.is_hold, 'neutral-icon pi-circle': !data.is_hold, 'false-icon pi-times-circle': data.is_deleted}"
+               v-tooltip="getToolTipText(data)"></i>
             </template>
           </Column>
-          <Column field="number" header="Номер" :sortable="true" />
-          <Column field="type" header="Документ" :sortable="true" />
-          <Column field="project.name" header="Проект" :sortable="true" />
-          <Column field="time" header="Время" :sortable="true" />
-          <Column field="storageFrom.name" header="Склад" :sortable="true" />
-          <Column field="amount" header="Сумма" />
-          <Column field="author.name" header="Автор" />
-          <Column :exportable="false" style="min-width:8rem">
+          <Column field="number" header="№" sortable style="max-width:3rem" />
+          <Column field="type" header="Документ" sortable />
+          <Column field="project.name" header="Проект" sortable />
+          <Column field="time" header="Время" sortable dataType="date">
             <template #body="{data}">
-                <Button icon="pi pi-pencil" class="p-button-rounded p-button-secondary p-button-outlined mr-2" @click="openUpdateDocumentRedactor(data)" />
+              {{formatDate(data.time)}}
+            </template>
+          </Column>
+          <Column field="storage_from.name" header="со склада" sortable />
+          <Column field="storage_to.name" header="на склад" sortable />
+          <Column field="amount" header="Сумма" sortable>
+            <template #body="slotProps">
+              {{formatCurrency(slotProps.data.amount)}}
+            </template>
+          </Column>
+          <Column field="author.name" header="Автор" style="max-width:9rem" sortable />
+          <Column :exportable="false" style="max-width:3rem">
+            <template #body="{data}"> 
+              <!-- openUpdateDocumentRedactor(data) -->
+              <Button icon="pi pi-bars" class="p-button-rounded p-button-secondary p-button-text mr-2" @click="toggleModalMenu($event, data)" />
             </template>
           </Column>
           <template #paginatorstart>
@@ -56,23 +67,36 @@
     </div>
   </div>
   </div>
+
   <Dialog v-model:visible="displayDocument" :style="{width: '80vw'}" :modal="true"  :showHeader="showDialogHeader">
     <div v-if="docRedactor">
       <DocRedactor :docId="docId" :type="type" :docType="docType"/>
     </div>
     <div v-else>
-      <Document :docId="docId" @open-update-doc="openUpdateDocumentRedactor" @open-copy-doc="openCopyDocumentRedactor" />
+      <Document :docId="docId" @copy-to-request-doc="openRequestDocRedactor" @open-update-doc="openUpdateDocumentRedactor" @open-copy-doc="openCopyDocumentRedactor" />
     </div>
     <template #footer>
       <Button label="Закрыть" icon="pi pi-times" @click="closeDocument" class="p-button-sm p-button-secondary p-button-text"/>
       <Button v-if="docRedactor" label="Сохранить" icon="pi pi-check" @click="saveDocument" class="p-button-sm p-button-rounded p-button-secondary" autofocus />
+      <Button label="Провести" icon="pi pi-check" @click="holdDocument" class="p-button-sm p-button-rounded p-button-secondary" :disabled="disableHoldButton" />
     </template>
   </Dialog>
+
   <OverlayPanel ref="opDocTypes">
     <div v-for="docType in docTypes" :key="docType">
      <Button class="p-button-secondary p-button-text" @click="addNewDocByType(docType.name)">{{docType.name}}</Button>
     </div>
   </OverlayPanel>
+
+  <Menu ref="menu" :model="menuModel" :popup="true" />
+
+  <Dialog header="Подтверждение" class="border" v-model:visible="displayConfirmation" :style="{width: '300px'}" :modal="true" :showHeader="false">
+      <h3>Удалить документ?</h3>
+    <template #footer>
+      <Button label="Нет" icon="pi pi-times" @click="closeConfirmation" class="p-button-text"/>
+      <Button label="Да" icon="pi pi-check" @click="deleteDocument" class="p-button-text" autofocus />
+    </template>
+  </Dialog>
 </template>
 
 <script>
@@ -86,6 +110,7 @@ import Document from '@/components/Document.vue';
 import MainMenu from '@/components/MainMenu.vue';
 import Toolbar from 'primevue/toolbar';
 import OverlayPanel from 'primevue/overlaypanel';
+import Menu from 'primevue/menu';
 
 export default {
     name: 'DocContent',
@@ -99,7 +124,8 @@ export default {
       Document,
       MainMenu,
       Toolbar,
-      OverlayPanel
+      OverlayPanel,
+      Menu
     },
     props: {
         filter: String,
@@ -113,7 +139,24 @@ export default {
         selectedProduct: null,
         showDialogHeader: false,
         docRedactor: Boolean,
-        docType: null 
+        docType: null,
+        menuModel: [
+          {label: 'Изменить', icon: 'pi pi-pencil',
+            command: () => {
+              this.openUpdateDocumentRedactor(this.data);
+            }},
+          {label: 'Копировать', icon: 'pi pi-copy',
+            command: () => {
+              this.openCopyDocumentRedactor(this.data);
+            }},
+          {label: 'Удалить', icon: 'pi pi-times',
+            command: () => {
+              this.openConfirmation(this.data)
+            }}
+        ],
+        data: null,
+        displayConfirmation: false,
+        disableHoldButton: true
       };
     },
     computed: {
@@ -140,9 +183,40 @@ export default {
       },
       success() {
         this.$store.dispatch('getDocuments', this.filter)
+      },
+      document(val) {
+        this.disableHoldButton = val.is_hold;
       }
     },
 	methods: {
+    getToolTipText(doc) {
+      if(doc.is_hold) {
+        return 'проведен';
+      } else if(doc.is_deleted) {
+        return 'удален';
+      } else {
+        return 'не проведен';
+      }
+    },
+    openConfirmation(value) {
+      this.data = value;
+      this.displayConfirmation = true;
+    },
+    closeConfirmation() {
+      this.displayConfirmation = false;
+    },
+    toggleModalMenu(event, data) {
+      this.data = data;
+      this.$refs.menu.toggle(event);
+    },
+    formatCurrency(value) {
+      return value.toLocaleString('re-RU', {style: 'currency', currency: 'RUB'});
+    },
+    deleteDocument() {
+      console.log("docId = ", this.data.id);
+      this.$store.dispatch('deleteDocument', this.data.id);
+      this.closeConfirmation();
+    },
 		openDocument(value) {
       this.docRedactor = false;
 			this.docId = value.data.id;
@@ -153,6 +227,13 @@ export default {
 			this.docType = value;
 			this.docId = 0;
       this.type = 'add';
+			this.displayDocument = true;
+    },
+    openRequestDocRedactor(value) {
+      this.docRedactor = true;
+			this.docType = 'Заявка';
+			this.docId = value.id;
+      this.type = 'copyToRequestDoc';
 			this.displayDocument = true;
     },
 		openUpdateDocumentRedactor(value) {
@@ -183,6 +264,9 @@ export default {
         this.$store.dispatch('addDocument', this.document);
       }	
     },
+    holdDocument() {
+      this.$store.dispatch('holdDocument', this.document.id);
+    },
     logout() {
       this.$store.dispatch('logout');
     },
@@ -190,9 +274,18 @@ export default {
         this.$refs.opDocTypes.toggle(event);
     },
     addNewDocByType(type) {
-      console.log(type)
       this.openNewDocument(type)
       this.$refs.opDocTypes.hide();
+    },
+    formatDate(value) {
+      return value.toLocaleDateString('ru-RU', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
     }
 	}
 }
@@ -206,12 +299,8 @@ function setLidingNull(val) {
 }
 
 function formatDate(date) {
-  if(typeof(date) === "object") { 
-  let strDate = setLidingNull(date.getDate()) + "." + setLidingNull(date.getMonth()+1) + "." + date.getFullYear() + " " 
+  return setLidingNull(date.getMonth()+1) + "." + setLidingNull(date.getDate()) + "." + date.getFullYear() + " " 
       + setLidingNull(date.getHours()) + ":" + setLidingNull(date.getMinutes()) + ":" + setLidingNull(date.getSeconds());
-    return strDate;
-  }
-  return date;
 }
 
 </script>
@@ -238,10 +327,13 @@ function formatDate(date) {
     border-radius: 3px;
   }
   .true-icon {
-    color: green;
+    color: rgb(15, 163, 15);
+  }
+  .neutral-icon {
+    color: rgb(73, 73, 73);
   }
   .false-icon {
-    color: red;
+    color: rgb(224, 17, 17);
   }
   .mr-2 {
     margin: 0px 20px 0px 0px;

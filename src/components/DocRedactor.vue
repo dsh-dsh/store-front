@@ -3,20 +3,26 @@
     <div v-if="doc.author && doc.project">
 
       <div class="formgrid grid">
+
         <div class="field col-12 md:col-12">
           <h4 class="mb-2">Документ  {{ doc.doc_type }}</h4>
         </div>
+
         <div class="field col-12 md:col-5 flex justify-content-between numberdatecard">
           <div class="mt-3 mb-3">
-          <!-- <label for="number" class="label">Номер</label><br> -->
-          <InputText id="number" type="text" class="p-inputtext smallinput" v-model="doc.number" />
+            <label for="number" class="label">Номер</label><br>
+            <InputText id="number" type="text" class="p-inputtext smallinput" v-model="doc.number" />
           </div>
           <div class="mt-3 mb-3">
-          <!-- <label for="time" class="label">Дата</label><br> -->
-          <Calendar id="time" v-model="doc.time" :showTime="true" :showSeconds="true" dateFormat="dd.mm.yy" />
+            <label for="time" class="label">Дата</label><br>
+            <Calendar id="time" v-model="doc.time" :showTime="true" :showSeconds="true" dateFormat="dd.mm.yy" />
           </div>
         </div>
-        <div class="field col-12 md:col-6"></div>
+        <div class="field col-12 md:col-7 center right">
+          <div v-if="doc.doc_type === 'Инвентаризация'" class="mr-5">
+            <Button label="Заполнить" class="p-button-rounded p-button-secondary" @click="onFillRestClick" :disabled="disabledFillItemRest"/>
+          </div>
+        </div>
 
         <div class="field col-12 md:col-4">
           <label for="author" class="label">Автор</label><br>
@@ -266,12 +272,19 @@ export default {
             itemSelectType: String,
             filters: {
                 'name': {value: null, matchMode: FilterMatchMode.CONTAINS}
-            }
+            },
+            disabledFillItemRest: true
         };
     },
     computed: {
         doc() {
-          return this.$store.state.document
+          let doc = this.$store.state.document;
+          if(this.type === "copyToRequestDoc") {
+            doc.id = 0;
+            doc.doc_type = "Перемещение";
+            doc.time = new Date();
+          }
+          return doc;
         },
         projects() {
           return this.$store.state.projects
@@ -294,10 +307,12 @@ export default {
               total += item.amount - item.discount;
           }
           return this.formatCurrency(total);
+        },
+        itemRest() {
+          return this.$store.state.itemRest;
         }
     },
     mounted() {
-      console.log("docType - ", this.docType)
       this.$store.dispatch('getDocument', [this.docId, this.docType]);
     },
     watch: {
@@ -309,25 +324,35 @@ export default {
           this.selectedStorageTo = value.storage_to.id
         }
         if(value.doc_type == "Поступление" || value.doc_type == "Оприходование") {
-          console.log(value)
           this.disabledStorageFrom = true;
         }
-        if(value.doc_type == "Списание" || value.doc_type == "Чек ККМ") {
+        if(value.doc_type == "Списание" || value.doc_type == "Чек ККМ" || value.doc_type == "Инвентаризация") {
           this.disabledStorageTo = true;
         }
         this.selectedProject = value.project.id
       },
+      itemRest(value) {
+        this.doc.doc_items = value;
+      }
     },
     methods: {
+      enableFillItemRestButton() {
+        if((this.doc.author.id != 0) && (this.doc.storage_from.id != 0)) {
+          this.disabledFillItemRest = false;
+        }
+      },
+      onFillRestClick() {
+        this.$store.dispatch('getRestOnDateAndStorage', [this.doc.time, this.doc.storage_from.id]);
+      },
       onProjectChange(event) {
         this.doc.project = event.value;
       },
-      onStorageFromChange(event) {
-        this.doc.storage_from = event.value;
-      },
-      onStorageToChange(event) {
-        this.doc.storage_to = event.value;
-      },
+      // onStorageFromChange(event) {
+      //   this.doc.storage_from = event.value;
+      // },
+      // onStorageToChange(event) {
+      //   this.doc.storage_to = event.value;
+      // },
       onCellEditComplete(event) {
         let { data, newValue, field } = event;
         if(field != 'item_name') {
@@ -347,6 +372,7 @@ export default {
       },
       onUserSelect(event) {
         this.doc.author = event.data;
+        this.enableFillItemRestButton();
         this.$refs.opUsers.hide();
       },
       onRecipientClick(event) {
@@ -376,6 +402,7 @@ export default {
       onStorageSelect(event) {
         if(this.storageType == 'storageFrom') {
           this.doc.storage_from = event.data;
+          this.enableFillItemRestButton();
         } else {
           this.doc.storage_to = event.data;
         }
@@ -464,6 +491,9 @@ class Item {
   .mr-1 {
     margin: 0px 10px 0px 0px;
   }
+  .mr-5 {
+    margin: 0px 50px 0px 0px;
+  }
   .mb-2 {
     margin-bottom: 5px;
   }
@@ -495,5 +525,15 @@ class Item {
   }
   h4 {
     color: rgb(96, 125, 139);
+  }
+  .center {
+    display: flex;
+    align-items: center;
+  }
+  .right {
+    justify-content: end;
+  }
+  .ml-1 {
+      margin-left: 10 px;
   }
 </style>

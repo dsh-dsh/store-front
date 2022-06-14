@@ -9,7 +9,6 @@ const host = "http://localhost:8081";
       headers: {'Authorization': context.state.token}
     })
 	.then(res => handleGetResponce(res, context))
-    .then(res => res.json())
     .then(data => data.data);
   }
 
@@ -24,7 +23,7 @@ async function post(url, headers, body ) {
 
   }
 
-  async function put(url, headers, body ) {
+async function put(url, headers, body ) {
 	return fetch(host + url, {
 		method: 'PUT',
 		headers: headers,
@@ -35,27 +34,49 @@ async function post(url, headers, body ) {
 
 	}
 
+async function del(url, headers, body ) {
+	return fetch(host + url, {
+		method: 'DELETE',
+		headers: headers,
+		body: JSON.stringify(body)
+	})
+	.then(res => res.json())
+	.then(data => data.data);
+
+	}
+
   function handleGetResponce(response, context) {
-	// let res = response.json;
-	// if (res.error) {
-	// 	context.state.toast?.add({severity:'error', summary: 'error', detail: res.error, life: 3000});
-	// 	return null;
-	// } else {
-	// 	return res.data;
-	// }
-	// console.log(config)
-	context.state.toast?.add({severity:'info', summary: 'Info Message', detail:'Message Content', life: 1000});
-	return response;
+	let res = response.json();
+	if (res.error) {
+		context.state.toast?.add({severity:'error', summary: 'error', detail: res.error, life: 3000});
+	} else {
+		context.state.toast?.add({severity:'info', summary: 'Info Message', detail: 'Message Content', life: 1000});
+	}
+	return res;
   }
 
 //   function handlePostResponce(response, context) {
 // 	context.state.toast?.add({severity:'info', summary: 'Info Message', detail:'Message Content', life: 3000});
 // 	return response;
 //   }
+
+function setLidingNull(val) {
+	if(val < 10) {
+		return "0" + val;
+	} else {
+		return val;
+	}
+  }
+
+function formateDate(date) {
+	return setLidingNull(date.getMonth()+1 + "." + date.getDate()) + "." + date.getFullYear() + " " 
+	+ setLidingNull(date.getHours()) + ":" + setLidingNull(date.getMinutes()) + ":" + setLidingNull(date.getSeconds());
+}
+
 class Document {
 	id = 0;
     number = 0;
-    time = "08.06.2022 18:51:54";
+    time = "";
 	amount = 0.0;
 	tax = 0.0;
 	doc_type = "";
@@ -153,6 +174,7 @@ const Store = createStore({
 			users: [],
 			companies: [],
 			success: 0,
+			itemRest: 0
 		}
     },
 
@@ -213,6 +235,9 @@ const Store = createStore({
 		setSuccess (state) {
 			state.success++;
 		},
+		setItemRest (state, res) {
+			state.itemRest = res
+		}
     },
 
     actions: { 
@@ -229,7 +254,7 @@ const Store = createStore({
 			context.commit('setWorkShops', response)
 		},
 		async getUnits(context) {
-			const response = await get('/api/v1/catalogs/units', context)
+			const response = await get('/api/v1/catalogs/units', context);
 			context.commit('setUnits', response)
 		},
 		async getStorages(context) {
@@ -237,9 +262,14 @@ const Store = createStore({
 			context.commit('setStorages', response)
 		},
 		async getDocuments(context, filter) {
-			filter = filter !== "" ? "?filter=" + filter : ""
-			const response = await get('/api/v1/docs/list' + filter, context)
-			context.commit('setDocuments', response)
+			filter = filter !== "" ? "?filter=" + filter : "";
+			const response = await get('/api/v1/docs/list' + filter, context);
+			for (let i = 0; i < response.length; i++) {
+				response[i].time = new Date(response[i].time);
+				console.log(response[i]);
+			}
+			// document.time = new Date(document.time);
+			context.commit('setDocuments', response);
 		},
 		async getUsers(context) {
 			const response = await get('/api/v1/catalogs/users', context)
@@ -252,11 +282,13 @@ const Store = createStore({
 		async getDocument(context, [id, docType]) {
 			let document = null;
 			if(id == 0) {
-				console.log(docType)
-				document = new Document(docType, "08.06.2022 18:51:54");
-				console.log(document);
+				document = new Document(docType, formateDate(new Date()));
 			} else {
 				document = await get('/api/v1/docs?id=' + id, context)
+			}
+			document.time = new Date(document.time);
+			if(document.check_info) {
+				document.check_info.date_time = new Date(document.check_info.date_time);
 			}
 			context.commit('setDocument', document)
 		},
@@ -301,6 +333,22 @@ const Store = createStore({
 			const response = await post('/api/v1/docs', headers, request);
 			if(response == 'ok') { context.commit('setSuccess'); }
 		},
+		async deleteDocument(context, docId) {
+			let request = {'item_doc_dto': {'id': docId}};
+			let headers = {'Content-Type': 'application/json', 'Authorization': context.state.token};
+			const response = await del('/api/v1/docs', headers, request);
+			if(response == 'ok') { context.commit('setSuccess'); }
+		},
+		async getRestOnDateAndStorage(context, [docTime, storageId]) {
+			const response = await get('/api/v1/rest/inventory?time=' + formateDate(docTime) + "&storageId=" + storageId , context);
+			console.log(response);
+			context.commit('setItemRest', response)
+		},
+		async holdDocument(context, docId) {
+			let headers = {'Authorization': context.state.token };
+			const response = await post('/api/v1/docs/hold/' + docId, headers);
+			if(response == 'ok') { context.commit('setSuccess'); }
+		}
     }
 })
 

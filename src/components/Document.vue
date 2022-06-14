@@ -1,41 +1,54 @@
 <template>
     <br>
     <div class="formgrid grid">
-        <div class="col-12 md:col-8 center">
+        <div class="col-12 md:col-7 center">
             <h4>{{ header }}</h4>
         </div>
-        <div class="col-12 md:col-2 center">
-            <Button label="Изменить" class="p-button-sm p-button-rounded p-button-secondary" @click="onUpdateClick"/>
-        </div>
-        <div class="col-12 md:col-2 center">
-            <Button label="Копировать" class="p-button-sm p-button-rounded p-button-secondary" @click="onCopyClick"/>
+        <div class="col-12 md:col-5 center">
+            <div class="center right">
+                <div v-if="doc.doc_type === 'Заявка'" class="mr-2">
+                    <Button label="Перемещение" class="p-button-rounded p-button-secondary p-button-outlined" @click="onRequestClick"/>
+                </div>
+                <div class="mr-2">
+                    <Button label="Изменить" class="p-button-sm p-button-rounded p-button-secondary" @click="onUpdateClick"/>
+                </div>
+                <div>
+                    <Button label="Копировать" class="p-button-sm p-button-rounded p-button-secondary" @click="onCopyClick"/>
+                </div>
+            </div>
         </div>
     </div>
+
     <div v-if="doc.author" class="formgrid grid">
         <div class="col-12 md:col-4">
             <label for="author" class="label">автор</label>
             <p id="author" class="text_field">{{ doc.author.name }}</p>
         </div>
-        <div class="col-12 md:col-8">
+        <div class="col-12 md:col-4">
             <label for="project" class="label">проект</label>
             <p id="project" class="text_field">{{ doc.project.name }}</p>
         </div>
+        <div class="col-12 md:col-4"></div>
+
         <div class="col-12 md:col-4">
             <label for="storageFrom" class="label">со склада</label>
             <p id="storageFrom" class="text_field">{{ (doc.storage_from? doc.storage_from.name:'') }}</p>
         </div>
-        <div class="col-12 md:col-8">
+        <div class="col-12 md:col-4">
             <label for="storageTo" class="label">на склад</label>
             <p id="storageTo" class="text_field">{{ (doc.storage_to? doc.storage_to.name:'') }}</p>
         </div>
-        <div class="col-12 md:col-4">
-            <label for="recipient" class="label">получатель</label>
-            <p id="recipient" class="text_field">{{ (doc.recipient? doc.recipient.name:'') }}</p>
-        </div>
-        <div class="col-12 md:col-8">
+        <div class="col-12 md:col-4"></div>
+
+        <div v-if="doc.doc_type == 'Поступление'" class="field col-12 md:col-4">
             <label for="supplier" class="label">отправитель</label>
             <p id="supplier" class="text_field">{{ (doc.supplier? doc.supplier.name:'') }}</p>
         </div>
+        <div v-if="doc.doc_type == 'Поступление'" class="field col-12 md:col-4">
+            <label for="recipient" class="label">получатель</label>
+            <p id="recipient" class="text_field">{{ (doc.recipient? doc.recipient.name:'') }}</p>
+        </div>
+        <div v-if="doc.doc_type == 'Поступление'" class="field col-12 md:col-4"></div>
     </div>
     
     <div v-if="doc.check_info">
@@ -145,6 +158,7 @@ export default {
     },
     data() {
         return {
+            header: "",
         };
     },
     props: {
@@ -152,7 +166,8 @@ export default {
     },
     emits: {
         openUpdateDoc: null,
-        openCopyDoc: null
+        openCopyDoc: null,
+        copyToRequestDoc: null
     },
     computed: {
         doc() {
@@ -164,15 +179,14 @@ export default {
               total += (item.price * item.quantity) - item.discount;
           }
           return this.formatCurrency(total);
-        },
-        header() {
-            return "Документ " + this.doc.doc_type + " № " + this.doc.number + 
-            " от " + this.doc.time + (this.doc.is_hold?' (проведен)':' (не проведен)');
         }
     },
     methods: {
         formatCurrency(value) {
             return value.toLocaleString('re-RU', {style: 'currency', currency: 'RUB'});
+        },
+        onRequestClick() {
+            this.$emit('copyToRequestDoc', this.doc);
         },
         onUpdateClick() {
             this.$emit('openUpdateDoc', this.doc);
@@ -184,8 +198,29 @@ export default {
     mounted() {
         this.$store.dispatch('getDocument', [this.docId, ""]);
     },
+    watch: {
+        doc(value) {
+            this.header = "Документ " + value.doc_type + " № " + value.number + 
+            " от " + formatDate(value.time) + (value.is_hold?' (проведен)':' (не проведен)');
+        }
+    }
 }
+
+function setLidingNull(val) {
+	if(val < 10) {
+		return "0" + val;
+	} else {
+		return val;
+	}
+}
+
+function formatDate(date) {
+	return setLidingNull(date.getDate()) + "." + setLidingNull(date.getMonth()+1) + "." + date.getFullYear() + " " 
+	+ setLidingNull(date.getHours()) + ":" + setLidingNull(date.getMinutes()) + ":" + setLidingNull(date.getSeconds());
+}
+
 </script>
+
 <style scoped>
   .label {
     margin: 0px;
@@ -209,7 +244,13 @@ export default {
     display: flex;
     align-items: center;
   }
+  .right {
+    margin-left: auto;
+  }
   .ml-2 {
       margin-left: 10 px;
+  }
+  .mr-2 {
+      margin-right: 10 px;
   }
 </style>
