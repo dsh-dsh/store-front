@@ -35,7 +35,7 @@
             </template>
           </Column>
           <Column field="number" header="№" sortable style="max-width:3rem" />
-          <Column field="type" header="Документ" sortable />
+          <Column field="doc_type" header="Документ" sortable />
           <Column field="project.name" header="Проект" sortable />
           <Column field="time" header="Время" sortable dataType="date">
             <template #body="{data}">
@@ -50,7 +50,7 @@
             </template>
           </Column>
           <Column field="author.name" header="Автор" style="max-width:9rem" sortable />
-          <Column :exportable="false" style="max-width:3rem">
+          <Column style="max-width:3rem">
             <template #body="{data}"> 
               <!-- openUpdateDocumentRedactor(data) -->
               <Button icon="pi pi-bars" class="p-button-rounded p-button-secondary p-button-text mr-2" @click="toggleModalMenu($event, data)" />
@@ -78,7 +78,7 @@
     <template #footer>
       <Button label="Закрыть" icon="pi pi-times" @click="closeDocument" class="p-button-sm p-button-secondary p-button-text"/>
       <Button v-if="docRedactor" label="Сохранить" icon="pi pi-check" @click="saveDocument" class="p-button-sm p-button-rounded p-button-secondary" autofocus />
-      <Button label="Провести" icon="pi pi-check" @click="holdDocument" class="p-button-sm p-button-rounded p-button-secondary" :disabled="disableHoldButton" />
+      <Button :label="holdLable" icon="pi pi-check" @click="holdDocument" class="p-button-sm p-button-rounded p-button-secondary" />
     </template>
   </Dialog>
 
@@ -91,12 +91,13 @@
   <Menu ref="menu" :model="menuModel" :popup="true" />
 
   <Dialog header="Подтверждение" class="border" v-model:visible="displayConfirmation" :style="{width: '300px'}" :modal="true" :showHeader="false">
-      <h3>Удалить документ?</h3>
+      <h3>{{confirmationMessage}}</h3>
     <template #footer>
       <Button label="Нет" icon="pi pi-times" @click="closeConfirmation" class="p-button-text"/>
-      <Button label="Да" icon="pi pi-check" @click="deleteDocument" class="p-button-text" autofocus />
+      <Button label="Да" icon="pi pi-check" @click="positiveConfirmation" class="p-button-text" autofocus />
     </template>
   </Dialog>
+
 </template>
 
 <script>
@@ -151,12 +152,15 @@ export default {
             }},
           {label: 'Удалить', icon: 'pi pi-times',
             command: () => {
+              this.confirmationType = 'delete';
               this.openConfirmation(this.data)
             }}
         ],
         data: null,
         displayConfirmation: false,
-        disableHoldButton: true
+        holdLable: '',
+        confirmationMessage: '',
+        confirmationType: '',
       };
     },
     computed: {
@@ -185,7 +189,16 @@ export default {
         this.$store.dispatch('getDocuments', this.filter)
       },
       document(val) {
-        this.disableHoldButton = val.is_hold;
+        this.holdLable = val.is_hold? 'Отменить проведение' : 'Провести';
+      },
+      confirmationType(val) {
+        if(val == 'hold') {
+          this.confirmationMessage = 'hold';
+        } else if(val == 'save') {
+          this.confirmationMessage = 'save';
+        } else if(val == 'delete') {
+          this.confirmationMessage = 'Удалить документ?';
+        }
       }
     },
 	methods: {
@@ -198,13 +211,6 @@ export default {
         return 'не проведен';
       }
     },
-    openConfirmation(value) {
-      this.data = value;
-      this.displayConfirmation = true;
-    },
-    closeConfirmation() {
-      this.displayConfirmation = false;
-    },
     toggleModalMenu(event, data) {
       this.data = data;
       this.$refs.menu.toggle(event);
@@ -213,8 +219,8 @@ export default {
       return value.toLocaleString('re-RU', {style: 'currency', currency: 'RUB'});
     },
     deleteDocument() {
-      console.log("docId = ", this.data.id);
-      this.$store.dispatch('deleteDocument', this.data.id);
+      console.log(this.data)
+      this.$store.dispatch('deleteDocument', this.data);
       this.closeConfirmation();
     },
 		openDocument(value) {
@@ -252,7 +258,6 @@ export default {
 			this.displayDocument = false;
 		},
 		saveDocument() {
-			this.displayDocument = false;
       this.document.time = formatDate(this.document.time);
       if(this.document.check_info) {
         this.document.check_info.date_time = formatDate(this.document.check_info.date_time);
@@ -263,9 +268,17 @@ export default {
         this.document.id = 0;
         this.$store.dispatch('addDocument', this.document);
       }	
+      if(this.document.is_hold == false) {
+        this.confirmationType = 'hold';
+        this.displayConfirmation = true;
+      } else {
+        this.displayDocument = false;
+      }
     },
     holdDocument() {
+      this.displayConfirmation = false;
       this.$store.dispatch('holdDocument', this.document.id);
+			this.displayDocument = false;
     },
     logout() {
       this.$store.dispatch('logout');
@@ -286,7 +299,22 @@ export default {
         minute: '2-digit',
         second: '2-digit'
       });
-    }
+    },
+    openConfirmation(value) {
+      this.data = value;
+      this.displayConfirmation = true;
+    },
+    closeConfirmation() {
+      this.displayConfirmation = false;
+			this.displayDocument = false;
+    },
+    positiveConfirmation() {
+      if(this.confirmationType == 'delete') {
+        this.deleteDocument();
+      } else if(this.confirmationType == 'hold') {
+        this.holdDocument();
+      }
+    },
 	}
 }
 

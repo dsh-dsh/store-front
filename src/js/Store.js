@@ -154,6 +154,31 @@ class Document {
 	}
 }
 
+class Item {
+    id = 0;
+    name = '';
+    workshop = '';
+    unit = '';
+    number = 0;
+    prices = [];
+    sets = [];
+    ingredients = [];
+    print_name = '';
+    reg_time = '';
+    is_weight = false;
+    is_in_employee_menu = false;
+    is_alcohol = false;
+    is_not_in_price_list = false;
+    is_garnish = false;
+    is_include_garnish = false;
+    is_sauce = false;
+    is_include_sauce = false;
+    parent_id = 0;
+    constructor(time){
+        this.reg_time = time;
+    }
+}
+
 const Store = createStore({
 
     state () {
@@ -266,7 +291,6 @@ const Store = createStore({
 			const response = await get('/api/v1/docs/list' + filter, context);
 			for (let i = 0; i < response.length; i++) {
 				response[i].time = new Date(response[i].time);
-				console.log(response[i]);
 			}
 			// document.time = new Date(document.time);
 			context.commit('setDocuments', response);
@@ -314,8 +338,13 @@ const Store = createStore({
 			context.commit('setItemTree', response)
 		},
 		async getItem(context, itemId) {
-			const response = await get('/api/v1/items' + '?date=2022-05-05&id=' + itemId, context)
-			context.commit('setItem', response)
+			let item;
+			if(itemId != 0) {
+				item = await get('/api/v1/items' + '?date=2022-05-05&id=' + itemId, context);
+			} else {
+				item = new Item(new Date());
+			}
+			context.commit('setItem', item)
 		},
 		async getItems(context) {
 			const response = await get('/api/v1/items/list', context)
@@ -333,8 +362,8 @@ const Store = createStore({
 			const response = await post('/api/v1/docs', headers, request);
 			if(response == 'ok') { context.commit('setSuccess'); }
 		},
-		async deleteDocument(context, docId) {
-			let request = {'item_doc_dto': {'id': docId}};
+		async deleteDocument(context, body) {
+			let request = {'item_doc_dto': body};
 			let headers = {'Content-Type': 'application/json', 'Authorization': context.state.token};
 			const response = await del('/api/v1/docs', headers, request);
 			if(response == 'ok') { context.commit('setSuccess'); }

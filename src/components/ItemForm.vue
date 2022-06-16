@@ -2,6 +2,9 @@
 <template>
     <div>
         <div class="itemform">
+            <div class="right">
+                <Button label="Новая номенклатура" @click="addNewItem" class="p-button-rounded p-button-secondary p-button-outlined" />
+            </div>
             <span class="p-float-label span">
                 <Calendar class="longinput" v-model="formTime" :showIcon="true" dateFormat="dd.mm.yy" />
             </span>
@@ -98,6 +101,7 @@ import InputText from 'primevue/inputtext';
 import Checkbox from 'primevue/checkbox';
 import Dropdown from 'primevue/dropdown';
 import Textarea from 'primevue/textarea';
+import Button from 'primevue/button';
 export default {
   name: 'ItemForm',
   components: {
@@ -106,12 +110,12 @@ export default {
     InputText, 
     Checkbox,
     Dropdown,
-    Textarea
+    Textarea,
+    Button
   },
     data() {
         return {
             formTime: null,
-            // item: "",
             id: 6,
             date: '2022-05-05',
             selectedUnit: null,
@@ -138,11 +142,20 @@ export default {
         item() {
             return this.$store.state.item
         }
+    },
+    methods: {
+        addNewItem() {
+            this.$store.dispatch('getItem', 0);
+        }
     }
 }
+
 </script>
 
 <style scoped>
+    .right {
+        justify-content: end;
+    }
     .span {
         margin: 20px 20px 30px 20px;
     }

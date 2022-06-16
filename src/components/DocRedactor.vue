@@ -177,10 +177,15 @@
             <InputText v-model="data[field]" autofocus />
           </template>
         </Column>
+        <Column style="width:3rem">
+          <template #body="{data}">
+            <Button icon="pi pi-minus" class="p-button-rounded p-button-secondary p-button-text mr-2" @click="deleteRow(data)" />
+          </template>
+        </Column>
         <ColumnGroup type="footer">
           <Row>
               <Column footer="сумма:" :colspan="4" footerStyle="text-align:right" />
-              <Column :footer="totalAmount" />
+              <Column :footer="totalAmount" :colspan="2" />
           </Row>
         </ColumnGroup>
       </DataTable> 
@@ -336,6 +341,10 @@ export default {
       }
     },
     methods: {
+      deleteRow(value) {
+        this.doc.doc_items = this.doc.doc_items.filter( currentValue => currentValue != value );
+        console.log(this.doc.doc_items);
+      },
       enableFillItemRestButton() {
         if((this.doc.author.id != 0) && (this.doc.storage_from.id != 0)) {
           this.disabledFillItemRest = false;
@@ -347,12 +356,6 @@ export default {
       onProjectChange(event) {
         this.doc.project = event.value;
       },
-      // onStorageFromChange(event) {
-      //   this.doc.storage_from = event.value;
-      // },
-      // onStorageToChange(event) {
-      //   this.doc.storage_to = event.value;
-      // },
       onCellEditComplete(event) {
         let { data, newValue, field } = event;
         if(field != 'item_name') {
@@ -519,8 +522,6 @@ class Item {
   .numberdatecard {
     padding: 20px 20px 20px 20px;
     background-color: rgb(147, 175, 177);
-    /* background-color: rgb(100, 132, 133); */
-    /* background-color: rgb(247, 243, 238); */
     border-radius: 5px;
   }
   h4 {
