@@ -373,6 +373,7 @@ const Store = createStore({
 			if(response == 'ok') { context.commit('setSuccess'); }
 		},
 		async deleteDocument(context, doc) {
+			doc.date_time = doc.date_time.getTime();
 			let request = {'item_doc_dto': doc};
 			let headers = {'Content-Type': 'application/json', 'Authorization': context.state.token};
 			const response = await del('/api/v1/docs', headers, request);

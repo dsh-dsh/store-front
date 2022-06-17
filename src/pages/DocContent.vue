@@ -194,11 +194,13 @@ export default {
       },
       confirmationType(val) {
         if(val == 'hold') {
-          this.confirmationMessage = 'hold';
+          this.confirmationMessage = 'Провести документ?';
         } else if(val == 'save') {
           this.confirmationMessage = 'save';
         } else if(val == 'delete') {
           this.confirmationMessage = 'Удалить документ?';
+        } else if(val == 'unDelete') {
+          this.confirmationMessage = 'Отменить удаление документа?';
         }
       }
     },
@@ -213,8 +215,21 @@ export default {
       }
     },
     toggleModalMenu(event, data) {
-      this.deleteLable = "aaaa";
-      this.data = data;
+      this.menuModel.pop();
+      let deleteLable = '';
+      if(data.is_deleted) {
+        deleteLable = 'Отменить'
+        this.confirmationType = 'unDelete';
+      } else {
+        deleteLable = 'Удалить'
+        this.confirmationType = 'delete';
+      }
+      console.log(deleteLable);
+      let delItem = {label: deleteLable, icon: 'pi pi-times',
+            command: () => {
+              this.openConfirmation(data)
+            }}
+      this.menuModel.push(delItem);
       this.$refs.menu.toggle(event);
     },
     formatCurrency(value) {
@@ -287,16 +302,6 @@ export default {
       this.openNewDocument(type)
       this.$refs.opDocTypes.hide();
     },
-    // formateDate(value) {
-    //   return value.toLocaleDateString('ru-RU', {
-    //     day: '2-digit',
-    //     month: '2-digit',
-    //     year: 'numeric',
-    //     hour: '2-digit',
-    //     minute: '2-digit',
-    //     second: '2-digit'
-    //   });
-    // },
     openConfirmation(value) {
       this.data = value;
       this.displayConfirmation = true;
@@ -306,7 +311,7 @@ export default {
 			this.displayDocument = false;
     },
     positiveConfirmation() {
-      if(this.confirmationType == 'delete') {
+      if(this.confirmationType == 'delete' || this.confirmationType == 'unDelete') {
         this.deleteDocument();
       } else if(this.confirmationType == 'hold') {
         this.holdDocument();
@@ -314,19 +319,6 @@ export default {
     },
 	}
 }
-
-// function setLidingNull(val) {
-//   if(val < 10) {
-//     return "0" + val;
-//   } else {
-//     return val;
-//   }
-// }
-
-// function formatDate(date) {
-//   return setLidingNull(date.getMonth()+1) + "." + setLidingNull(date.getDate()) + "." + date.getFullYear() + " " 
-//       + setLidingNull(date.getHours()) + ":" + setLidingNull(date.getMinutes()) + ":" + setLidingNull(date.getSeconds());
-// }
 
 </script>
 <style scoped>
