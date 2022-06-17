@@ -62,6 +62,7 @@ async function del(url, headers, body ) {
 
 function setLidingNull(val) {
 	if(val < 10) {
+		console.log(val)
 		return "0" + val;
 	} else {
 		return val;
@@ -76,7 +77,7 @@ function formateDate(date) {
 class Document {
 	id = 0;
     number = 0;
-    time = "";
+    date_time = "";
 	amount = 0.0;
 	tax = 0.0;
 	doc_type = "";
@@ -120,9 +121,9 @@ class Document {
 		"id": 0
 		};
         base_document_id = 0;	
-	constructor(docType, time){
+	constructor(docType, dateTime){
 		this.doc_type = docType;
-		this.time = time;
+		this.date_time = dateTime;
 		if(docType === "Чек ККМ") {
 			this.check_info = {
 				"waiter": "",
@@ -131,7 +132,7 @@ class Document {
 				"amount_received": 0.0,
 				"guest_number": 0,
 				"table_number": 0,
-				"date_time": time,
+				"date_time": dateTime,
 				"is_return": false,
 				"is_KKM_checked": false,
 				"is_payed": false,
@@ -290,9 +291,8 @@ const Store = createStore({
 			filter = filter !== "" ? "?filter=" + filter : "";
 			const response = await get('/api/v1/docs/list' + filter, context);
 			for (let i = 0; i < response.length; i++) {
-				response[i].time = new Date(response[i].time);
+				response[i].date_time = new Date(response[i].date_time);
 			}
-			// document.time = new Date(document.time);
 			context.commit('setDocuments', response);
 		},
 		async getUsers(context) {
@@ -306,11 +306,11 @@ const Store = createStore({
 		async getDocument(context, [id, docType]) {
 			let document = null;
 			if(id == 0) {
-				document = new Document(docType, formateDate(new Date()));
+				document = new Document(docType, new Date());
 			} else {
 				document = await get('/api/v1/docs?id=' + id, context)
 			}
-			document.time = new Date(document.time);
+			document.date_time = new Date(document.date_time);
 			if(document.check_info) {
 				document.check_info.date_time = new Date(document.check_info.date_time);
 			}
@@ -350,20 +350,30 @@ const Store = createStore({
 			const response = await get('/api/v1/items/list', context)
 			context.commit('setItems', response)
 		},
-		async updateDocument(context, body) {
-			let request = {'item_doc_dto': body};
+		async updateDocument(context, doc) {
+			doc.date_time = doc.date_time.getTime();
+			if(doc.check_info) {
+				doc.check_info.date_time = doc.check_info.date_time.getTime();
+			}
+			console.log(doc)
+			let request = {'item_doc_dto': doc};
 			let headers = {'Content-Type': 'application/json', 'Authorization': context.state.token };
 			const response = await put('/api/v1/docs', headers, request);
 			if(response == 'ok') { context.commit('setSuccess'); }
 		},
-		async addDocument(context, body) {
-			let request = {'item_doc_dto': body};
+		async addDocument(context, doc) {
+			doc.date_time = doc.date_time.getTime();
+			if(doc.check_info) {
+				doc.check_info.date_time = doc.check_info.date_time.getTime();
+			}
+			console.log(doc)
+			let request = {'item_doc_dto': doc};
 			let headers = {'Content-Type': 'application/json', 'Authorization': context.state.token };
 			const response = await post('/api/v1/docs', headers, request);
 			if(response == 'ok') { context.commit('setSuccess'); }
 		},
-		async deleteDocument(context, body) {
-			let request = {'item_doc_dto': body};
+		async deleteDocument(context, doc) {
+			let request = {'item_doc_dto': doc};
 			let headers = {'Content-Type': 'application/json', 'Authorization': context.state.token};
 			const response = await del('/api/v1/docs', headers, request);
 			if(response == 'ok') { context.commit('setSuccess'); }
@@ -380,5 +390,6 @@ const Store = createStore({
 		}
     }
 })
+
 
 export { Store }
