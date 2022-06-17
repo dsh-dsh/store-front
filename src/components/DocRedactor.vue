@@ -15,7 +15,7 @@
           </div>
           <div class="mt-3 mb-3">
             <label for="time" class="label">Дата</label><br>
-            <Calendar id="time" v-model="doc.time" :showTime="true" :showSeconds="true" dateFormat="dd.mm.yy" />
+            <Calendar id="time" v-model="dateInput" dateFormat="dd.mm.yy" :showIcon="true" />
           </div>
         </div>
         <div class="field col-12 md:col-7 center right">
@@ -37,7 +37,7 @@
         </div>
         <div class="field col-12 md:col-4"></div>
 
-        <div class="field col-12 md:col-4">
+        <div v-if="!orderDoc" class="field col-12 md:col-4">
           <div v-if="doc.storage_from">
             <label for="storageFrom" class="label">со склада</label><br>
             <div class="p-inputgroup">
@@ -46,7 +46,7 @@
             </div>
           </div>
         </div>
-        <div class="field col-12 md:col-4">
+        <div v-if="!orderDoc" class="field col-12 md:col-4">
           <div v-if="doc.storage_to">
           <label for="storageTo" class="label">на склад</label><br>
             <div class="p-inputgroup">
@@ -55,7 +55,7 @@
             </div>
           </div>
         </div>
-        <div class="field col-12 md:col-4"></div>
+        <div v-if="!orderDoc" class="field col-12 md:col-4"></div>
 
         <div v-if="doc.doc_type == 'Поступление'" class="field col-12 md:col-4">
           <div v-if="doc.supplier">
@@ -76,7 +76,21 @@
           </div>
         </div>
         <div v-if="doc.doc_type == 'Поступление'" class="field col-12 md:col-4"></div>
+        
+        <div v-if="orderDoc" class="field col-12 md:col-12">
+          <div v-if="doc.individual">
+            <label for="individual" class="label">Физ лицо</label><br>
+            <div class="p-inputgroup">
+              <InputText id="individual" type="text" class="p-inputtext-sm" v-model="doc.individual.name" />
+              <Button icon="pi pi-check" class="p-button-warning" @click="onIndividualClick"/>
+            </div>
+          </div>
+        </div>
 
+        <div v-if="orderDoc" class="field col-12 md:col-12">
+          <label for="amount" class="label">сумма</label><br>
+          <InputText id="amount" type="text" class="p-inputtext-sm mr-1" v-model="doc.amount" />
+        </div>
       </div>
     </div>
 
@@ -114,7 +128,7 @@
         </div>
         <div class="field col-12 md:col-3">
           <label for="kkm_check_time" class="label">время</label><br>
-          <Calendar id="kkm_check_time" v-model="doc.check_info.date_time" :showTime="true" :showSeconds="true" dateFormat="dd.mm.yy" />
+          <Calendar id="kkm_check_time" v-model="checkDateInput" :showTime="true" :showSeconds="true" dateFormat="dd.mm.yy" disabled/>
         </div>
         <div class="field col-12 md:col-3">
         </div>
@@ -138,13 +152,6 @@
           <label for="isDelivery" class="label">доставка</label>
           <InputSwitch id="isDelivery" v-model="doc.check_info.is_delivery" /> 
         </div>
-      </div>
-    </div>
-
-    <div v-if="doc.amount">
-      <div class="field col-12 md:col-12">
-        <label for="amount" class="label">сумма</label><br>
-        <InputText id="amount" type="text" class="p-inputtext-sm mr-1" v-model="doc.amount" />
       </div>
     </div>
     <div v-if="doc.doc_items">
@@ -265,20 +272,22 @@ export default {
             disabledRecipient: false,
             selectedSupplier: null,
             disabledSupplier: false,
-
+            userType: null,
             companyType: null,
             selectedCompany: null,
             storageType: null,
             selectedStorage: null,
             selectedItem: null,
-
+            dateInput: '',
+            checkDateInput: '',
             currentField: null,
             currentData: null,
             itemSelectType: String,
             filters: {
                 'name': {value: null, matchMode: FilterMatchMode.CONTAINS}
             },
-            disabledFillItemRest: true
+            disabledFillItemRest: true,
+            orderDoc: false
         };
     },
     computed: {
@@ -328,6 +337,9 @@ export default {
         if(value.storage_to) {
           this.selectedStorageTo = value.storage_to.id
         }
+        if(value.doc_type == "РКО" || value.doc_type == "ПКО") {
+          this.orderDoc = true;
+        }
         if(value.doc_type == "Поступление" || value.doc_type == "Оприходование") {
           this.disabledStorageFrom = true;
         }
@@ -335,15 +347,21 @@ export default {
           this.disabledStorageTo = true;
         }
         this.selectedProject = value.project.id
+        this.dateInput = value.date_time;
+        if(value.check_info) {
+          this.checkDateInput = value.check_info.date_time;
+        }
       },
       itemRest(value) {
         this.doc.doc_items = value;
+      },
+      dateInput(value) {
+        this.doc.date_time = value;
       }
     },
     methods: {
       deleteRow(value) {
         this.doc.doc_items = this.doc.doc_items.filter( currentValue => currentValue != value );
-        console.log(this.doc.doc_items);
       },
       enableFillItemRestButton() {
         if((this.doc.author.id != 0) && (this.doc.storage_from.id != 0)) {
@@ -371,16 +389,25 @@ export default {
         return value.toLocaleString('re-RU', {style: 'currency', currency: 'RUB'});
       },
       onAuthorClick(event) {
+        this.userType = 'author';
         this.$refs.opUsers.toggle(event);
       },
       onUserSelect(event) {
-        this.doc.author = event.data;
+        if(this.userType == 'individual') {
+          this.doc.individual = event.data;
+        } else {
+          this.doc.author = event.data;
+        }
         this.enableFillItemRestButton();
         this.$refs.opUsers.hide();
       },
       onRecipientClick(event) {
         this.companyType = 'recipient';
         this.$refs.opCompanies.toggle(event);
+      },
+      onIndividualClick(event) {
+        this.userType = 'individual';
+        this.$refs.opUsers.toggle(event);
       },
       onSupplierClick(event) {
         this.companyType = 'supplier';

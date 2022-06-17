@@ -85,7 +85,7 @@
             </div>
             <div class="col-12 md:col-3">
                 <label for="kkm_check_time" class="label">время</label>
-                <p id="kkm_check_time" class="text_field sm">{{ doc.check_info.date_time }}</p>
+                <p id="kkm_check_time" class="text_field sm">{{ checkDate }}</p>
             </div>
             <div class="col-12 md:col-3">
             </div>
@@ -158,7 +158,8 @@ export default {
     },
     data() {
         return {
-            header: "",
+            header: '',
+            checkDate: ''
         };
     },
     props: {
@@ -200,23 +201,34 @@ export default {
     },
     watch: {
         doc(value) {
-            this.header = "Документ " + value.doc_type + " № " + value.number + 
-            " от " + formatDate(value.time) + (value.is_hold?' (проведен)':' (не проведен)');
+            let header = "Документ " + value.doc_type + " № " + value.number + 
+            " от " + formatDate(value.date_time);
+            if(value.is_hold) {
+                header += " (проведен)";
+            } else if(value.is_deleted) {
+                header += " (удален)";
+            } else {
+                header += " (не проведен)";
+            }
+            this.header = header;
+            if(value.check_info) {
+                this.checkDate = formatDate(value.check_info.date_time, true);
+            }
         }
     }
 }
 
-function setLidingNull(val) {
-	if(val < 10) {
-		return "0" + val;
-	} else {
-		return val;
-	}
-}
-
-function formatDate(date) {
-	return setLidingNull(date.getDate()) + "." + setLidingNull(date.getMonth()+1) + "." + date.getFullYear() + " " 
-	+ setLidingNull(date.getHours()) + ":" + setLidingNull(date.getMinutes()) + ":" + setLidingNull(date.getSeconds());
+function formatDate(date, withTime) {
+    let params = {
+        day: 'numeric',
+        month: 'numeric',
+        year: 'numeric'};
+    if(withTime) {
+        params.hour = 'numeric';
+        params.minute = 'numeric';
+        params.second = 'numeric';
+    }
+    return date.toLocaleString("ru-Ru", params);
 }
 
 </script>

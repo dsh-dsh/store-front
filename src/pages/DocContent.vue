@@ -14,7 +14,7 @@
     <div>
       <div class="border">
         <DataTable :value="documents" @row-click="openDocument" class="p-datatable-sm" stripedRows :paginator="true" :rows="10"
-          v-model:selection="selectedProduct" selectionMode="single" sortField="time" :sortOrder="1"
+          v-model:selection="selectedProduct" selectionMode="single" sortField="date_time" :sortOrder="1"
           paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
           :rowsPerPageOptions="[10,20,50]" responsiveLayout="scroll"
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords}">
@@ -37,9 +37,9 @@
           <Column field="number" header="№" sortable style="max-width:3rem" />
           <Column field="doc_type" header="Документ" sortable />
           <Column field="project.name" header="Проект" sortable />
-          <Column field="time" header="Время" sortable dataType="date">
+          <Column field="date_time" header="Время" sortable dataType="date">
             <template #body="{data}">
-              {{formatDate(data.time)}}
+              {{new Date(data.date_time).toLocaleDateString('ru-RU', {day: '2-digit', month: '2-digit', year: 'numeric'})}}
             </template>
           </Column>
           <Column field="storage_from.name" header="со склада" sortable />
@@ -141,6 +141,12 @@ export default {
         showDialogHeader: false,
         docRedactor: Boolean,
         docType: null,
+        data: null,
+        displayConfirmation: false,
+        holdLable: '',
+        confirmationMessage: '',
+        confirmationType: '',
+        deleteLable: 'Удалить',
         menuModel: [
           {label: 'Изменить', icon: 'pi pi-pencil',
             command: () => {
@@ -150,17 +156,12 @@ export default {
             command: () => {
               this.openCopyDocumentRedactor(this.data);
             }},
-          {label: 'Удалить', icon: 'pi pi-times',
+          {label: this.deleteLable, icon: 'pi pi-times',
             command: () => {
               this.confirmationType = 'delete';
               this.openConfirmation(this.data)
             }}
-        ],
-        data: null,
-        displayConfirmation: false,
-        holdLable: '',
-        confirmationMessage: '',
-        confirmationType: '',
+        ]
       };
     },
     computed: {
@@ -212,6 +213,7 @@ export default {
       }
     },
     toggleModalMenu(event, data) {
+      this.deleteLable = "aaaa";
       this.data = data;
       this.$refs.menu.toggle(event);
     },
@@ -219,7 +221,6 @@ export default {
       return value.toLocaleString('re-RU', {style: 'currency', currency: 'RUB'});
     },
     deleteDocument() {
-      console.log(this.data)
       this.$store.dispatch('deleteDocument', this.data);
       this.closeConfirmation();
     },
@@ -258,10 +259,6 @@ export default {
 			this.displayDocument = false;
 		},
 		saveDocument() {
-      this.document.time = formatDate(this.document.time);
-      if(this.document.check_info) {
-        this.document.check_info.date_time = formatDate(this.document.check_info.date_time);
-      }
       if(this.type == 'update') {
         this.$store.dispatch('updateDocument', this.document);
       }	else {
@@ -290,16 +287,16 @@ export default {
       this.openNewDocument(type)
       this.$refs.opDocTypes.hide();
     },
-    formatDate(value) {
-      return value.toLocaleDateString('ru-RU', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-      });
-    },
+    // formateDate(value) {
+    //   return value.toLocaleDateString('ru-RU', {
+    //     day: '2-digit',
+    //     month: '2-digit',
+    //     year: 'numeric',
+    //     hour: '2-digit',
+    //     minute: '2-digit',
+    //     second: '2-digit'
+    //   });
+    // },
     openConfirmation(value) {
       this.data = value;
       this.displayConfirmation = true;
@@ -318,18 +315,18 @@ export default {
 	}
 }
 
-function setLidingNull(val) {
-  if(val < 10) {
-    return "0" + val;
-  } else {
-    return val;
-  }
-}
+// function setLidingNull(val) {
+//   if(val < 10) {
+//     return "0" + val;
+//   } else {
+//     return val;
+//   }
+// }
 
-function formatDate(date) {
-  return setLidingNull(date.getMonth()+1) + "." + setLidingNull(date.getDate()) + "." + date.getFullYear() + " " 
-      + setLidingNull(date.getHours()) + ":" + setLidingNull(date.getMinutes()) + ":" + setLidingNull(date.getSeconds());
-}
+// function formatDate(date) {
+//   return setLidingNull(date.getMonth()+1) + "." + setLidingNull(date.getDate()) + "." + date.getFullYear() + " " 
+//       + setLidingNull(date.getHours()) + ":" + setLidingNull(date.getMinutes()) + ":" + setLidingNull(date.getSeconds());
+// }
 
 </script>
 <style scoped>
