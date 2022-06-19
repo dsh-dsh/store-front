@@ -52,7 +52,6 @@
           <Column field="author.name" header="Автор" style="max-width:9rem" sortable />
           <Column style="max-width:3rem">
             <template #body="{data}"> 
-              <!-- openUpdateDocumentRedactor(data) -->
               <Button icon="pi pi-bars" class="p-button-rounded p-button-secondary p-button-text mr-2" @click="toggleModalMenu($event, data)" />
             </template>
           </Column>
@@ -215,6 +214,7 @@ export default {
       }
     },
     toggleModalMenu(event, data) {
+      this.data = data;
       this.menuModel.pop();
       let deleteLable = '';
       if(data.is_deleted) {
@@ -224,7 +224,6 @@ export default {
         deleteLable = 'Удалить'
         this.confirmationType = 'delete';
       }
-      console.log(deleteLable);
       let delItem = {label: deleteLable, icon: 'pi pi-times',
             command: () => {
               this.openConfirmation(data)
@@ -259,6 +258,7 @@ export default {
 			this.displayDocument = true;
     },
 		openUpdateDocumentRedactor(value) {
+      console.log(value)
       this.docRedactor = true;
 			this.docId = value.id;
       this.type = 'update';

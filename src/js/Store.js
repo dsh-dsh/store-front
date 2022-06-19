@@ -62,7 +62,6 @@ async function del(url, headers, body ) {
 
 function setLidingNull(val) {
 	if(val < 10) {
-		console.log(val)
 		return "0" + val;
 	} else {
 		return val;
@@ -158,8 +157,8 @@ class Document {
 class Item {
     id = 0;
     name = '';
-    workshop = '';
-    unit = '';
+    workshop =  {name: '---'};
+    unit =  {name: '---'};
     number = 0;
     prices = [];
     sets = [];
@@ -200,7 +199,8 @@ const Store = createStore({
 			users: [],
 			companies: [],
 			success: 0,
-			itemRest: 0
+			itemRest: 0,
+			parentNode: null
 		}
     },
 
@@ -263,6 +263,9 @@ const Store = createStore({
 		},
 		setItemRest (state, res) {
 			state.itemRest = res
+		},
+		saveParentNode (state, res) {
+			state.parentNode = res
 		}
     },
 
@@ -346,6 +349,18 @@ const Store = createStore({
 			}
 			context.commit('setItem', item)
 		},
+		async saveItem(context, [item, date]) {
+			let headers = {'Content-Type': 'application/json', 'Authorization': context.state.token };
+			let response;
+			if(item.id == 0) {
+				item.reg_date = date.getTime();				
+				response = await post('/api/v1/items', headers, item);
+			} else {
+				response = await put('/api/v1/items/' + date, headers, item);
+			}
+			if(response == 'ok') { context.commit('setSuccess'); }
+			context.commit('setItem', new Item());
+		},
 		async getItems(context) {
 			const response = await get('/api/v1/items/list', context)
 			context.commit('setItems', response)
@@ -355,7 +370,6 @@ const Store = createStore({
 			if(doc.check_info) {
 				doc.check_info.date_time = doc.check_info.date_time.getTime();
 			}
-			console.log(doc)
 			let request = {'item_doc_dto': doc};
 			let headers = {'Content-Type': 'application/json', 'Authorization': context.state.token };
 			const response = await put('/api/v1/docs', headers, request);
@@ -366,7 +380,6 @@ const Store = createStore({
 			if(doc.check_info) {
 				doc.check_info.date_time = doc.check_info.date_time.getTime();
 			}
-			console.log(doc)
 			let request = {'item_doc_dto': doc};
 			let headers = {'Content-Type': 'application/json', 'Authorization': context.state.token };
 			const response = await post('/api/v1/docs', headers, request);
@@ -388,6 +401,9 @@ const Store = createStore({
 			let headers = {'Authorization': context.state.token };
 			const response = await post('/api/v1/docs/hold/' + docId, headers);
 			if(response == 'ok') { context.commit('setSuccess'); }
+		},
+		setParentNode(context, parentNode) {
+			context.commit('saveParentNode', parentNode);
 		}
     }
 })
