@@ -8,6 +8,7 @@ export default class IngredientService {
         const ingredients = []
 
         ingredientObject.forEach(element => {
+            // if()
             let netto = element.quantity_list[0].quantity;
             let gross = element.quantity_list[1].quantity;
             ingredients.push(new Ingredient(element.child.name, netto, gross, false));
