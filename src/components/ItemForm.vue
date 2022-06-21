@@ -9,13 +9,13 @@
 
                 <div class="field col-12 md:col-12">
                     <span class="p-float-label">
-                        <Calendar v-model="formDate" class="longinput" :showIcon="true" dateFormat="dd.mm.yy" />
+                        <Calendar v-model="formDate" @date-select="setDate" class="longinput" :showIcon="true" :showButtonBar="true" dateFormat="dd.mm.yy" />
                     </span>
                 </div>
 
                 <div class="field col-12 md:col-6">
                     <span class="p-float-label">
-                        <InputText id="itemname" class="longinput" type="text" v-model="item.name" />
+                        <InputText id="itemname" class="longinput" @change="setPrintName" type="text" v-model="item.name" />
                         <label for="itemname">Наименование</label>
                     </span>
                 </div>
@@ -165,13 +165,13 @@ export default {
     data() {
         return {
             displayConfirmation: false,
-            formDate: new Date(),
             id: 6,
             selectedUnit: {name: '---'},
             selectedWorkshop: {name: '---'},
             retailPrice: "",
             deliveryPrice: "",
-            confirmationMessage: ""
+            confirmationMessage: "",
+            formDate: new Date()
         }
     },
     computed: {
@@ -186,9 +186,19 @@ export default {
         },
         parentNode() {
             return this.$store.state.parentNode;
+        },
+        itemDate() {
+            return this.$store.state.itemDate;
         }
+
     },
     methods: {
+        setPrintName() {
+            this.item.print_name = this.item.name;
+        },
+        setDate(value) {
+            this.$store.dispatch('setDate', value);
+        },
         addNewItem() {
             this.$store.dispatch('getItem', 0);
         },
@@ -211,9 +221,9 @@ export default {
             this.$refs.opWorkshops.toggle(event);
         },
         saveItem() {
-            let date = this.formDate.getTime();
+            // let date = this.formDate.getTime();
             this.item.parent_id = this.parentNode.data;
-            this.$store.dispatch("saveItem", [this.item, date]);
+            this.$store.dispatch("saveItem", [this.item, this.formDate]);
         },
         closeConfirmation() {
             this.displayConfirmation = false;
@@ -230,8 +240,17 @@ export default {
             if(value.target) {
                 value = value.target._value;
             }
-            console.log(event, type);
-            this.item.prices.push(new Price(this.formDate.getTime(), value, type));
+            let priceTypeExists = false;
+            for(let i = 0; i < this.item.prices.length; i++) {
+                if(this.item.prices[i].type === type) {
+                    this.item.prices[i] = new Price(this.formDate.getTime(), value, type);
+                    priceTypeExists = true;
+                }
+            }
+            if(!priceTypeExists) {
+                this.item.prices.push(new Price(this.formDate.getTime(), value, type));
+            }
+            console.log(this.item.prices);
         }
     },
     watch: {
@@ -248,6 +267,9 @@ export default {
                     this.deliveryPrice = price.value;
                 }
             }
+        },
+        itemDate(val) {
+            this.formDate = val;
         }
     },
     mounted() {

@@ -157,8 +157,8 @@ class Document {
 class Item {
     id = 0;
     name = '';
-    workshop =  {name: '---'};
-    unit =  {name: '---'};
+    workshop =  {name: '---', code: 'NONE'};
+    unit =  {name: '---', code: 'NONE'};
     number = 0;
     prices = [];
     sets = [];
@@ -200,7 +200,8 @@ const Store = createStore({
 			companies: [],
 			success: 0,
 			itemRest: 0,
-			parentNode: null
+			parentNode: null,
+			itemDate: new Date()
 		}
     },
 
@@ -266,10 +267,16 @@ const Store = createStore({
 		},
 		saveParentNode (state, res) {
 			state.parentNode = res
+		},
+		setDate(state, res) {
+			state.itemDate = res;
 		}
     },
 
     actions: { 
+		setDate(context, date) {
+			context.commit('setDate', date);
+		},
 		async getDocTypes(context) {
 			const response = await get('/api/v1/catalogs/document/types', context)
 			context.commit('setDocTypes', response)
@@ -339,11 +346,12 @@ const Store = createStore({
 		async getItemTree(context) {
 			const response = await get('/api/v1/items/tree', context)
 			context.commit('setItemTree', response)
+			console.log(response)
 		},
 		async getItem(context, itemId) {
 			let item;
 			if(itemId != 0) {
-				item = await get('/api/v1/items' + '?date=2022-05-05&id=' + itemId, context);
+				item = await get('/api/v1/items' + '?date=' + context.state.itemDate.getTime() + '&id=' + itemId, context);
 			} else {
 				item = new Item(new Date());
 			}
@@ -353,12 +361,15 @@ const Store = createStore({
 			let headers = {'Content-Type': 'application/json', 'Authorization': context.state.token };
 			let response;
 			if(item.id == 0) {
-				item.reg_date = date.getTime();				
+				item.reg_time = date.getTime();				
 				response = await post('/api/v1/items', headers, item);
 			} else {
 				response = await put('/api/v1/items/' + date, headers, item);
 			}
-			if(response == 'ok') { context.commit('setSuccess'); }
+			if(response == 'ok') { 
+				context.commit('setSuccess'); 
+				this.getItemTree();
+			}
 			context.commit('setItem', new Item());
 		},
 		async getItems(context) {
