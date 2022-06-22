@@ -11,24 +11,21 @@
           </template>
         </Column>
         <Column field="name" header="Наименование"></Column>
-        <Column field="gross" header="Брутто">
+        <Column field="gross.quantity" header="Брутто">
           <template #editor="{ data, field }">
             <InputText v-model="data[field]" />
           </template>
         </Column>
-        <Column field="netto" header="Нетто">
+        <Column field="netto.quantity" header="Нетто">
           <template #editor="{ data, field }">
             <InputText v-model="data[field]" />
           </template>
         </Column>
         <Column style="width:3rem">
           <template #body="{data}">
-            <img v-if="data.is_deleted" @click="toogleDeleted(data)" src="../../dist/img/x.png" />
-            <img v-else @click="toogleDeleted(data)" src="../../dist/img/v.png" />
+            <img v-if="data.enable.quantity == 1.0" @click="toogleDeleted(data)" src="../../dist/img/v.png" />
+            <img v-else @click="toogleDeleted(data)" src="../../dist/img/x.png" />
           </template>
-          <!-- <template #body="{data}">
-            <Button icon="pi pi-minus" class="p-button-rounded p-button-secondary p-button-text mr-2" @click="deleteRow(data)" />
-          </template> -->
         </Column>
       </DataTable>
     </div>
@@ -42,7 +39,6 @@
 
 <script>
 import 'primeicons/primeicons.css';
-import IngredientService from '../services/IngredientService';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
@@ -51,29 +47,31 @@ import InputText from 'primevue/inputtext';
 export default {
   name: 'IngredientTable',
   components: {
-    DataTable, Column, Button, OverlayPanel, InputText
+    DataTable, 
+    Column, 
+    Button, 
+    OverlayPanel, 
+    InputText
   },
-  props: {
-    ingrObject: Object
-  },
-  ingredientService: null,
   data() {
     return {
-      ingredients: [],
       selectedItem: null,
     };
   },
   computed: {
     items() {
       return this.$store.state.items;
+    },
+    ingredients() {
+      return this.$store.state.ingredients;
+    },
+    itemDate() {
+      return this.$store.state.itemDate;
     }
   },
-  created() {
-    this.ingredientService = new IngredientService();
-  },
   watch: {
-    ingrObject: function(val) {
-      this.ingredients = this.ingredientService.getIngredients(val)
+    itemDate(val) {
+      console.log(val);
     }
   },
   methods: {
@@ -81,51 +79,32 @@ export default {
       this.$store.dispatch('getItem', ingredient.id);
     },
     toogleDeleted(ingredient) {
-      ingredient.is_deleted = !ingredient.is_deleted;
+      ingredient.enable.quantity = ingredient.enable.quantity == 1? 0 : 1;
+      ingredient.enable.id = 0;
+      ingredient.enable.date = this.itemDate.getTime();
+      console.log(this.ingredients)
     },
     addNewIngredient(event) {
       this.$refs.opItems.toggle(event);
     },
     onItemSelect(event) {
-      // if(this.itemSelectType == 'update') {
-      //   this.updateItem(event.data.id, event.data.name);
-      // } else {
-      //   this.addItem(event.data.name);
-      // }
       this.addItem(event.data);
       this.$refs.opItems.hide();
     },
-    // updateItem(item_id, item_name){
-    //   this.currentData['item_name'] = item_name;
-    //   this.currentData['item_id'] = item_id;
-    // },
     addItem(item) {
-        this.ingredients.push(new Ingredient(item.id, item.name, 0.0, 0.0, false));
-    },
-    deleteRow(value) {
-      this.ingredients = this.ingredients.filter( currentValue => currentValue != value );
+      this.$store.dispatch('addIngredient', item);
     },
     onCellEditComplete(event) {
       let { data, newValue, field } = event;
-      data[field] = newValue;
+      let fieldArr = field.split(".");
+      data[fieldArr[0]].quantity = newValue;
+      data[fieldArr[0]].id = 0;
+      data[fieldArr[0]].date = this.itemDate.getTime();
     },
   }
 }
 
-class Ingredient {
-    id = 0;
-    name = "";
-    netto = 0;
-    gross = 0;
-    is_deleted = false;
-    constructor(id, name, netto, gross, deleted) {
-      this.id = id;
-      this.name = name;
-      this.netto = netto;
-      this.gross = gross;
-      this.deleted = deleted;
-    }
-}
+
 </script>
 
 <style scoped>

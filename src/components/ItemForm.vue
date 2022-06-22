@@ -96,7 +96,8 @@
                 </div>
 
                 <div class="field col-12 md:col-12">
-                    <IngredientTable :ingrObject="item.ingredients" />
+                    <!-- <IngredientTable :ingrObject="item.ingredients" /> -->
+                    <IngredientTable />
                 </div>
 
                 <div class="col-12 md:col-6">
@@ -221,8 +222,8 @@ export default {
             this.$refs.opWorkshops.toggle(event);
         },
         saveItem() {
-            // let date = this.formDate.getTime();
             this.item.parent_id = this.parentNode.data;
+            console.log(this.item)
             this.$store.dispatch("saveItem", [this.item, this.formDate]);
         },
         closeConfirmation() {

@@ -178,6 +178,24 @@ class Item {
         this.reg_time = time;
     }
 }
+class Ingredient {
+    id = 0;
+    name = "";
+	childId = 0;
+	parentId = 0;
+    netto = 0;
+    gross = 0;
+    enable = true;
+    constructor(id, name, childId, parentId, netto, gross, enable) {
+      this.id = id;
+      this.name = name;
+      this.childId = childId;
+      this.parentId = parentId;
+      this.netto = netto;
+      this.gross = gross;
+      this.enable = enable;
+    }
+}
 
 const Store = createStore({
 
@@ -201,7 +219,8 @@ const Store = createStore({
 			success: 0,
 			itemRest: 0,
 			parentNode: null,
-			itemDate: new Date()
+			itemDate: new Date(),
+			ingredients: []
 		}
     },
 
@@ -256,6 +275,13 @@ const Store = createStore({
 		setItem (state, res) {
 			state.item = res;
 		},
+		setIngredients(state, res) {
+			state.ingredients = res;
+		},
+		addIngredient(state, item) {
+			console.log("store ", item)
+			state.ingredients.push(new Ingredient(item.id, item.name, 0.0, 0.0, 1));
+		},
 		setItems (state, res) {
 			state.items = res;
 		},
@@ -274,6 +300,9 @@ const Store = createStore({
     },
 
     actions: { 
+		aaa(context) {
+			console.log(context.state.ingredients)
+		},
 		setDate(context, date) {
 			context.commit('setDate', date);
 		},
@@ -346,7 +375,6 @@ const Store = createStore({
 		async getItemTree(context) {
 			const response = await get('/api/v1/items/tree', context)
 			context.commit('setItemTree', response)
-			console.log(response)
 		},
 		async getItem(context, itemId) {
 			let item;
@@ -355,7 +383,28 @@ const Store = createStore({
 			} else {
 				item = new Item(new Date());
 			}
+			this.dispatch('getIngredients', item.ingredients);
 			context.commit('setItem', item)
+		},
+		getIngredients(context, ingredientObject) {
+			let ingredients = []
+			if (ingredientObject) {
+				ingredientObject.forEach(element => {
+					let gross, netto, enable;
+					for(let quantity of element.quantity_list) {
+						if(quantity.type == 'GROSS') gross = quantity; 
+						if(quantity.type == 'NET') netto = quantity; 
+						if(quantity.type == 'ENABLE') enable = quantity;
+						// if(quantity.type == 'ENABLE') enable = quantity.quantity == 1.0? true : false;
+					}
+					ingredients.push(new Ingredient(element.id, element.child.name, element.child.id, element.parent.id, netto, gross, enable));
+				});
+			}
+			context.commit('setIngredients', ingredients);
+		},
+		addIngredient(context, item) {
+			console.log(item)
+			context.commit('addIngredient', item);
 		},
 		async saveItem(context, [item, date]) {
 			let headers = {'Content-Type': 'application/json', 'Authorization': context.state.token };
@@ -364,11 +413,10 @@ const Store = createStore({
 				item.reg_time = date.getTime();				
 				response = await post('/api/v1/items', headers, item);
 			} else {
-				response = await put('/api/v1/items/' + date, headers, item);
+				response = await put('/api/v1/items/' + date.getTime(), headers, item);
 			}
 			if(response == 'ok') { 
 				context.commit('setSuccess'); 
-				this.getItemTree();
 			}
 			context.commit('setItem', new Item());
 		},
@@ -418,6 +466,74 @@ const Store = createStore({
 		}
     }
 })
+
+// id = 0;
+//     name = "";
+// 	childId = 0;
+// 	parentId = 0;
+//     netto = 0;
+//     gross = 0;
+//     enable = true;
+
+// function getIngredients(arr) {
+// 	let ingrArr;
+// 	for(let i = 0; i < arr.length; i++) {
+// 		let parent = new itemDTO(arr[i].parentId, '');
+// 		let child = new itemDTO(arr[i].childId, arr[i].name);
+// 		let dto = new IngredientDTO(arr[i].id, parent, child, false);
+// 		dto.quantity_list = [arr[i].netto, arr[i].gross, arr[i].enable];
+// 		ingrArr[i] = dto;
+// 	}
+// 	return ingrArr;
+// }
+
+// function addIngredient(arr) {
+// 	let ingrArr;
+// 	for(let i = 0; i < arr.length; i++) {
+// 		let parent = new itemDTO(arr[i].parentId, '');
+// 		let child = new itemDTO(arr[i].childId, arr[i].name);
+// 		let dto = new IngredientDTO(arr[i].id, parent, child, false);
+// 		dto.quantity_list = [arr[i].netto, arr[i].gross, arr[i].enable];
+// 		ingrArr[i] = dto;
+// 	}
+// 	return ingrArr;
+// }
+
+// class itemDTO {
+// 	id = 0;
+// 	name = "";
+// 	constructor(id, name) {
+// 		this.id = id;
+// 		this.name = name;
+// 	}
+// }
+
+// class QuantityDTO {
+// 	id = 0;
+// 	date = "";
+// 	quantity = 0.0;
+// 	type = "";
+// 	constructor(id, date, quantity, type) {
+// 		this.id = id;
+// 		this.date = date;
+// 		this.quantity = quantity;
+// 		this.type = type;
+// 	}
+// }
+
+// class IngredientDTO {
+// 	id = 0;
+// 	parent = null;
+// 	child = null;
+// 	quantity_list = [];
+// 	is_deleted = false;
+// 	constructor(id, parent, child, is_deleted) {
+// 		this.id = id;
+// 		this.parent = parent;
+// 		this.child = child;
+// 		this.is_deleted = is_deleted;
+// 	}
+// }
 
 
 export { Store }
