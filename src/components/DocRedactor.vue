@@ -156,7 +156,7 @@
     </div>
     <div v-if="doc.doc_items">
       <Button icon="pi pi-plus" @click="onAddItemClick" class="p-button-text p-button-rounded" />
-      <DataTable :value="doc.doc_items" editMode="cell" @cell-edit-init="onCellEditInit" 
+      <DataTable :value="doc.doc_items" editMode="cell" @cell-edit-init="onCellEditInit"
           @cell-edit-complete="onCellEditComplete" class="p-datatable-sm editable-cells-table" responsiveLayout="scroll">
         <Column field="item_name" header="Наименование" key="item_name">
           <template #editor="{ data, field }">
@@ -165,6 +165,11 @@
           </template>
         </Column>
         <Column field="quantity" header="Количество" key="quantity">
+          <template #editor="{ data, field }">
+            <InputText v-model="data[field]" autofocus />
+          </template>
+        </Column>
+        <Column v-if="isInventory" field="quantity_fact" header="Фактически" key="quantity_fact">
           <template #editor="{ data, field }">
             <InputText v-model="data[field]" autofocus />
           </template>
@@ -179,19 +184,19 @@
             <InputText v-model="data[field]" autofocus />
           </template>
         </Column>
-        <Column field="discount" header="Скидка" key="discount">
+        <Column v-if="isCheck" field="discount" header="Скидка" key="discount">
           <template #editor="{ data, field }">
             <InputText v-model="data[field]" autofocus />
           </template>
         </Column>
-        <Column style="width:3rem">
+        <Column style="width:1rem">
           <template #body="{data}">
             <Button icon="pi pi-minus" class="p-button-rounded p-button-secondary p-button-text mr-2" @click="deleteRow(data)" />
           </template>
         </Column>
         <ColumnGroup type="footer">
           <Row>
-              <Column footer="сумма:" :colspan="4" footerStyle="text-align:right" />
+              <Column footer="сумма:" :colspan="colSpan" footerStyle="text-align:right" />
               <Column :footer="totalAmount" :colspan="2" />
           </Row>
         </ColumnGroup>
@@ -287,12 +292,15 @@ export default {
                 'name': {value: null, matchMode: FilterMatchMode.CONTAINS}
             },
             disabledFillItemRest: true,
-            orderDoc: false
+            orderDoc: false,
+            isInventory: false,
+            isCheck: false,
+            colSpan: 3
         };
     },
     computed: {
         doc() {
-          let doc = this.$store.state.document;
+          let doc = this.$store.state.ds.document;
           if(this.type === "copyToRequestDoc") {
             doc.id = 0;
             doc.doc_type = "Перемещение";
@@ -301,19 +309,19 @@ export default {
           return doc;
         },
         projects() {
-          return this.$store.state.projects
+          return this.$store.state.cs.projects
         },
         storages() {
-          return this.$store.state.storages
+          return this.$store.state.cs.storages
         },
         users() {
-          return this.$store.state.users;
+          return this.$store.state.cs.users;
         },
         companies() {
-          return this.$store.state.companies;
+          return this.$store.state.cs.companies;
         },
         items() {
-          return this.$store.state.items;
+          return this.$store.state.cs.items;
         },
         totalAmount() {
           let total = 0;
@@ -323,7 +331,7 @@ export default {
           return this.formatCurrency(total);
         },
         itemRest() {
-          return this.$store.state.itemRest;
+          return this.$store.state.ds.itemRest;
         }
     },
     mounted() {
@@ -346,11 +354,20 @@ export default {
         if(value.doc_type == "Списание" || value.doc_type == "Чек ККМ" || value.doc_type == "Инвентаризация") {
           this.disabledStorageTo = true;
         }
+        if(value.doc_type == "Чек ККМ") {
+          this.isCheck = true;
+          this.colSpan++;
+        }
+        if(value.doc_type == "Инвентаризация") {
+          this.isInventory = true;
+          this.colSpan++;
+        }
         this.selectedProject = value.project.id
         this.dateInput = value.date_time;
         if(value.check_info) {
           this.checkDateInput = value.check_info.date_time;
         }
+        this.enableFillItemRestButton();
       },
       itemRest(value) {
         this.doc.doc_items = value;
@@ -369,7 +386,7 @@ export default {
         }
       },
       onFillRestClick() {
-        this.$store.dispatch('getRestOnDateAndStorage', [this.doc.time, this.doc.storage_from.id]);
+        this.$store.dispatch('getRestOnDateAndStorage', [this.doc.id, this.dateInput, this.doc.storage_from.id]);
       },
       onProjectChange(event) {
         this.doc.project = event.value;

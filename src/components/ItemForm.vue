@@ -2,6 +2,13 @@
 <template>
     <div>
         <div class="itemform">
+            <Breadcrumb :home="homeCrumb" :model="crumbs">
+                <!-- <template #item="{item}">
+                    <router-link :to="item.to" custom v-slot="{href, route, navigate, isActive, isExactActive}"> 
+                        <a :href="href" @click="navigate" :class="{'active-link': isActive, 'active-link-exact': isExactActive}> {{route.fullPath}}</a>
+                    </router-link>
+                </template> -->
+            </Breadcrumb>
             <div class="header">
                 <Button label="Новая номенклатура" @click="addNewItem" class="p-button-rounded p-button-secondary p-button-sm" />
             </div>
@@ -148,21 +155,23 @@ import Button from 'primevue/button';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import Dialog from 'primevue/dialog';
+import Breadcrumb from 'primevue/breadcrumb';
 
 export default {
-  name: 'ItemForm',
-  components: {
-    IngredientTable,
-    Calendar,
-    InputText, 
-    Checkbox,
-    Textarea,
-    Button,
-    Column,
-    OverlayPanel,
-    DataTable,
-    Dialog
-  },
+    name: 'ItemForm',
+    components: {
+        IngredientTable,
+        Calendar,
+        InputText, 
+        Checkbox,
+        Textarea,
+        Button,
+        Column,
+        OverlayPanel,
+        DataTable,
+        Dialog,
+        Breadcrumb
+    },
     data() {
         return {
             displayConfirmation: false,
@@ -172,26 +181,29 @@ export default {
             retailPrice: "",
             deliveryPrice: "",
             confirmationMessage: "",
-            formDate: new Date()
+            formDate: new Date(),
+            homeCrumb: {icon: 'pi pi-inbox', to: '/items'},
         }
     },
     computed: {
         workshops() {
-            return this.$store.state.workshops
+            return this.$store.state.cs.workshops
         },
         units() {
-            return this.$store.state.units
+            return this.$store.state.cs.units
         },
         item() {
-            return this.$store.state.item
+            return this.$store.state.is.item
         },
         parentNode() {
-            return this.$store.state.parentNode;
+            return this.$store.state.is.parentNode;
         },
         itemDate() {
-            return this.$store.state.itemDate;
+            return this.$store.state.is.itemDate;
+        },
+        crumbs() {
+            return this.$store.state.is.crumbs;
         }
-
     },
     methods: {
         setPrintName() {
@@ -223,7 +235,6 @@ export default {
         },
         saveItem() {
             this.item.parent_id = this.parentNode.data;
-            console.log(this.item)
             this.$store.dispatch("saveItem", [this.item, this.formDate]);
         },
         closeConfirmation() {
@@ -251,7 +262,6 @@ export default {
             if(!priceTypeExists) {
                 this.item.prices.push(new Price(this.formDate.getTime(), value, type));
             }
-            console.log(this.item.prices);
         }
     },
     watch: {

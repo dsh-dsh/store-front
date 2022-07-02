@@ -1,0 +1,104 @@
+import {Item, Quantity, Ingredient} from "@/js/model/Item"
+import {get, post, put} from "@/js/common"
+
+export const ItemStore = {
+    state: () => {
+        return {
+            itemTree: null,
+            item: "",
+            parentNode: null,
+            itemDate: new Date(),
+            ingredients: [],
+            crumbs: [],
+            expandedKeys: {}
+        }
+    },
+    mutations: {
+		setItemTree (state, res) {
+			state.itemTree = res;
+		},
+		setItem (state, res) {
+			state.item = res;
+		},
+		setIngredients(state, res) {
+			state.ingredients = res;
+		},
+		addIngredient(state, ingredient) {
+			state.ingredients.push(ingredient);
+		},
+		saveParentNode (state, res) {
+			state.parentNode = res
+		},
+		setDate(state, res) {
+			state.itemDate = res;
+		},
+		addCrumb(state, crumb) {
+			state.crumbs.push(crumb);
+		},
+		expandKey(state, key) {
+			state.expandedKeys[key] = true;
+		}
+        
+    },
+    actions: {
+		async getItemTree({rootState, commit}) {
+			const response = await get('/api/v1/items/tree', rootState)
+			commit('setItemTree', response)
+		},
+		async getItem({state, rootState, commit}, itemId) {
+			let item;
+			if(itemId != 0) {
+				item = await get('/api/v1/items' + '?date=' + state.itemDate.getTime() + '&id=' + itemId, rootState);
+			} else {
+				item = new Item(new Date());
+			}
+			commit('setIngredients', item.ingredients);
+			commit('setItem', item)
+		},
+		addIngredient({state, commit}, item) {
+			let date = state.itemDate.getTime()
+			let netto = new Quantity(0, date, 0.0, 'NET');
+			let gross = new Quantity(0, date, 0.0, 'GROSS');
+			let enable = new Quantity(0, date, 1, 'ENABLE');
+			let ingredient = new Ingredient(0, item.name, item.id, state.item.id, netto, gross, enable);
+            console.log(ingredient)
+			commit('addIngredient', ingredient);
+		},
+		async saveItem({rootState, commit}, [item, date]) {
+			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
+			let response;
+			if(item.id == 0) {
+				item.reg_time = date.getTime();				
+				response = await post('/api/v1/items', headers, item);
+			} else {
+				response = await put('/api/v1/items/' + date.getTime(), headers, item);
+			}
+			if(response == 'ok') { 
+				commit('setSuccess'); 
+			}
+			commit('setItem', new Item());
+		},
+		setParentNode({commit}, parentNode) {
+			commit('saveParentNode', parentNode);
+		},
+		expandNodes({state}, itemId) {
+			console.log(itemId)
+			let node = state.itemTree[1];
+            this.dispatch('expandNode', node);
+        },
+		expandNode({commit}, node) {
+            if (node.children && node.children.length) {
+				commit('expandKey', node.key);
+                for (let child of node.children) {
+                    this.dispatch('expandNode', child);
+                }
+            }
+        },
+		addCrumb({commit}, crumb) {
+			commit('addCrumb', crumb);
+		},
+		setDate({commit}, date) {
+			commit('setDate', date);
+		}
+    }
+}

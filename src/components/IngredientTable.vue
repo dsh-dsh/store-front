@@ -60,29 +60,31 @@ export default {
   },
   computed: {
     items() {
-      return this.$store.state.items;
+      return this.$store.state.cs.items;
     },
     ingredients() {
-      return this.$store.state.ingredients;
+      return this.$store.state.is.ingredients;
     },
     itemDate() {
-      return this.$store.state.itemDate;
+      return this.$store.state.is.itemDate;
     }
   },
   watch: {
-    itemDate(val) {
-      console.log(val);
-    }
   },
   methods: {
     onIngredientClick(ingredient) {
-      this.$store.dispatch('getItem', ingredient.id);
+      let crumb = {label: ingredient.name, to:'/items?date=1655995857192&id=11'};
+      this.$store.dispatch('addCrumb', crumb);
+      this.$store.dispatch('expandNodes', ingredient.child_id);
+      this.$store.dispatch('getItem', ingredient.child_id);
     },
     toogleDeleted(ingredient) {
       ingredient.enable.quantity = ingredient.enable.quantity == 1? 0 : 1;
-      ingredient.enable.id = 0;
-      ingredient.enable.date = this.itemDate.getTime();
-      console.log(this.ingredients)
+      let timestamp = atStartOfDay(this.itemDate).getTime();
+      if(ingredient.enable.date != timestamp) {
+        ingredient.enable.id = 0;
+        ingredient.enable.date = timestamp;
+      }
     },
     addNewIngredient(event) {
       this.$refs.opItems.toggle(event);
@@ -98,10 +100,17 @@ export default {
       let { data, newValue, field } = event;
       let fieldArr = field.split(".");
       data[fieldArr[0]].quantity = newValue;
-      data[fieldArr[0]].id = 0;
-      data[fieldArr[0]].date = this.itemDate.getTime();
+      let timestamp = atStartOfDay(this.itemDate).getTime();
+      if(data[fieldArr[0]].date != timestamp) {
+        data[fieldArr[0]].id = 0;
+        data[fieldArr[0]].date = timestamp;
+      }
     },
   }
+}
+
+function atStartOfDay(date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
 
 

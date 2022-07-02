@@ -165,10 +165,10 @@ export default {
     },
     computed: {
       documents() {
-        return this.$store.state.documents
+        return this.$store.state.ds.documents
       },
       document() {
-        return this.$store.state.document
+        return this.$store.state.ds.document
       },
       success() {
         return this.$store.state.success
@@ -258,7 +258,6 @@ export default {
 			this.displayDocument = true;
     },
 		openUpdateDocumentRedactor(value) {
-      console.log(value)
       this.docRedactor = true;
 			this.docId = value.id;
       this.type = 'update';

@@ -127,11 +127,13 @@
       <DataTable :value="doc.doc_items" editMode="cell" class="p-datatable-sm" responsiveLayout="scroll">
         <Column field="item_name" header="Наименование" key="item_name"></Column>
         <Column field="quantity" header="Количество" key="quantity"></Column>
+        <Column v-if="isInventory" field="quantity_fact" header="Фактически" key="quantity_fact"></Column>
         <Column field="price" header="Цена" key="price"></Column>
-        <Column field="discount" header="Скидка" key="discount"></Column>
+        <Column field="amount" header="Сумма" key="price"></Column>
+        <Column v-if="isCheck" field="discount" header="Скидка" key="discount"></Column>
         <ColumnGroup type="footer">
           <Row>
-              <Column footer="сумма:" :colspan="3" footerStyle="text-align:right" />
+              <Column footer="сумма:" :colspan="colSpan" footerStyle="text-align:right" />
               <Column :footer="totalAmount" />
           </Row>
         </ColumnGroup>
@@ -159,7 +161,10 @@ export default {
     data() {
         return {
             header: '',
-            checkDate: ''
+            checkDate: '',
+            isInventory: false,
+            isCheck: false,
+            colSpan: 3
         };
     },
     props: {
@@ -172,7 +177,7 @@ export default {
     },
     computed: {
         doc() {
-            return this.$store.state.document
+            return this.$store.state.ds.document
         },
         totalAmount() {
           let total = 0;
@@ -213,6 +218,14 @@ export default {
             this.header = header;
             if(value.check_info) {
                 this.checkDate = formatDate(value.check_info.date_time, true);
+            }
+            if(value.doc_type == "Чек ККМ") {
+                this.isCheck = true;
+                this.colSpan++;
+            }
+            if(value.doc_type == "Инвентаризация") {
+                this.isInventory = true;
+                this.colSpan++;
             }
         }
     }

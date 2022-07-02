@@ -1,6 +1,6 @@
 <template>
   <div class="tree">
-    <Tree :value="nodes" selectionMode="single" v-model:selectionKeys="selectedKey" 
+    <Tree :value="nodes" :expandedKeys="expandedKeys" selectionMode="single" v-model:selectionKeys="selectedKey" 
     :metaKeySelection="false" @node-collapse="onNodeCollapse" @node-expand="onNodeExpand" @node-select="onNodeSelect"></Tree>
   </div>
 </template>
@@ -20,7 +20,11 @@ export default {
   },
   computed: {
     nodes() {
-      return this.$store.state.itemTree;
+      return this.$store.state.is.itemTree;
+    },
+    expandedKeys() {
+      let result = this.$store.state.is.expandedKeys;
+      return result;
     }
   },
   mounted() {
