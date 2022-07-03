@@ -35,8 +35,21 @@ export const ItemStore = {
 		addCrumb(state, crumb) {
 			state.crumbs.push(crumb);
 		},
+		delCrumb(state, crumb) {
+			for(var i = state.crumbs.length - 1; i >= 0; i--) {
+				if(state.crumbs[i] == crumb) {
+					state.crumbs.pop();
+					break;
+				}
+				state.crumbs.pop();
+			}
+		},
+		delCrumbs(state) {
+			state.crumbs = [];
+		},
 		expandKey(state, key) {
 			state.expandedKeys[key] = true;
+			console.log("state.expandedKeys", state.expandedKeys);
 		}
         
     },
@@ -61,7 +74,6 @@ export const ItemStore = {
 			let gross = new Quantity(0, date, 0.0, 'GROSS');
 			let enable = new Quantity(0, date, 1, 'ENABLE');
 			let ingredient = new Ingredient(0, item.name, item.id, state.item.id, netto, gross, enable);
-            console.log(ingredient)
 			commit('addIngredient', ingredient);
 		},
 		async saveItem({rootState, commit}, [item, date]) {
@@ -82,11 +94,12 @@ export const ItemStore = {
 			commit('saveParentNode', parentNode);
 		},
 		expandNodes({state}, itemId) {
-			console.log(itemId)
-			let node = state.itemTree[1];
+			console.log("expandNodes", itemId)
+			let node = state.itemTree[0];
             this.dispatch('expandNode', node);
         },
 		expandNode({commit}, node) {
+			console.log("expandNode", node)
             if (node.children && node.children.length) {
 				commit('expandKey', node.key);
                 for (let child of node.children) {
@@ -96,6 +109,12 @@ export const ItemStore = {
         },
 		addCrumb({commit}, crumb) {
 			commit('addCrumb', crumb);
+		},
+		delCrumb({commit}, crumb) {
+			commit('delCrumb', crumb);
+		},
+		delCrumbs({commit}) {
+			commit('delCrumbs');
 		},
 		setDate({commit}, date) {
 			commit('setDate', date);

@@ -3,11 +3,10 @@
     <div>
         <div class="itemform">
             <Breadcrumb :home="homeCrumb" :model="crumbs">
-                <!-- <template #item="{item}">
-                    <router-link :to="item.to" custom v-slot="{href, route, navigate, isActive, isExactActive}"> 
-                        <a :href="href" @click="navigate" :class="{'active-link': isActive, 'active-link-exact': isExactActive}> {{route.fullPath}}</a>
-                    </router-link>
-                </template> -->
+                <template #item="{item}">
+                    <!-- <Button :label="item.label" @click="onCrumbClick(item)" class="p-button-secondary p-button-text" /> -->
+                    <span @click="onCrumbClick(item)" class="crumb">{{item.label}}</span>
+                </template>
             </Breadcrumb>
             <div class="header">
                 <Button label="Новая номенклатура" @click="addNewItem" class="p-button-rounded p-button-secondary p-button-sm" />
@@ -225,6 +224,11 @@ export default {
         onWorkshopClick(event) {
             this.$refs.opWorkshops.toggle(event);
         },
+        onCrumbClick(crumb) {
+            this.$store.dispatch('delCrumb', crumb);
+            this.$store.dispatch('expandNodes', crumb.id);
+            this.$store.dispatch('getItem', crumb.id);
+        },
         onUnitSelect(event) {
             this.item.unit = this.selectedUnit;
             this.$refs.opUnits.toggle(event);
@@ -302,6 +306,9 @@ class Price {
 </script>
 
 <style scoped>
+    .crumb {
+        cursor: pointer;
+    }
     .field {
         margin-bottom: 30px;
     }

@@ -34,6 +34,7 @@ export default {
     onNodeSelect(node) {
       if(!node.is_node) {
         this.$store.dispatch('getItem', node.data);
+        this.$store.dispatch('delCrumbs');
       } else {
         this.$store.dispatch('setParentNode', node);
       }

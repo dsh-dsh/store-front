@@ -73,7 +73,8 @@ export default {
   },
   methods: {
     onIngredientClick(ingredient) {
-      let crumb = {label: ingredient.name, to:'/items?date=1655995857192&id=11'};
+      let item = this.$store.state.is.item;
+      let crumb = {label: item.name, id: item.id};
       this.$store.dispatch('addCrumb', crumb);
       this.$store.dispatch('expandNodes', ingredient.child_id);
       this.$store.dispatch('getItem', ingredient.child_id);
