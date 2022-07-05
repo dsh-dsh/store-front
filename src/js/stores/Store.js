@@ -1,6 +1,6 @@
 import {createStore} from 'vuex';
 import {router} from '../Routes';
-import {get, post} from "@/js/common"
+import {post} from "@/js/common"
 import {DocStore} from "@/js/stores/DocStore"
 import {ItemStore} from "@/js/stores/ItemStore"
 import {CatalogStore} from "@/js/stores/CatalogStore"
@@ -63,10 +63,6 @@ const store = createStore({
 		},
 		installToast(context, toast) {
 			context.commit('installToast', toast)
-		},
-		async getItems({state, commit}) {
-			const response = await get('/api/v1/items/list', state)
-			commit('setItems', response)
 		},
     }
 })

@@ -33,6 +33,11 @@
       <DataTable :value="items" v-model:selection="selectedItem" selectionMode="single" 
           :paginator="true" :rows="5" @rowSelect="onItemSelect" responsiveLayout="scroll" >
           <Column field="name" header="Name" sortable />
+          <Column v-for="storage of storages" :header="storage.name" :key="storage.id">
+            <template #body="{data}">
+              <span> {{getItemRestOnStorage(data, storage)}} </span>
+            </template>
+          </Column>
       </DataTable>
     </OverlayPanel>
 </template>
@@ -67,11 +72,21 @@ export default {
     },
     itemDate() {
       return this.$store.state.is.itemDate;
+    },
+    storages() {
+      return this.$store.state.cs.storages;
     }
   },
   watch: {
   },
   methods: {
+    getItemRestOnStorage(item, storage) {
+      for(let rest of item.rest_list) {
+        if(rest.storage.id == storage.id) {
+          return rest.quantity;
+        }
+      }
+    },
     onIngredientClick(ingredient) {
       let item = this.$store.state.is.item;
       let crumb = {label: item.name, id: item.id};

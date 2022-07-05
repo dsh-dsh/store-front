@@ -226,6 +226,11 @@
     <DataTable :value="items" v-model:selection="selectedItem" selectionMode="single" 
         :paginator="true" :rows="5" @rowSelect="onItemSelect" responsiveLayout="scroll" >
         <Column field="name" header="Name" sortable />
+        <Column v-for="storage of storages" :header="storage.name" :key="storage.id">
+          <template #body="{data}">
+            <span> {{getItemRestOnStorage(data, storage)}} </span>
+          </template>
+        </Column>
     </DataTable>
   </OverlayPanel>
 </template>
@@ -377,6 +382,13 @@ export default {
       }
     },
     methods: {
+      getItemRestOnStorage(item, storage) {
+        for(let rest of item.rest_list) {
+          if(rest.storage.id == storage.id) {
+            return rest.quantity;
+          }
+        }
+      },
       deleteRow(value) {
         this.doc.doc_items = this.doc.doc_items.filter( currentValue => currentValue != value );
       },

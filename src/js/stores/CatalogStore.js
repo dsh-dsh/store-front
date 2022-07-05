@@ -67,5 +67,9 @@ export const CatalogStore = {
 			const response = await get('/api/v1/catalogs/companies', rootState)
 			commit('setCompanies', response)
 		},
+		async getItems({rootState, commit}) {
+			const response = await get('/api/v1/items/list', rootState)
+			commit('setItems', response)
+		},
     }
 }

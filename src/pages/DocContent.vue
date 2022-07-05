@@ -14,7 +14,7 @@
     <div>
       <div class="border">
         <DataTable :value="documents" @row-click="openDocument" class="p-datatable-sm" stripedRows :paginator="true" :rows="10"
-          v-model:selection="selectedProduct" selectionMode="single" sortField="date_time" :sortOrder="1"
+          v-model:selection="selectedProduct" selectionMode="single" sortField="date_time" :sortOrder="-1"
           paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
           :rowsPerPageOptions="[10,20,50]" responsiveLayout="scroll"
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords}">

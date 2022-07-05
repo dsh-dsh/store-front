@@ -74,8 +74,7 @@ export const DocStore = {
 			if(response == 'ok') { commit('setSuccess'); }
 		},
 		async getRestOnDateAndStorage({commit, rootState}, [docId, docTime, storageId]) {
-			console.log(docId, docTime, storageId);
-			let url = '/api/v1/rest/inventory?docID=' + docId + 'time=' + docTime.getTime() + "&storageId=" + storageId;
+			let url = '/api/v1/rest/inventory?docId=' + docId + '&time=' + docTime.getTime() + "&storageId=" + storageId;
 			const response = await get(url , rootState);
 			commit('setItemRest', response)
 		},
