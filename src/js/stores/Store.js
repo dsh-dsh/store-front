@@ -4,13 +4,16 @@ import {post} from "@/js/common"
 import {DocStore} from "@/js/stores/DocStore"
 import {ItemStore} from "@/js/stores/ItemStore"
 import {CatalogStore} from "@/js/stores/CatalogStore"
+import {WebSocketStore} from "@/js/stores/WebSocketStore"
+
 
 const store = createStore({
 
 	modules: {
 		ds: DocStore,
 		is: ItemStore,
-		cs: CatalogStore
+		cs: CatalogStore,
+		ws: WebSocketStore
 	},
 
     state () {

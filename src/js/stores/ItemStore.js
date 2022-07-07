@@ -81,9 +81,9 @@ export const ItemStore = {
 			let response;
 			if(item.id == 0) {
 				item.reg_time = date.getTime();				
-				response = await post('/api/v1/items', headers, item);
+				response = await post('/api/v1/items', headers, item, rootState);
 			} else {
-				response = await put('/api/v1/items/' + date.getTime(), headers, item);
+				response = await put('/api/v1/items/' + date.getTime(), headers, item, rootState);
 			}
 			if(response == 'ok') { 
 				commit('setSuccess'); 

@@ -6,41 +6,44 @@ export async function get(url, state) {
       headers: {'Authorization': state.token}
     })
 	.then(res  => res.json())
-	.then(data => handleGetResponce(data, state))
+	.then(data => handleResponce(data, state))
     .then(data => data.data);
 }
 
-export async function post(url, headers, body ) {
+export async function post(url, headers, body, state) {
     return fetch(host + url, {
 		method: 'POST',
 		headers: headers,
 		body: JSON.stringify(body)
     })
     .then(res => res.json())
+	.then(data => handleResponce(data, state))
     .then(data => data.data);
 }
 
-export async function put(url, headers, body ) {
+export async function put(url, headers, body, state) {
 	return fetch(host + url, {
 		method: 'PUT',
 		headers: headers,
 		body: JSON.stringify(body)
 	})
 	.then(res => res.json())
+	.then(data => handleResponce(data, state))
 	.then(data => data.data);
 }
 
-export async function del(url, headers, body ) {
+export async function del(url, headers, body, state) {
 	return fetch(host + url, {
 		method: 'DELETE',
 		headers: headers,
 		body: JSON.stringify(body)
 	})
 	.then(res => res.json())
+	.then(data => handleResponce(data, state))
 	.then(data => data.data);
 }
 
-function handleGetResponce(data, state) {
+function handleResponce(data, state) {
 	if (data.error) {
 		state.toast?.add({ severity:'error', summary: 'error', detail: data.error, life: 3000 });
 	} else {

@@ -35,6 +35,8 @@ export default {
     this.$store.dispatch('getUsers')
     this.$store.dispatch('getCompanies')
     this.$store.dispatch('getDocTypes')
+    // this.$store.dispatch('getSocketConnection')
+    this.$store.dispatch('setDates')
   }
 }
 </script>

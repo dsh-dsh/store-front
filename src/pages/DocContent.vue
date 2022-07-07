@@ -18,6 +18,17 @@
           paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
           :rowsPerPageOptions="[10,20,50]" responsiveLayout="scroll"
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords}">
+          <template #header>
+            <div class="flex justify-content-end">
+              <div class="horizontal">
+              <span class="mlr-1">с</span>
+              <Calendar id="buttonbar" v-model="firstDate" @date-select="setStartDate" dateFormat="dd.mm.yy" :showButtonBar="true" />
+              <span class="mlr-1">до</span>
+              <Calendar id="buttonbar" v-model="lastDate" @date-select="setEndDate" dateFormat="dd.mm.yy" :showButtonBar="true" />
+              <Button icon="pi pi-angle-right" @click="resetDocuments" class="p-button-sm p-button-rounded p-button-secondary p-button-text mlr-1" />
+              </div>
+            </div>
+          </template>
           <template #empty>
             <div class="flex justify-content-center">
               <p>Журнал пуст</p>
@@ -111,6 +122,7 @@ import MainMenu from '@/components/MainMenu.vue';
 import Toolbar from 'primevue/toolbar';
 import OverlayPanel from 'primevue/overlaypanel';
 import Menu from 'primevue/menu';
+import Calendar from 'primevue/calendar';
 
 export default {
     name: 'DocContent',
@@ -125,7 +137,8 @@ export default {
       MainMenu,
       Toolbar,
       OverlayPanel,
-      Menu
+      Menu,
+      Calendar
     },
     props: {
         filter: String,
@@ -146,6 +159,8 @@ export default {
         confirmationMessage: '',
         confirmationType: '',
         deleteLable: 'Удалить',
+        firstDate: null,
+        lastDate: null,
         menuModel: [
           {label: 'Изменить', icon: 'pi pi-pencil',
             command: () => {
@@ -174,11 +189,18 @@ export default {
         return this.$store.state.success
       },
       docTypes() {
-        return this.$store.state.docTypes
+        return this.$store.state.cs.docTypes
+      },
+      startDate() {
+        return this.$store.state.ds.startDate;
+      },
+      endDate() {
+        return this.$store.state.ds.endDate;
       }
-
     },
     mounted() {
+      this.firstDate = this.$store.state.ds.startDate;
+      this.lastDate = this.$store.state.ds.endDate;
       this.$store.dispatch('getDocuments', this.filter)
     },
     watch: {
@@ -201,9 +223,21 @@ export default {
         } else if(val == 'unDelete') {
           this.confirmationMessage = 'Отменить удаление документа?';
         }
-      }
+      },
+      startDate(val) {
+        this.firstDate = val;
+      },
+      endDate(val) {
+        this.lastDate = val;
+      },
     },
 	methods: {
+    setStartDate(date) {
+      this.$store.dispatch('setStartDate', date)
+    },
+    setEndDate(date) {
+      this.$store.dispatch('setEndDate', date)
+    },
     getToolTipText(doc) {
       if(doc.is_hold) {
         return 'проведен';
@@ -316,6 +350,9 @@ export default {
         this.holdDocument();
       }
     },
+    resetDocuments() {
+      this.$store.dispatch('getDocuments', this.filter);
+    }
 	}
 }
 
@@ -356,6 +393,12 @@ export default {
   }
   .mb-2 {
     margin-bottom: 20px;
+  }
+  .mlr-1 {
+    margin: 0px 10px 0px 10px;
+  }
+  .horizontal {
+    justify-content: center;
   }
   .logout {
     font-weight: bold;
