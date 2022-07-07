@@ -248,7 +248,6 @@
 <script>
 import Calendar from 'primevue/calendar';
 import InputText from 'primevue/inputtext';
-// import Dropdown from 'primevue/dropdown';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import InputSwitch from 'primevue/inputswitch';
@@ -263,7 +262,6 @@ export default {
     components: {
         Calendar,
         InputText,
-        // Dropdown,
         DataTable,
         Column,
         InputSwitch,
@@ -347,6 +345,9 @@ export default {
         },
         itemRest() {
           return this.$store.state.ds.itemRest;
+        },
+        defaultProperties() {
+          return this.$store.state.ss.defaultProperties;
         }
     },
     mounted() {
@@ -354,12 +355,6 @@ export default {
     },
     watch: {
       doc(value) {
-        if(value.storage_from) {
-          this.selectedStorageFrom = value.storage_from.id
-        }
-        if(value.storage_to) {
-          this.selectedStorageTo = value.storage_to.id
-        }
         if(value.doc_type == "РКО" || value.doc_type == "ПКО") {
           this.orderDoc = true;
         }
@@ -368,6 +363,24 @@ export default {
         }
         if(value.doc_type == "Списание" || value.doc_type == "Чек ККМ" || value.doc_type == "Инвентаризация") {
           this.disabledStorageTo = true;
+        }
+        if(value.id == 0) {
+          let projectId = this.defaultProperties.filter(prop => prop.type == 'PROJECT').pop().property;
+          value.project = this.getProjectById(projectId);
+          if(!this.disabledStorageTo) {
+            let storageToId = this.defaultProperties.filter(prop => prop.type == 'STORAGE_TO').pop().property;
+            value.storage_to = this.getStorageById(storageToId);
+          }
+          if(!this.disabledStorageFrom) {
+            let storageFromId = this.defaultProperties.filter(prop => prop.type == 'STORAGE_FROM').pop().property;
+            value.storage_from = this.getStorageById(storageFromId);
+          }
+        }
+        if(value.storage_from) {
+          this.selectedStorageFrom = value.storage_from.id
+        }
+        if(value.storage_to) {
+          this.selectedStorageTo = value.storage_to.id
         }
         if(value.doc_type == "Чек ККМ") {
           this.isCheck = true;
@@ -392,6 +405,12 @@ export default {
       }
     },
     methods: {
+      getProjectById(id) {
+        return this.projects.filter(project => project.id == id).pop();
+      },
+      getStorageById(id) {
+        return this.storages.filter(storage => storage.id == id).pop();
+      },
       getItemRestOnStorage(item, storage) {
         for(let rest of item.rest_list) {
           if(rest.storage.id == storage.id) {

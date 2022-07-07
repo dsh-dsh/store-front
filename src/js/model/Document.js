@@ -8,10 +8,7 @@ export default class Document {
 	is_payed = true;
 	is_hold = false;
 	is_delivery = false;
-    project = {
-			"id": 0,
-			"name": ""
-		};
+    project = this.getDefaultProject();
     author = {
 			"id": 0,
 			"email": "",
@@ -68,4 +65,13 @@ export default class Document {
 			this.doc_items = [];
 		}
 	}
+
+	getDefaultProject() {
+		// console.log(this.$store.state.cs.projects);
+		return {
+			"id": 0,
+			"name": ""
+		};
+	}
+
 }
