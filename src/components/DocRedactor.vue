@@ -33,7 +33,11 @@
         </div>
         <div class="field col-12 md:col-4">
           <label for="project" class="label">Проект</label><br>
-          <Dropdown id="project" class="input" v-model="selectedProject" :options="projects" optionLabel="name" placeholder="Проект" @change="onProjectChange" />
+            <div class="p-inputgroup">
+              <InputText id="project" type="text" class="p-inputtext-sm" v-model="doc.project.name" />
+              <Button icon="pi pi-check" class="p-button-warning" @click="onProjectClick" />
+            </div>
+          <!-- <Dropdown id="project" class="input" v-model="selectedProject" :options="projects" optionLabel="name" placeholder="Проект" @change="onProjectChange" /> -->
         </div>
         <div class="field col-12 md:col-4"></div>
 
@@ -202,6 +206,12 @@
         </ColumnGroup>
       </DataTable> 
     </div>  
+  <OverlayPanel ref="opProjects">
+    <DataTable :value="projects" v-model:selection="selectedProject" selectionMode="single" 
+        :paginator="true" :rows="5" @rowSelect="onProjectSelect" responsiveLayout="scroll" >
+        <Column field="name" header="Name" sortable style="width: 60%"/>
+    </DataTable>
+  </OverlayPanel>
   <OverlayPanel ref="opUsers">
     <DataTable :value="users" v-model:selection="selectedUsers" selectionMode="single" 
         :paginator="true" :rows="5" @rowSelect="onUserSelect" responsiveLayout="scroll" >
@@ -238,7 +248,7 @@
 <script>
 import Calendar from 'primevue/calendar';
 import InputText from 'primevue/inputtext';
-import Dropdown from 'primevue/dropdown';
+// import Dropdown from 'primevue/dropdown';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import InputSwitch from 'primevue/inputswitch';
@@ -253,7 +263,7 @@ export default {
     components: {
         Calendar,
         InputText,
-        Dropdown,
+        // Dropdown,
         DataTable,
         Column,
         InputSwitch,
@@ -367,7 +377,7 @@ export default {
           this.isInventory = true;
           this.colSpan++;
         }
-        this.selectedProject = value.project.id
+        this.selectedProject = value.project
         this.dateInput = value.date_time;
         if(value.check_info) {
           this.checkDateInput = value.check_info.date_time;
@@ -400,9 +410,6 @@ export default {
       onFillRestClick() {
         this.$store.dispatch('getRestOnDateAndStorage', [this.doc.id, this.dateInput, this.doc.storage_from.id]);
       },
-      onProjectChange(event) {
-        this.doc.project = event.value;
-      },
       onCellEditComplete(event) {
         let { data, newValue, field } = event;
         if(field != 'item_name') {
@@ -429,6 +436,13 @@ export default {
         }
         this.enableFillItemRestButton();
         this.$refs.opUsers.hide();
+      },
+      onProjectClick(event) {
+        this.$refs.opProjects.toggle(event);
+      },
+      onProjectSelect(event) {
+        this.doc.project = event.data;
+        this.$refs.opProjects.hide();
       },
       onRecipientClick(event) {
         this.companyType = 'recipient';
