@@ -1,6 +1,7 @@
 import { host } from './Constants'
 
 export async function get(url, state) {
+	console.log(state)
     return fetch(host + url, {
       method: 'GET',
       headers: {'Authorization': state.token}
@@ -18,7 +19,7 @@ export async function post(url, headers, body, state) {
     })
     .then(res => res.json())
 	.then(data => handleResponce(data, state))
-    .then(data => data.data);
+    .then(data => data);
 }
 
 export async function put(url, headers, body, state) {

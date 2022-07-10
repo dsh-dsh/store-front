@@ -5,7 +5,7 @@ export default class Document {
 	amount = 0.0;
 	tax = 0.0;
 	doc_type = "";
-	is_payed = true;
+	is_payed = false;
 	is_hold = false;
 	is_delivery = false;
     project = this.getDefaultProject();

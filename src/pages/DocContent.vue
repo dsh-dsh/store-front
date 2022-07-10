@@ -89,6 +89,7 @@
       <Button label="Закрыть" icon="pi pi-times" @click="closeDocument" class="p-button-sm p-button-secondary p-button-text"/>
       <Button v-if="docRedactor" label="Сохранить" icon="pi pi-check" @click="saveDocument" class="p-button-sm p-button-rounded p-button-secondary" autofocus />
       <Button :label="holdLable" icon="pi pi-check" @click="holdDocument" class="p-button-sm p-button-rounded p-button-secondary" />
+      <!-- <Button label="check Unholden Docs" icon="pi pi-check" @click="checkUnholdenDocs" class="p-button-sm p-button-rounded p-button-secondary" /> -->
     </template>
   </Dialog>
 
@@ -103,8 +104,8 @@
   <Dialog header="Подтверждение" class="border" v-model:visible="displayConfirmation" :style="{width: '300px'}" :modal="true" :showHeader="false">
       <h3>{{confirmationMessage}}</h3>
     <template #footer>
-      <Button label="Нет" icon="pi pi-times" @click="closeConfirmation" class="p-button-text"/>
-      <Button label="Да" icon="pi pi-check" @click="positiveConfirmation" class="p-button-text" autofocus />
+      <Button v-if="buttonNoEnabled" label="Нет" icon="pi pi-times" @click="closeConfirmation" class="p-button-text" />
+      <Button label="OK" icon="pi pi-check" @click="positiveConfirmation" class="p-button-text" autofocus />
     </template>
   </Dialog>
 
@@ -158,6 +159,7 @@ export default {
         holdLable: '',
         confirmationMessage: '',
         confirmationType: '',
+        buttonNoEnabled: true,
         deleteLable: 'Удалить',
         firstDate: null,
         lastDate: null,
@@ -196,6 +198,9 @@ export default {
       },
       endDate() {
         return this.$store.state.ds.endDate;
+      },
+      exsistNotHoldenDocs() {
+        return this.$store.state.ds.exsistNotHoldenDocs;
       }
     },
     mounted() {
@@ -211,9 +216,10 @@ export default {
         this.$store.dispatch('getDocuments', this.filter)
       },
       document(val) {
-        this.holdLable = val.is_hold? 'Отменить проведение' : 'Провести';
+        this.holdLable = val.is_hold? 'Отменить проведение' : (val.doc_type == 'Перемещение'? 'Подтвердить получение' : 'Провести');
       },
       confirmationType(val) {
+        this.buttonNoEnabled = true;
         if(val == 'hold') {
           this.confirmationMessage = 'Провести документ?';
         } else if(val == 'save') {
@@ -222,6 +228,11 @@ export default {
           this.confirmationMessage = 'Удалить документ?';
         } else if(val == 'unDelete') {
           this.confirmationMessage = 'Отменить удаление документа?';
+        } else if(val == 'price') {
+          this.buttonNoEnabled = false;
+          this.confirmationMessage = 'Для проведения заполните все цены в документе';
+        } else if(val == 'serialHold') {
+          this.confirmationMessage = 'Есть более ранние не проведенные документы. Провести их?';
         }
       },
       startDate(val) {
@@ -230,6 +241,10 @@ export default {
       endDate(val) {
         this.lastDate = val;
       },
+      exsistNotHoldenDocs() {
+        this.confirmationType = 'serialHold';
+        this.displayConfirmation = true;
+      }
     },
 	methods: {
     setStartDate(date) {
@@ -320,10 +335,30 @@ export default {
         this.displayDocument = false;
       }
     },
+    serialHoldDocument() {
+      this.$store.dispatch('serialHoldDocument', this.document.id);
+      this.displayConfirmation = false;
+    },
     holdDocument() {
       this.displayConfirmation = false;
-      this.$store.dispatch('holdDocument', this.document.id);
-			this.displayDocument = false;
+      if(this.checkPrices()) {
+        this.$store.dispatch('holdDocument', this.document.id);
+        this.displayDocument = false;
+      } else {
+        this.confirmationType = 'price';
+        this.displayConfirmation = true;
+      }
+    },
+    checkPrices() {
+      if(this.document.doc_type == 'Инвентаризация') {
+        console.log(this.document.doc_items)
+        for(let docItem of this.document.doc_items) {
+          if(docItem.price == 0) {
+            return false;
+          }
+        }
+      }
+      return true;
     },
     logout() {
       this.$store.dispatch('logout');
@@ -348,6 +383,10 @@ export default {
         this.deleteDocument();
       } else if(this.confirmationType == 'hold') {
         this.holdDocument();
+      } else if(this.confirmationType == 'serialHold') {
+        this.serialHoldDocument();
+      } else {
+        this.displayConfirmation = false;
       }
     },
     resetDocuments() {

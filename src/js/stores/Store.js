@@ -20,7 +20,6 @@ const store = createStore({
 
     state () {
 		return {
-			companies: [],
 			success: 0,
 			message: String,
 			toast: null,
@@ -42,6 +41,7 @@ const store = createStore({
 		getToken (state) {
 			let user = JSON.parse(localStorage.getItem('user'))
 			state.token = user.token
+			console.log(user, state);
 		}, 
 		installToast(state, toast) {
 			state.toast = toast;
@@ -54,8 +54,8 @@ const store = createStore({
     actions: { 
 		async login(context, body) {
 			let headers = {'Content-Type': 'application/json' }
-			const response = await post('/api/v1/auth/login', headers, body)
-			context.commit('setUser', response)
+			const response = await post('/api/v1/auth/login', headers, body, context.state)
+			context.commit('setUser', response.data)
 		},
 		async logout(context) {
 			context.commit('setUser', null)

@@ -3,14 +3,14 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import LoginPage from "../pages/LoginPage.vue";
 import DocContent from "../pages/DocContent.vue";
 import ItemContent from "../pages/ItemContent.vue";
-import DefaultContent from "../pages/DefaultContent.vue";
+import Settings from "../pages/Settings.vue";
 
 const routes = [
   { path: '/', redirect: '/documents' },
   { path: '/login', component: LoginPage },
   { path: '/documents/:filter?', component: DocContent, props: true },
   { path: '/items', component: ItemContent },
-  { path: '/default', component: DefaultContent }
+  { path: '/default', component: Settings }
 ]
 
 export const router = createRouter({

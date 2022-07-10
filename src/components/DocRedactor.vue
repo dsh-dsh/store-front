@@ -20,7 +20,8 @@
         </div>
         <div class="field col-12 md:col-7 center right">
           <div v-if="doc.doc_type === 'Инвентаризация'" class="mr-5">
-            <Button label="Заполнить" class="p-button-rounded p-button-secondary" @click="onFillRestClick" :disabled="disabledFillItemRest"/>
+            <Button label="Заполнить" class="p-button-rounded p-button-secondary mr-1" @click="onFillRestClick" :disabled="disabledFillItemRest"/>
+            <Button label="Создать подчиненные документы" class="p-button-rounded p-button-secondary" @click="onCreateDockClick" :disabled="disabledFillItemRest"/>
           </div>
         </div>
 
@@ -241,6 +242,7 @@
             <span> {{getItemRestOnStorage(data, storage)}} </span>
           </template>
         </Column>
+        <Column field="price" header="Цена" sortable />
     </DataTable>
   </OverlayPanel>
 </template>
@@ -321,6 +323,9 @@ export default {
           }
           return doc;
         },
+        user() {
+          return this.$store.state.user;
+        },
         projects() {
           return this.$store.state.cs.projects
         },
@@ -365,6 +370,9 @@ export default {
           this.disabledStorageTo = true;
         }
         if(value.id == 0) {
+          let user = JSON.parse(localStorage.getItem('user'));
+          let author = this.users.filter(u => u.id == user.id).pop();
+          value.author = author;
           let projectId = this.defaultProperties.filter(prop => prop.type == 'PROJECT').pop().property;
           value.project = this.getProjectById(projectId);
           if(!this.disabledStorageTo) {
@@ -428,6 +436,9 @@ export default {
       },
       onFillRestClick() {
         this.$store.dispatch('getRestOnDateAndStorage', [this.doc.id, this.dateInput, this.doc.storage_from.id]);
+      },
+      onCreateDockClick() {
+        this.$store.dispatch('createRelativeDocks', this.doc);
       },
       onCellEditComplete(event) {
         let { data, newValue, field } = event;
@@ -517,18 +528,19 @@ export default {
       },
       onItemSelect(event) {
         if(this.itemSelectType == 'update') {
-          this.updateItem(event.data.id, event.data.name);
+          this.updateItem(event.data.id, event.data.name, event.data.price);
         } else {
-          this.addItem(event.data.id, event.data.name);
+          this.addItem(event.data.id, event.data.name, event.data.price);
         }
         this.$refs.opItems.hide();
       },
-      updateItem(item_id, item_name){
-        this.currentData['item_name'] = item_name;
+      updateItem(item_id, item_name, item_price){
         this.currentData['item_id'] = item_id;
+        this.currentData['item_name'] = item_name;
+        this.currentData['price'] = item_price;
       },
-      addItem(item_id, item_name) {
-          this.doc.doc_items.push(new Item(this.doc.id, item_id, item_name, 0.0, 0.0, 0.0, 0.0,));
+      addItem(item_id, item_name, item_price) {
+          this.doc.doc_items.push(new Item(this.doc.id, item_id, item_name, 0.0, item_price, 0.0, 0.0,));
       }
       
     }

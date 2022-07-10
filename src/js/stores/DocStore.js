@@ -1,5 +1,26 @@
 import Document from "@/js/model/Document"
 import {get, post, put, del} from "@/js/common"
+import DocItem from "../model/DocItem";
+
+function fillRelativeDoc(relativeDoc, inventiryDoc) {
+	relativeDoc.author = inventiryDoc.author;
+	relativeDoc.project = inventiryDoc.project;
+	if(relativeDoc.doc_type == 'Списание') {
+		relativeDoc.storage_from = inventiryDoc.storage_from;
+	} else {
+		relativeDoc.storage_to = inventiryDoc.storage_from;
+	}
+	relativeDoc.base_document_id = inventiryDoc.id;
+	let k = relativeDoc.doc_type == 'Списание'? -1 : 1; 
+	for(let docItem of inventiryDoc.doc_items) {
+		let difference = (docItem.quantity_fact - docItem.quantity) * k;
+		if(difference > 0) {
+			let newDocItem = new DocItem(docItem.item_id, docItem.item_name, difference, docItem.price);
+			relativeDoc.doc_items.push(newDocItem);
+		}
+	}
+	console.log(relativeDoc);
+}
 
 export const DocStore = {
     state: () => {
@@ -8,7 +29,8 @@ export const DocStore = {
 			documents: null,
 			itemRest: 0,
 			startDate: 0,
-			endDate: 0
+			endDate: 0,
+			exsistNotHoldenDocs: 0
         }
     },
     mutations: {
@@ -30,6 +52,12 @@ export const DocStore = {
 		},
 		setEndDate(state, date) {
 			state.endDate = date;
+		},
+		setRootSuccess(rootState) {
+			rootState.success++;
+		},
+		setExsistNotHoldenDocs(state) {
+			state.exsistNotHoldenDocs++;
 		}
     },
     actions: {
@@ -88,6 +116,20 @@ export const DocStore = {
 			const response = await post('/api/v1/docs', headers, request, rootState);
 			if(response == 'ok') { commit('setSuccess'); }
 		},
+		createRelativeDocks({commit}, doc) {
+			let writeOffDocument = new Document('Списание', doc.date_time);
+			fillRelativeDoc(writeOffDocument, doc);
+			if(writeOffDocument.doc_items.length > 0) {
+				this.dispatch("addDocument", writeOffDocument);
+			}
+			let receiptDocument = new Document('Оприходование', doc.date_time);
+			fillRelativeDoc(receiptDocument, doc);
+			if(receiptDocument.doc_items.length > 0) {
+				this.dispatch("addDocument", receiptDocument);
+			}
+			commit('setSuccess');
+		},
+		
 		async deleteDocument({commit, rootState}, doc) {
 			doc.date_time = doc.date_time.getTime();
 			let request = {'item_doc_dto': doc};
@@ -97,8 +139,16 @@ export const DocStore = {
 		},
 		async holdDocument({commit, rootState}, docId) {
 			let headers = {'Authorization': rootState.token };
-			const response = await post('/api/v1/docs/hold/' + docId, headers, rootState);
-			if(response == 'ok') { commit('setSuccess'); }
+			const response = await post('/api/v1/docs/hold/' + docId, headers, null, rootState);
+			if(response.type == 1) {
+				commit('setExsistNotHoldenDocs');
+			}
+			if(response.data == 'ok') { commit('setSuccess'); }
+		},
+		async serialHoldDocument({commit, rootState}, docId) {
+			let headers = {'Authorization': rootState.token };
+			const response = await post('/api/v1/docs/hold/serial/' + docId, headers, null, rootState);
+			if(response.data == 'ok') { commit('setSuccess'); }
 		},
 		async getRestOnDateAndStorage({commit, rootState}, [docId, docTime, storageId]) {
 			let url = '/api/v1/rest/inventory?docId=' + docId + '&time=' + docTime.getTime() + "&storageId=" + storageId;

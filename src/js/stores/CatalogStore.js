@@ -2,7 +2,8 @@ import {get} from "@/js/common"
 
 export const CatalogStore = {
     state: () => {
-            return {
+        return {
+			companies: [],
             docTypes: [],
             workshops: [],
             units: [],
