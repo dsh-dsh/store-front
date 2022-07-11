@@ -41,7 +41,6 @@ const store = createStore({
 		getToken (state) {
 			let user = JSON.parse(localStorage.getItem('user'))
 			state.token = user.token
-			console.log(user, state);
 		}, 
 		installToast(state, toast) {
 			state.toast = toast;
