@@ -124,6 +124,7 @@ import Toolbar from 'primevue/toolbar';
 import OverlayPanel from 'primevue/overlaypanel';
 import Menu from 'primevue/menu';
 import Calendar from 'primevue/calendar';
+import {DocumentType} from '@/js/Constants';
 
 export default {
     name: 'DocContent',
@@ -163,6 +164,7 @@ export default {
         deleteLable: 'Удалить',
         firstDate: null,
         lastDate: null,
+        DocumentType: DocumentType,
         menuModel: [
           {label: 'Изменить', icon: 'pi pi-pencil',
             command: () => {
@@ -216,7 +218,7 @@ export default {
         this.$store.dispatch('getDocuments', this.filter)
       },
       document(val) {
-        this.holdLable = val.is_hold? 'Отменить проведение' : (val.doc_type == 'Перемещение'? 'Подтвердить получение' : 'Провести');
+        this.holdLable = val.is_hold? 'Отменить проведение' : (val.doc_type == this.DocumentType.MOVEMENT_DOC? 'Подтвердить получение' : 'Провести');
       },
       confirmationType(val) {
         this.buttonNoEnabled = true;
@@ -301,7 +303,7 @@ export default {
     },
     openRequestDocRedactor(value) {
       this.docRedactor = true;
-			this.docType = 'Заявка';
+			this.docType = this.DocumentType.REQUEST_DOC;
 			this.docId = value.id;
       this.type = 'copyToRequestDoc';
 			this.displayDocument = true;
@@ -350,7 +352,7 @@ export default {
       }
     },
     checkPrices() {
-      if(this.document.doc_type == 'Инвентаризация') {
+      if(this.document.doc_type == this.DocumentType.INVENTORY_DOC) {
         console.log(this.document.doc_items)
         for(let docItem of this.document.doc_items) {
           if(docItem.price == 0) {

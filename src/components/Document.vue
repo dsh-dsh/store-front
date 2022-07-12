@@ -6,7 +6,7 @@
         </div>
         <div class="col-12 md:col-5 center">
             <div class="center right">
-                <div v-if="doc.doc_type === 'Заявка'" class="mr-2">
+                <div v-if="doc.doc_type === DocumentType.REQUEST_DOC" class="mr-2">
                     <Button label="Перемещение" class="p-button-rounded p-button-secondary p-button-outlined" @click="onRequestClick"/>
                 </div>
                 <div class="mr-2">
@@ -40,15 +40,15 @@
         </div>
         <div class="col-12 md:col-4"></div>
 
-        <div v-if="doc.doc_type == 'Поступление'" class="field col-12 md:col-4">
+        <div v-if="doc.doc_type == DocumentType.POSTING_DOC" class="field col-12 md:col-4">
             <label for="supplier" class="label">отправитель</label>
             <p id="supplier" class="text_field">{{ (doc.supplier? doc.supplier.name:'') }}</p>
         </div>
-        <div v-if="doc.doc_type == 'Поступление'" class="field col-12 md:col-4">
+        <div v-if="doc.doc_type == DocumentType.POSTING_DOC" class="field col-12 md:col-4">
             <label for="recipient" class="label">получатель</label>
             <p id="recipient" class="text_field">{{ (doc.recipient? doc.recipient.name:'') }}</p>
         </div>
-        <div v-if="doc.doc_type == 'Поступление'" class="field col-12 md:col-4"></div>
+        <div v-if="doc.doc_type == DocumentType.POSTING_DOC" class="field col-12 md:col-4"></div>
     </div>
     
     <div v-if="doc.check_info">
@@ -148,6 +148,8 @@ import ColumnGroup from 'primevue/columngroup';     //optional for column groupi
 import Row from 'primevue/row'; 
 import Button from 'primevue/button';
 import Divider from 'primevue/divider';
+import {DocumentType} from '@/js/Constants';
+
 export default {
     name: 'Document',
     components: {
@@ -164,7 +166,8 @@ export default {
             checkDate: '',
             isInventory: false,
             isCheck: false,
-            colSpan: 3
+            colSpan: 3,
+            DocumentType: DocumentType
         };
     },
     props: {
@@ -219,11 +222,11 @@ export default {
             if(value.check_info) {
                 this.checkDate = formatDate(value.check_info.date_time, true);
             }
-            if(value.doc_type == "Чек ККМ") {
+            if(value.doc_type == DocumentType.CHECK_DOC) {
                 this.isCheck = true;
                 this.colSpan++;
             }
-            if(value.doc_type == "Инвентаризация") {
+            if(value.doc_type == DocumentType.INVENTORY_DOC) {
                 this.isInventory = true;
                 this.colSpan++;
             }

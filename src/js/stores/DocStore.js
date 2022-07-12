@@ -1,17 +1,18 @@
 import Document from "@/js/model/Document"
 import {get, post, put, del} from "@/js/common"
 import DocItem from "../model/DocItem";
+import {DocumentType} from '@/js/Constants';
 
 function fillRelativeDoc(relativeDoc, inventiryDoc) {
 	relativeDoc.author = inventiryDoc.author;
 	relativeDoc.project = inventiryDoc.project;
-	if(relativeDoc.doc_type == 'Списание') {
+	if(relativeDoc.doc_type == DocumentType.WRITE_OFF_DOC) {
 		relativeDoc.storage_from = inventiryDoc.storage_from;
 	} else {
 		relativeDoc.storage_to = inventiryDoc.storage_from;
 	}
 	relativeDoc.base_document_id = inventiryDoc.id;
-	let k = relativeDoc.doc_type == 'Списание'? -1 : 1; 
+	let k = relativeDoc.doc_type == DocumentType.WRITE_OFF_DOC? -1 : 1; 
 	for(let docItem of inventiryDoc.doc_items) {
 		let difference = (docItem.quantity_fact - docItem.quantity) * k;
 		if(difference > 0) {

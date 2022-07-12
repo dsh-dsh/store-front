@@ -71,6 +71,8 @@ import OverlayPanel from 'primevue/overlaypanel';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import InputText from 'primevue/inputtext';
+import {Property} from '@/js/Constants';
+
 export default {
   name: 'Settings',
   components: {
@@ -107,21 +109,19 @@ export default {
       return this.$store.state.cs.storages
     },
   },
-  watch: {
-    defaultProperties(val) {
-      this.user = val[0].user;
-    }
-  },
   methods: {
     setDefaultProperties() {
       if(this.activeIndex == 0) {
-        let projectId = this.defaultProperties.filter(prop => prop.type == 'PROJECT').pop().property;
+
+        this.user = this.defaultProperties[0].user;
+
+        let projectId = this.defaultProperties.filter(prop => prop.type == Property.PROJECT).pop().property;
         this.defaultProject = this.getProjectById(projectId);
 
-        let storageToId = this.defaultProperties.filter(prop => prop.type == 'STORAGE_TO').pop().property;
+        let storageToId = this.defaultProperties.filter(prop => prop.type == Property.STORAGE_TO).pop().property;
         this.defaultStorageTo = this.getStorageById(storageToId);
 
-        let storageFromId = this.defaultProperties.filter(prop => prop.type == 'STORAGE_FROM').pop().property;
+        let storageFromId = this.defaultProperties.filter(prop => prop.type == Property.STORAGE_FROM).pop().property;
         this.defaultStorageFrom = this.getStorageById(storageFromId);
       }
     },
@@ -140,7 +140,7 @@ export default {
     onProjectSelect(event) {
       this.defaultProject = event.data;
       this.$refs.opProjects.hide();
-      this.setProperty(this.user, 'PROJECT', event.data.id);
+      this.setProperty(this.user, Property.PROJECT, event.data.id);
     },
     onStorageFromClick(event) {
       this.storageType = 'storageFrom';
@@ -153,10 +153,10 @@ export default {
     onStorageSelect(event) {
       if(this.storageType == 'storageFrom') {
         this.defaultStorageFrom = event.data;
-        this.setProperty(this.user, 'STORAGE_FROM', event.data.id);
+        this.setProperty(this.user, Property.STORAGE_FROM, event.data.id);
       } else {
         this.defaultStorageTo = event.data;
-        this.setProperty(this.user, 'STORAGE_TO', event.data.id);
+        this.setProperty(this.user, Property.STORAGE_TO, event.data.id);
       }
       this.$refs.opStorage.hide();
     },

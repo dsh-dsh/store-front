@@ -19,7 +19,7 @@
           </div>
         </div>
         <div class="field col-12 md:col-7 center right">
-          <div v-if="doc.doc_type === 'Инвентаризация'" class="mr-5">
+          <div v-if="doc.doc_type === DocumentType.INVENTORY_DOC" class="mr-5">
             <Button label="Заполнить" class="p-button-rounded p-button-secondary mr-1" @click="onFillRestClick" :disabled="disabledFillItemRest"/>
             <Button label="Создать подчиненные документы" class="p-button-rounded p-button-secondary" @click="onCreateDockClick" :disabled="disabledFillItemRest"/>
           </div>
@@ -62,7 +62,7 @@
         </div>
         <div v-if="!orderDoc" class="field col-12 md:col-4"></div>
 
-        <div v-if="doc.doc_type == 'Поступление'" class="field col-12 md:col-4">
+        <div v-if="doc.doc_type == DocumentType.POSTING_DOC" class="field col-12 md:col-4">
           <div v-if="doc.supplier">
             <label for="supplier" class="label">Поставщик</label><br>
             <div class="p-inputgroup">
@@ -71,7 +71,7 @@
             </div>
           </div>
         </div>
-        <div v-if="doc.doc_type == 'Поступление'" class="field col-12 md:col-4">
+        <div v-if="doc.doc_type == DocumentType.POSTING_DOC" class="field col-12 md:col-4">
           <div v-if="doc.recipient">
             <label for="recipient" class="label">Получатель</label><br>
             <div class="p-inputgroup">
@@ -80,7 +80,7 @@
             </div>
           </div>
         </div>
-        <div v-if="doc.doc_type == 'Поступление'" class="field col-12 md:col-4"></div>
+        <div v-if="doc.doc_type == DocumentType.POSTING_DOC" class="field col-12 md:col-4"></div>
         
         <div v-if="orderDoc" class="field col-12 md:col-12">
           <div v-if="doc.individual">
@@ -236,6 +236,11 @@
   <OverlayPanel ref="opItems">
     <DataTable :value="items" v-model:selection="selectedItem" selectionMode="single" 
         :paginator="true" :rows="5" @rowSelect="onItemSelect" responsiveLayout="scroll" >
+        <template #loading>
+          <div class="flex justify-content-center">
+            <i class="pi pi-spin pi-spinner" style="font-size: 2rem">
+          </i></div>
+        </template>
         <Column field="name" header="Name" sortable />
         <Column v-for="storage of storages" :header="storage.name" :key="storage.id">
           <template #body="{data}">
@@ -259,6 +264,7 @@ import Button from 'primevue/button';
 import OverlayPanel from 'primevue/overlaypanel';
 import Divider from 'primevue/divider';
 import {FilterMatchMode} from 'primevue/api';
+import {Property, DocumentType} from '@/js/Constants';
 export default {
     name: 'DocContent',
     components: {
@@ -310,7 +316,8 @@ export default {
             orderDoc: false,
             isInventory: false,
             isCheck: false,
-            colSpan: 3
+            colSpan: 3,            
+            DocumentType: DocumentType,
         };
     },
     computed: {
@@ -318,7 +325,7 @@ export default {
           let doc = this.$store.state.ds.document;
           if(this.type === "copyToRequestDoc") {
             doc.id = 0;
-            doc.doc_type = "Перемещение";
+            doc.doc_type = DocumentType.MOVEMENT_DOC;
             doc.time = new Date();
           }
           return doc;
@@ -360,27 +367,31 @@ export default {
     },
     watch: {
       doc(value) {
-        if(value.doc_type == "РКО" || value.doc_type == "ПКО") {
+        if(value.doc_type == DocumentType.WITHDRAW_ORDER_DOC 
+                    || value.doc_type == DocumentType.CREDIT_ORDER_DOC) {
           this.orderDoc = true;
         }
-        if(value.doc_type == "Поступление" || value.doc_type == "Оприходование") {
+        if(value.doc_type == DocumentType.POSTING_DOC 
+                    || value.doc_type == DocumentType.RECEIPT_DOC) {
           this.disabledStorageFrom = true;
         }
-        if(value.doc_type == "Списание" || value.doc_type == "Чек ККМ" || value.doc_type == "Инвентаризация") {
+        if(value.doc_type == DocumentType.WRITE_OFF_DOC 
+                    || value.doc_type == DocumentType.CHECK_DOC 
+                    || value.doc_type == DocumentType.INVENTORY_DOC) {
           this.disabledStorageTo = true;
         }
         if(value.id == 0) {
           let user = JSON.parse(localStorage.getItem('user'));
           let author = this.users.filter(u => u.id == user.id).pop();
           value.author = author;
-          let projectId = this.defaultProperties.filter(prop => prop.type == 'PROJECT').pop().property;
+          let projectId = this.defaultProperties.filter(prop => prop.type == Property.PROJECT).pop().property;
           value.project = this.getProjectById(projectId);
           if(!this.disabledStorageTo) {
-            let storageToId = this.defaultProperties.filter(prop => prop.type == 'STORAGE_TO').pop().property;
+            let storageToId = this.defaultProperties.filter(prop => prop.type == Property.STORAGE_TO).pop().property;
             value.storage_to = this.getStorageById(storageToId);
           }
           if(!this.disabledStorageFrom) {
-            let storageFromId = this.defaultProperties.filter(prop => prop.type == 'STORAGE_FROM').pop().property;
+            let storageFromId = this.defaultProperties.filter(prop => prop.type == Property.STORAGE_FROM).pop().property;
             value.storage_from = this.getStorageById(storageFromId);
           }
         }
@@ -390,11 +401,11 @@ export default {
         if(value.storage_to) {
           this.selectedStorageTo = value.storage_to.id
         }
-        if(value.doc_type == "Чек ККМ") {
+        if(value.doc_type == DocumentType.CHECK_DOC) {
           this.isCheck = true;
           this.colSpan++;
         }
-        if(value.doc_type == "Инвентаризация") {
+        if(value.doc_type == DocumentType.INVENTORY_DOC) {
           this.isInventory = true;
           this.colSpan++;
         }
