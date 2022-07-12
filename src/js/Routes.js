@@ -1,15 +1,17 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 
-import LoginPage from "../pages/LoginPage.vue";
-import DocContent from "../pages/DocContent.vue";
-import ItemContent from "../pages/ItemContent.vue";
-import Settings from "../pages/Settings.vue";
+import LoginPage from "@/pages/LoginPage.vue";
+import DocContent from "@/pages/DocContent.vue";
+import ItemContent from "@/pages/ItemContent.vue";
+import Settings from "@/pages/Settings.vue";
+import UserContent from "@/pages/UserContent.vue";
 
 const routes = [
   { path: '/', redirect: '/documents' },
   { path: '/login', component: LoginPage },
   { path: '/documents/:filter?', component: DocContent, props: true },
   { path: '/items', component: ItemContent },
+  { path: '/users', component: UserContent },
   { path: '/default', component: Settings }
 ]
 

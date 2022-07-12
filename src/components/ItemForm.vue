@@ -174,7 +174,6 @@ export default {
     data() {
         return {
             displayConfirmation: false,
-            id: 6,
             selectedUnit: {name: '---'},
             selectedWorkshop: {name: '---'},
             retailPrice: "",

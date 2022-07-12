@@ -6,6 +6,7 @@ import {ItemStore} from "@/js/stores/ItemStore"
 import {CatalogStore} from "@/js/stores/CatalogStore"
 import {WebSocketStore} from "@/js/stores/WebSocketStore"
 import {SettingStore} from "@/js/stores/SettingStore"
+import {UserStore} from "@/js/stores/UserStore"
 
 
 const store = createStore({
@@ -15,7 +16,8 @@ const store = createStore({
 		is: ItemStore,
 		cs: CatalogStore,
 		ws: WebSocketStore,
-		ss: SettingStore
+		ss: SettingStore,
+		us: UserStore
 	},
 
     state () {

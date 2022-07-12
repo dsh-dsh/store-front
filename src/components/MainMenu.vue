@@ -25,8 +25,13 @@ export default {
           to: "/items"
         },
         {
+          label: "Пользователи",
+          icon: "pi pi-fw pi-users",
+          to: "/users"
+        },
+        {
           label: "Настройки",
-          icon: "pi pi-fw pi-curcle",
+          icon: "pi pi-fw pi-cog",
           to: "/default"
         },
       ],
