@@ -342,7 +342,7 @@ class Price {
     .checkBox {
         display: flex;
         flex-direction: column;
-        align-items: flex-start;
+        align-items: flex-end;
     }
     .border {
         border: 1px solid #dee2e6;
