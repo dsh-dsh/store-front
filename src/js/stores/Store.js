@@ -22,6 +22,7 @@ const store = createStore({
 
     state () {
 		return {
+			user: null,
 			success: 0,
 			message: String,
 			toast: null,

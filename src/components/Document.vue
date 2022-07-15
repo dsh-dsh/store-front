@@ -10,7 +10,7 @@
                     <Button label="Перемещение" class="p-button-rounded p-button-secondary p-button-outlined" @click="onRequestClick"/>
                 </div>
                 <div class="mr-2">
-                    <Button label="Изменить" class="p-button-sm p-button-rounded p-button-secondary" @click="onUpdateClick"/>
+                    <Button label="Изменить" class="p-button-sm p-button-rounded p-button-secondary" @click="onUpdateClick" :disabled="enableRedactoring" />
                 </div>
                 <div>
                     <Button label="Копировать" class="p-button-sm p-button-rounded p-button-secondary" @click="onCopyClick"/>
@@ -167,7 +167,8 @@ export default {
             isInventory: false,
             isCheck: false,
             colSpan: 3,
-            DocumentType: DocumentType
+            DocumentType: DocumentType,
+            enableRedactoring: false
         };
     },
     props: {
@@ -230,6 +231,8 @@ export default {
                 this.isInventory = true;
                 this.colSpan++;
             }
+            let user = JSON.parse(localStorage.getItem('user'));
+            this.enableRedactoring = user.id != value.author.id; 
         }
     }
 }

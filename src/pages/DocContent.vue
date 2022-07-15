@@ -89,7 +89,6 @@
       <Button label="Закрыть" icon="pi pi-times" @click="closeDocument" class="p-button-sm p-button-secondary p-button-text"/>
       <Button v-if="docRedactor" label="Сохранить" icon="pi pi-check" @click="saveDocument" class="p-button-sm p-button-rounded p-button-secondary" autofocus />
       <Button :label="holdLable" icon="pi pi-check" @click="holdDocument" class="p-button-sm p-button-rounded p-button-secondary" />
-      <!-- <Button label="check Unholden Docs" icon="pi pi-check" @click="checkUnholdenDocs" class="p-button-sm p-button-rounded p-button-secondary" /> -->
     </template>
   </Dialog>
 
@@ -147,6 +146,7 @@ export default {
     },
     data() {
       return {
+        user: null,
         displayDocument: false,
         docId: 0,
         type: String,
@@ -209,6 +209,7 @@ export default {
       this.firstDate = this.$store.state.ds.startDate;
       this.lastDate = this.$store.state.ds.endDate;
       this.$store.dispatch('getDocuments', this.filter)
+      this.user = JSON.parse(localStorage.getItem('user'));
     },
     watch: {
       filter(val) {
@@ -266,6 +267,30 @@ export default {
     },
     toggleModalMenu(event, data) {
       this.data = data;
+      console.log(this.menuModel)
+      if(data.author.id != this.user.id) {
+        this.menuModel = [
+          {label: 'Копировать', icon: 'pi pi-copy',
+            command: () => {
+              this.openCopyDocumentRedactor(this.data);
+          }}
+        ];
+        this.$refs.menu.toggle(event);
+        return;
+      }
+      if(this.menuModel.length == 1) {
+        this.menuModel = [
+          {label: 'Изменить', icon: 'pi pi-pencil',
+            command: () => {
+              this.openUpdateDocumentRedactor(this.data);
+            }},
+          {label: 'Копировать', icon: 'pi pi-copy',
+            command: () => {
+              this.openCopyDocumentRedactor(this.data);
+          }},
+          {}
+        ];
+      }
       this.menuModel.pop();
       let deleteLable = '';
       if(data.is_deleted) {

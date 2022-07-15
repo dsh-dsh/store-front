@@ -38,7 +38,6 @@
               <InputText id="project" type="text" class="p-inputtext-sm" v-model="doc.project.name" />
               <Button icon="pi pi-check" class="p-button-warning" @click="onProjectClick" />
             </div>
-          <!-- <Dropdown id="project" class="input" v-model="selectedProject" :options="projects" optionLabel="name" placeholder="Проект" @change="onProjectChange" /> -->
         </div>
         <div class="field col-12 md:col-4"></div>
 
