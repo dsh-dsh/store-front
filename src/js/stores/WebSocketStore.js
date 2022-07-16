@@ -6,7 +6,9 @@ export const WebSocketStore = {
         return {
             received_messages: [],
             send_message: null,
-            connected: false
+            connected: false,
+            socket: null,
+            stompClient: null
         }
     },
     mutations: {
@@ -16,21 +18,20 @@ export const WebSocketStore = {
         send() {
             console.log("Send message:" + this.send_message);
             if (this.stompClient && this.stompClient.connected) {
-            //   const msg = { name: this.send_message };
               const msg = { text: "message" };
               console.log(JSON.stringify(msg));
               this.stompClient.send("ws/app/hello", JSON.stringify(msg), {});
             }
         },
-        connect() {
-            this.socket = new SockJS("http://localhost:8090/ws");
-            this.stompClient = Stomp.over(this.socket);
+        getSocketConnection() {
+            let socket = new SockJS("http://localhost:8081/ws");
+            this.stompClient = Stomp.over(socket);
             this.stompClient.connect(
               {},
               frame => {
                 this.connected = true;
                 console.log(frame);
-                this.stompClient.subscribe("/ws/topic", tick => {
+                this.stompClient.subscribe("/ws/subscribe", tick => {
                   console.log(tick);
                   this.received_messages.push(JSON.parse(tick.body).content);
                 });

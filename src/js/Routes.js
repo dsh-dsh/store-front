@@ -28,10 +28,6 @@ router.beforeEach((to, from, next) => {
   // localStorage.removeItem('user')
   let loggedIn = JSON.parse(localStorage.getItem('user'));
 
-  // console.log("path: ", to.path)
-  // console.log("authRequired: ", authRequired)
-  // console.log("user: ", loggedIn)
-
   if (authRequired && !loggedIn) {
     return next('/login');
   }

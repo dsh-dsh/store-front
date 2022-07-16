@@ -20,7 +20,6 @@ function fillRelativeDoc(relativeDoc, inventiryDoc) {
 			relativeDoc.doc_items.push(newDocItem);
 		}
 	}
-	console.log(relativeDoc);
 }
 
 export const DocStore = {

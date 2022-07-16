@@ -80,15 +80,15 @@
 
   <Dialog v-model:visible="displayDocument" :style="{width: '80vw'}" :modal="true"  :showHeader="showDialogHeader">
     <div v-if="docRedactor">
-      <DocRedactor :docId="docId" :type="type" :docType="docType"/>
+      <DocRedactor :docId="docId" @disable-hold-button="disableHoldButton" @disable-save-button="disableSaveButton" :type="type" :docType="docType"/>
     </div>
     <div v-else>
       <Document :docId="docId" @copy-to-request-doc="openRequestDocRedactor" @open-update-doc="openUpdateDocumentRedactor" @open-copy-doc="openCopyDocumentRedactor" />
     </div>
     <template #footer>
       <Button label="Закрыть" icon="pi pi-times" @click="closeDocument" class="p-button-sm p-button-secondary p-button-text"/>
-      <Button v-if="docRedactor" label="Сохранить" icon="pi pi-check" @click="saveDocument" class="p-button-sm p-button-rounded p-button-secondary" autofocus />
-      <Button :label="holdLable" icon="pi pi-check" @click="holdDocument" class="p-button-sm p-button-rounded p-button-secondary" />
+      <Button v-if="docRedactor" label="Сохранить" icon="pi pi-check" @click="saveDocument" class="p-button-sm p-button-rounded p-button-secondary" autofocus :disabled="disabledSaveButton"/>
+      <Button :label="holdLable" icon="pi pi-check" @click="holdDocument" class="p-button-sm p-button-rounded p-button-secondary" :disabled="disabledHoldButton" />
     </template>
   </Dialog>
 
@@ -165,6 +165,8 @@ export default {
         firstDate: null,
         lastDate: null,
         DocumentType: DocumentType,
+        disabledHoldButton: false,
+        disabledSaveButton: false,
         menuModel: [
           {label: 'Изменить', icon: 'pi pi-pencil',
             command: () => {
@@ -220,6 +222,8 @@ export default {
       },
       document(val) {
         this.holdLable = val.is_hold? 'Отменить проведение' : (val.doc_type == this.DocumentType.MOVEMENT_DOC? 'Подтвердить получение' : 'Провести');
+        this.disabledHoldButton = false;
+        this.disabledSaveButton = false;
       },
       confirmationType(val) {
         this.buttonNoEnabled = true;
@@ -250,6 +254,12 @@ export default {
       }
     },
 	methods: {
+    disableHoldButton() {
+      this.disabledHoldButton = true;
+    },
+    disableSaveButton(value) {
+      this.disabledSaveButton = value;
+    },
     setStartDate(date) {
       this.$store.dispatch('setStartDate', date)
     },
@@ -267,7 +277,6 @@ export default {
     },
     toggleModalMenu(event, data) {
       this.data = data;
-      console.log(this.menuModel)
       if(data.author.id != this.user.id) {
         this.menuModel = [
           {label: 'Копировать', icon: 'pi pi-copy',
@@ -378,7 +387,6 @@ export default {
     },
     checkPrices() {
       if(this.document.doc_type == this.DocumentType.INVENTORY_DOC) {
-        console.log(this.document.doc_items)
         for(let docItem of this.document.doc_items) {
           if(docItem.price == 0) {
             return false;

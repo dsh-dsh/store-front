@@ -11,11 +11,11 @@
         <div class="field col-12 md:col-5 flex justify-content-between numberdatecard">
           <div class="mt-3 mb-3">
             <label for="number" class="label">Номер</label><br>
-            <InputText id="number" type="text" class="p-inputtext smallinput" v-model="doc.number" />
+            <InputText id="number" @change="disableHoldButton" type="text" class="p-inputtext smallinput" v-model="doc.number" />
           </div>
           <div class="mt-3 mb-3">
             <label for="time" class="label">Дата</label><br>
-            <Calendar id="time" v-model="dateInput" dateFormat="dd.mm.yy" :showIcon="true" />
+            <Calendar id="time" @change="disableHoldButton" @date-select="disableHoldButton" v-model="dateInput" dateFormat="dd.mm.yy" :showIcon="true" />
           </div>
         </div>
         <div class="field col-12 md:col-7 center right">
@@ -93,7 +93,7 @@
 
         <div v-if="orderDoc" class="field col-12 md:col-12">
           <label for="amount" class="label">сумма</label><br>
-          <InputText id="amount" type="text" class="p-inputtext-sm mr-1" v-model="doc.amount" />
+          <InputText id="amount" @change="disableHoldButton" type="text" class="p-inputtext-sm mr-1" v-model="doc.amount" />
         </div>
       </div>
     </div>
@@ -108,89 +108,89 @@
       <div class="formgrid grid">
         <div class="field col-12 md:col-3">
           <label for="waiter" class="label">официант</label><br>
-          <InputText id="waiter" type="text" class="p-inputtext-sm mr-1" v-model="doc.check_info.waiter" />
+          <InputText id="waiter" @change="disableHoldButton" type="text" class="p-inputtext-sm mr-1" v-model="doc.check_info.waiter" />
         </div>
         <div class="field col-12 md:col-3">
           <label for="check_number" class="label">номер чека</label><br>
-          <InputText id="check_number" type="text" class="p-inputtext-sm mr-1" v-model="doc.check_info.check_number" />
+          <InputText id="check_number" @change="disableHoldButton" type="text" class="p-inputtext-sm mr-1" v-model="doc.check_info.check_number" />
         </div>
         <div class="field col-12 md:col-3">
           <label for="cash_register_number" class="label">номер кассы</label><br>
-          <InputText id="cash_register_number" type="text" class="p-inputtext-sm mr-1" v-model="doc.check_info.cash_register_number" />
+          <InputText id="cash_register_number" @change="disableHoldButton" type="text" class="p-inputtext-sm mr-1" v-model="doc.check_info.cash_register_number" />
         </div>
         <div class="field col-12 md:col-3">
           <label for="amount_received" class="label">получено</label><br>
-          <InputText id="amount_received" type="text" class="p-inputtext-sm mr-1" v-model="doc.check_info.amount_received" />
+          <InputText id="amount_received" @change="disableHoldButton" type="text" class="p-inputtext-sm mr-1" v-model="doc.check_info.amount_received" />
         </div>
         <div class="field col-12 md:col-3">
           <label for="table_number" class="label">стол</label><br>
-          <InputText id="table_number" type="text" class="p-inputtext-sm mr-1" v-model="doc.check_info.table_number" />
+          <InputText id="table_number" @change="disableHoldButton" type="text" class="p-inputtext-sm mr-1" v-model="doc.check_info.table_number" />
         </div>
         <div class="field col-12 md:col-3">
           <label for="guest_number" class="label">гость</label><br>
-          <InputText id="guest_number" type="text" class="p-inputtext-sm mr-1" v-model="doc.check_info.guest_number" />
+          <InputText id="guest_number" @change="disableHoldButton" type="text" class="p-inputtext-sm mr-1" v-model="doc.check_info.guest_number" />
         </div>
         <div class="field col-12 md:col-3">
           <label for="kkm_check_time" class="label">время</label><br>
-          <Calendar id="kkm_check_time" v-model="checkDateInput" :showTime="true" :showSeconds="true" dateFormat="dd.mm.yy" disabled/>
+          <Calendar id="kkm_check_time" @change="disableHoldButton" v-model="checkDateInput" :showTime="true" :showSeconds="true" dateFormat="dd.mm.yy" disabled/>
         </div>
         <div class="field col-12 md:col-3">
         </div>
         <div class="field col-12 md:col-2">
           <label for="isReturn" class="label">возврат</label>
-          <InputSwitch id="isReturn" v-model="doc.check_info.is_return" /> 
+          <InputSwitch id="isReturn" @change="disableHoldButton" v-model="doc.check_info.is_return" /> 
         </div>
         <div class="field col-12 md:col-2">
           <label for="isKKMChecked" class="label">пробит</label>
-          <InputSwitch id="isKKMChecked" v-model="doc.check_info.is_KKM_checked" /> 
+          <InputSwitch id="isKKMChecked" @change="disableHoldButton" v-model="doc.check_info.is_KKM_checked" /> 
         </div>
         <div class="field col-12 md:col-2">
           <label for="is_Paid" class="label">оплачен</label>
-          <InputSwitch id="is_Paid" v-model="doc.check_info.is_payed" /> 
+          <InputSwitch id="is_Paid" @change="disableHoldButton" v-model="doc.check_info.is_payed" /> 
         </div>
         <div class="field col-12 md:col-2">
           <label for="isPayedByCard" class="label">эквайринг</label>
-          <InputSwitch id="isPayedByCard" v-model="doc.check_info.is_payed_by_card" /> 
+          <InputSwitch id="isPayedByCard" @change="disableHoldButton" v-model="doc.check_info.is_payed_by_card" /> 
         </div>
         <div class="field col-12 md:col-2">
           <label for="isDelivery" class="label">доставка</label>
-          <InputSwitch id="isDelivery" v-model="doc.check_info.is_delivery" /> 
+          <InputSwitch id="isDelivery" @change="disableHoldButton" v-model="doc.check_info.is_delivery" /> 
         </div>
       </div>
     </div>
     <div v-if="doc.doc_items">
       <Button icon="pi pi-plus" @click="onAddItemClick" class="p-button-text p-button-rounded" />
-      <DataTable :value="doc.doc_items" editMode="cell" @cell-edit-init="onCellEditInit"
+      <DataTable :value="doc.doc_items" :rowClass="rowClass" editMode="cell" @cell-edit-init="onCellEditInit"
           @cell-edit-complete="onCellEditComplete" class="p-datatable-sm editable-cells-table" responsiveLayout="scroll">
         <Column field="item_name" header="Наименование" key="item_name">
           <template #editor="{ data, field }">
-            <InputText v-model="data[field]" autofocus/>
+            <InputText @change="disableHoldButton" v-model="data[field]" autofocus/>
             <Button icon="pi pi-check" class="p-button-warning" @click="onItemClick"/>
           </template>
         </Column>
         <Column field="quantity" header="Количество" key="quantity">
           <template #editor="{ data, field }">
-            <InputText v-model="data[field]" autofocus />
+            <InputText @change="disableHoldButton" v-model="data[field]" autofocus />
           </template>
         </Column>
         <Column v-if="isInventory" field="quantity_fact" header="Фактически" key="quantity_fact">
           <template #editor="{ data, field }">
-            <InputText v-model="data[field]" autofocus />
+            <InputText @change="disableHoldButton" v-model="data[field]" autofocus />
           </template>
         </Column>
         <Column field="price" header="Цена" key="price">
           <template #editor="{ data, field }">
-            <InputText v-model="data[field]" autofocus />
+            <InputText @change="disableHoldButton" v-model="data[field]" autofocus />
           </template>
         </Column>
         <Column field="amount" header="Сумма" key="amount">
           <template #editor="{ data, field }">
-            <InputText v-model="data[field]" autofocus />
+            <InputText @change="disableHoldButton" v-model="data[field]" autofocus />
           </template>
         </Column>
         <Column v-if="isCheck" field="discount" header="Скидка" key="discount">
           <template #editor="{ data, field }">
-            <InputText v-model="data[field]" autofocus />
+            <InputText @change="disableHoldButton" v-model="data[field]" autofocus />
           </template>
         </Column>
         <Column style="width:1rem">
@@ -206,6 +206,7 @@
         </ColumnGroup>
       </DataTable> 
     </div>  
+
   <OverlayPanel ref="opProjects">
     <DataTable :value="projects" v-model:selection="selectedProject" selectionMode="single" 
         :paginator="true" :rows="5" @rowSelect="onProjectSelect" responsiveLayout="scroll" >
@@ -283,8 +284,13 @@ export default {
         type: String,
         docType: String
     },
+    emits: {
+        disableHoldButton: null,
+        disableSaveButton: null
+    },
     data() {
         return {
+            user: null,
             selectedProject: null,
             selectedStorageFrom: null,
             disabledStorageFrom: false,
@@ -329,9 +335,6 @@ export default {
           }
           return doc;
         },
-        user() {
-          return this.$store.state.user;
-        },
         projects() {
           return this.$store.state.cs.projects
         },
@@ -363,6 +366,7 @@ export default {
     },
     mounted() {
       this.$store.dispatch('getDocument', [this.docId, this.docType]);
+      this.user = JSON.parse(localStorage.getItem('user'));
     },
     watch: {
       doc(value) {
@@ -380,8 +384,7 @@ export default {
           this.disabledStorageTo = true;
         }
         if(value.id == 0) {
-          let user = JSON.parse(localStorage.getItem('user'));
-          let author = this.users.filter(u => u.id == user.id).pop();
+          let author = this.users.filter(u => u.id == this.user.id).pop();
           value.author = author;
           let projectId = this.defaultProperties.filter(prop => prop.type == Property.PROJECT).pop().property;
           value.project = this.getProjectById(projectId);
@@ -423,6 +426,15 @@ export default {
       }
     },
     methods: {
+      rowClass(data) {
+          return data.is_composite === true ? 'row-composite': null;
+      },
+      disableHoldButton() {
+        this.$emit('disableHoldButton');
+      },
+      disableSaveButton() {
+        this.$emit('disableSaveButton');
+      },
       getProjectById(id) {
         return this.projects.filter(project => project.id == id).pop();
       },
@@ -438,6 +450,7 @@ export default {
       },
       deleteRow(value) {
         this.doc.doc_items = this.doc.doc_items.filter( currentValue => currentValue != value );
+        this.$emit('disableHoldButton');
       },
       enableFillItemRestButton() {
         if((this.doc.author.id != 0) && (this.doc.storage_from.id != 0)) {
@@ -446,6 +459,7 @@ export default {
       },
       onFillRestClick() {
         this.$store.dispatch('getRestOnDateAndStorage', [this.doc.id, this.dateInput, this.doc.storage_from.id]);
+        this.$emit('disableHoldButton');
       },
       onCreateDockClick() {
         this.$store.dispatch('createRelativeDocks', this.doc);
@@ -476,6 +490,7 @@ export default {
         }
         this.enableFillItemRestButton();
         this.$refs.opUsers.hide();
+        this.$emit('disableHoldButton');
       },
       onProjectClick(event) {
         this.$refs.opProjects.toggle(event);
@@ -483,6 +498,7 @@ export default {
       onProjectSelect(event) {
         this.doc.project = event.data;
         this.$refs.opProjects.hide();
+        this.$emit('disableHoldButton');
       },
       onRecipientClick(event) {
         this.companyType = 'recipient';
@@ -503,6 +519,7 @@ export default {
           this.doc.supplier = event.data;
         }
         this.$refs.opCompanies.hide();
+        this.$emit('disableHoldButton');
       },
       onStorageFromClick(event) {
         this.storageType = 'storageFrom';
@@ -513,6 +530,7 @@ export default {
         this.$refs.opStorage.toggle(event);
       },
       onStorageSelect(event) {
+        checkComposite();
         if(this.storageType == 'storageFrom') {
           this.doc.storage_from = event.data;
           this.enableFillItemRestButton();
@@ -520,6 +538,7 @@ export default {
           this.doc.storage_to = event.data;
         }
         this.$refs.opStorage.hide();
+        this.$emit('disableHoldButton');
       },
       onItemClick(event) {
         this.itemSelectType = 'update';
@@ -538,22 +557,45 @@ export default {
       },
       onItemSelect(event) {
         if(this.itemSelectType == 'update') {
-          this.updateItem(event.data.id, event.data.name, event.data.price);
+          this.updateItem(event.data.id, event.data.name, event.data.price, event.data.is_composite);
         } else {
-          this.addItem(event.data.id, event.data.name, event.data.price);
+          this.addItem(event.data.id, event.data.name, event.data.price, event.data.is_composite);
         }
         this.$refs.opItems.hide();
+        this.$emit('disableHoldButton');
       },
-      updateItem(item_id, item_name, item_price){
+      updateItem(item_id, item_name, item_price, is_composite){
         this.currentData['item_id'] = item_id;
         this.currentData['item_name'] = item_name;
         this.currentData['price'] = item_price;
+        this.currentData['is_composite'] = is_composite;
+        if(this.doc.doc_type == DocumentType.POSTING_DOC || this.doc.doc_type == DocumentType.RECEIPT_DOC) {
+          if(is_composite == true) {
+            this.$emit('disableSaveButton', true);
+          } 
+          else {
+            if(!checkComposite(this.doc.doc_items)) {
+              this.$emit('disableSaveButton', false);
+            }
+          }
+        }
       },
-      addItem(item_id, item_name, item_price) {
-          this.doc.doc_items.push(new Item(this.doc.id, item_id, item_name, 0.0, item_price, 0.0, 0.0,));
+      addItem(item_id, item_name, item_price, is_composite) {
+        if(is_composite == true 
+            && (this.doc.doc_type == DocumentType.POSTING_DOC || this.doc.doc_type == DocumentType.RECEIPT_DOC)) {
+          this.$emit('disableSaveButton', true);
+        }
+        if(this.doc.doc_items.filter(item => item.item_id === item_id).length == 0) {
+          this.doc.doc_items.push(new Item(this.doc.id, item_id, item_name, 0.0, item_price, 0.0, 0.0, is_composite));
+        }
       }
       
     }
+}
+
+function checkComposite(docItems) {
+  let itemArr = docItems.filter(item => item.is_composite == true);
+  return itemArr.length > 0;
 }
 
 class Item {
@@ -564,7 +606,8 @@ class Item {
     price = 0.0;
     discount = 0.0;
     quantity_fact = 0.0;
-    constructor(document_id, item_id, item_name, quantity, price, discount, quantity_fact) {
+    is_composite = false;
+    constructor(document_id, item_id, item_name, quantity, price, discount, quantity_fact, is_composite) {
         this.document_id = document_id;
         this.item_id = item_id;
         this.item_name = item_name;
@@ -572,12 +615,16 @@ class Item {
         this.price = price;
         this.discount = discount;
         this.quantity_fact = quantity_fact;
+        this.is_composite = is_composite;
     }
 }
 
 </script>
 
 <style scoped>
+  ::v-deep(.row-composite) {
+      background-color: rgba(255, 0, 0, 0.15) !important;
+  }
   .buttonContainer {
     display: flex;
     margin: 8px;

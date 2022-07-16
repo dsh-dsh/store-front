@@ -170,8 +170,6 @@ export default {
     },
     watch: {
         person(val) {
-            console.log(val)
-            // this.selectedProject = val.project;
             this.currentPerson = val;
         }
     },
@@ -188,6 +186,7 @@ export default {
             this.$store.dispatch('setDate', value);
         },
         addNewPerson() {
+            this.$store.dispatch('send');
             this.$store.dispatch('getPerson', 0);
         },
         savePerson() {
