@@ -4,7 +4,6 @@
         <div class="itemform">
             <Breadcrumb :home="homeCrumb" :model="crumbs">
                 <template #item="{item}">
-                    <!-- <Button :label="item.label" @click="onCrumbClick(item)" class="p-button-secondary p-button-text" /> -->
                     <span @click="onCrumbClick(item)" class="crumb">{{item.label}}</span>
                 </template>
             </Breadcrumb>
@@ -114,6 +113,7 @@
                 </div>
 
                 <div class="col-12 md:col-12" style="text-align: end">
+                    <Button label="Калькуляция" @click="getCalculation" class="p-button-rounded p-button-sm" style="margin-top: 15px" />
                     <Button label="Сохранить" @click="onSave" class="p-button-rounded p-button-sm" style="margin-top: 15px" />
                 </div>
             </div>
@@ -204,6 +204,9 @@ export default {
         }
     },
     methods: {
+        getCalculation() {
+            this.$store.dispatch('getCalculation', this.item.id);
+        },
         setPrintName() {
             this.item.print_name = this.item.name;
         },

@@ -10,7 +10,8 @@ export const ItemStore = {
             itemDate: new Date(),
             ingredients: [],
             crumbs: [],
-            expandedKeys: {}
+            expandedKeys: {},
+			calculation: null
         }
     },
     mutations: {
@@ -49,9 +50,11 @@ export const ItemStore = {
 		},
 		expandKey(state, key) {
 			state.expandedKeys[key] = true;
-			console.log("state.expandedKeys", state.expandedKeys);
+			// console.log("state.expandedKeys", state.expandedKeys);
+		},
+        setCalculation(state, res) {
+			state.calculation = res;
 		}
-        
     },
     actions: {
 		async getItemTree({rootState, commit}) {
@@ -89,6 +92,7 @@ export const ItemStore = {
 				commit('setSuccess'); 
 			}
 			commit('setItem', new Item());
+			commit('setIngredients', []);
 		},
 		setParentNode({commit}, parentNode) {
 			commit('saveParentNode', parentNode);
@@ -99,7 +103,7 @@ export const ItemStore = {
             this.dispatch('expandNode', node);
         },
 		expandNode({commit}, node) {
-			console.log("expandNode", node)
+			// console.log("expandNode", node)
             if (node.children && node.children.length) {
 				commit('expandKey', node.key);
                 for (let child of node.children) {
@@ -118,6 +122,10 @@ export const ItemStore = {
 		},
 		setDate({commit}, date) {
 			commit('setDate', date);
+		},
+		async getCalculation({state, rootState, commit}, itemId) {
+			let calculation = await get('/api/v1/items/calculation' + '?date=' + state.itemDate.getTime() + '&id=' + itemId, rootState);
+			commit('setCalculation', calculation);
 		}
     }
 }

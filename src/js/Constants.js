@@ -12,7 +12,7 @@ export const DocumentType = {
     WRITE_OFF_DOC: 'Списание',
     CHECK_DOC: 'Чек ККМ',
     CREDIT_ORDER_DOC: 'ПКО',
-    WITHDRAW_ORDER_DOC: 'РКО',
+    WITHDRAW_ORDER_DOC: 'Расходный кассовый ордер',
     REQUEST_DOC: 'Заявка',
     INVENTORY_DOC: 'Инвентаризация'
 };

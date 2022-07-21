@@ -530,7 +530,6 @@ export default {
         this.$refs.opStorage.toggle(event);
       },
       onStorageSelect(event) {
-        checkComposite();
         if(this.storageType == 'storageFrom') {
           this.doc.storage_from = event.data;
           this.enableFillItemRestButton();

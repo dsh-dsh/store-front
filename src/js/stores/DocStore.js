@@ -155,7 +155,11 @@ export const DocStore = {
 			const response = await get(url , rootState);
 			commit('setItemRest', response)
 		},
-        
+        async deleteDocs({commit, rootState}) {
+			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token};
+			const response = await del('/api/v1/docs/hard/delete', headers, null, rootState);
+			if(response.data == 'ok') { commit('setSuccess'); }
+		}
     }
 }
 

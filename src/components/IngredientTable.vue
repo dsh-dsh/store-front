@@ -4,7 +4,10 @@
       <div><Button icon="pi pi-plus" @click="addNewIngredient" class="p-button-text p-button-rounded" /></div>
     </div>
     <div class="border contentRight">
-      <DataTable :value="this.ingredients" editMode="cell" @cell-edit-complete="onCellEditComplete" class="p-datatable-sm editable-cells-table">
+      
+       <!-- v-model:filters="filters" filterDisplay="row"  -->
+      <DataTable :value="this.ingredients" editMode="cell" @cell-edit-complete="onCellEditComplete"
+       class="p-datatable-sm editable-cells-table">
         <Column style="width: 2.2rem">
           <template #body="{data}">
             <img @click="onIngredientClick(data)" src="../../dist/img/ii.png" />
@@ -21,11 +24,15 @@
             <InputText v-model="data[field]" />
           </template>
         </Column>
-        <Column style="width:3rem">
+        <!-- field="enable.quantity" dataType="boolean" -->
+        <Column  style="width:3rem">
           <template #body="{data}">
             <img v-if="data.enable.quantity == 1.0" @click="toogleDeleted(data)" src="../../dist/img/v.png" />
             <img v-else @click="toogleDeleted(data)" src="../../dist/img/x.png" />
           </template>
+          <!-- <template #filter="{filterModel,filterCallback}">
+            <TriStateCheckbox v-model="filterModel.value" @change="filterCallback()"/>
+          </template> -->
         </Column>
       </DataTable>
     </div>
@@ -49,6 +56,8 @@ import Column from 'primevue/column';
 import Button from 'primevue/button';
 import OverlayPanel from 'primevue/overlaypanel';
 import InputText from 'primevue/inputtext';
+import {FilterMatchMode} from 'primevue/api';
+// import TriStateCheckbox from 'primevue/tristatecheckbox';
 export default {
   name: 'IngredientTable',
   components: {
@@ -56,11 +65,13 @@ export default {
     Column, 
     Button, 
     OverlayPanel, 
-    InputText
+    InputText,
+    // TriStateCheckbox
   },
   data() {
     return {
       selectedItem: null,
+      filters:[]
     };
   },
   computed: {
@@ -122,6 +133,19 @@ export default {
         data[fieldArr[0]].date = timestamp;
       }
     },
+    initFilters() {
+      this.filters = {
+        // 'global': {value: null, matchMode: FilterMatchMode.CONTAINS},
+        // 'name': {operator: FilterOperator.AND, constraints: [{value: null, matchMode: FilterMatchMode.STARTS_WITH}]},
+        // 'country.name': {operator: FilterOperator.AND, constraints: [{value: null, matchMode: FilterMatchMode.STARTS_WITH}]},
+        // 'representative': {value: null, matchMode: FilterMatchMode.IN},
+        // 'date': {operator: FilterOperator.AND, constraints: [{value: null, matchMode: FilterMatchMode.DATE_IS}]},
+        // 'balance': {operator: FilterOperator.AND, constraints: [{value: null, matchMode: FilterMatchMode.EQUALS}]},
+        // 'status': {operator: FilterOperator.OR, constraints: [{value: null, matchMode: FilterMatchMode.EQUALS}]},
+        // 'activity': {value: null, matchMode: FilterMatchMode.BETWEEN},
+        'enable.quantity': {value: null, matchMode: FilterMatchMode.EQUALS}
+      }
+    }
   }
 }
 
