@@ -10,7 +10,7 @@ export class Item {
     print_name = '';
     reg_time = '';
     is_weight = false;
-    is_in_employee_menu = false;
+    is_not_in_employee_menu = false;
     is_alcohol = false;
     is_not_in_price_list = false;
     is_garnish = false;

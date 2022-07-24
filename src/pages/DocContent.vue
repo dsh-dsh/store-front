@@ -277,7 +277,7 @@ export default {
     },
     toggleModalMenu(event, data) {
       this.data = data;
-      if(data.author.id != this.user.id) {
+      if(this.user.role != 'ADMIN' && data.author.id != this.user.id) {
         this.menuModel = [
           {label: 'Копировать', icon: 'pi pi-copy',
             command: () => {

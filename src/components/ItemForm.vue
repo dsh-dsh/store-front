@@ -91,7 +91,7 @@
                         </span>
                         <span class="checkBoxLabel">
                             <label for="employeeMenu">Не для сотрудников  </label>
-                            <Checkbox id="employeeMenu" v-model="item.is_in_employee_menu" :binary="true" />
+                            <Checkbox id="employeeMenu" v-model="item.is_not_in_employee_menu" :binary="true" />
                         </span>
                         <span class="checkBoxLabel">
                             <label for="notInPriceList">Не отображать  </label>

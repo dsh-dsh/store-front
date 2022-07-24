@@ -47,7 +47,7 @@ function handleResponce(data, state) {
 	if (data.error) {
 		state.toast?.add({ severity:'error', summary: 'error', detail: data.error, life: 3000 });
 	} else {
-		state.toast?.add({ severity:'info', summary: 'Info Message', detail: 'data.message', life: 1000 });
+		state.toast?.add({ severity:'info', summary: 'Info Message', detail: data.message, life: 1000 });
 	}
 	return data;
 }
