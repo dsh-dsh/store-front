@@ -42,12 +42,23 @@
         <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
       </AccordionTab>
       <AccordionTab v-if="isAdmin" header="Настройки проведения документов">
-        <div v-if="defaultProject" class="formgrid grid">
-          <div class="col-12 md:col-10">
-          <span>При проведении документов из 1С не добавлять недостающие позиции, списывать только из наличия </span>
+        <div v-if="defaultProject" class="formgrid grid leftAlignment">
+          <div class="col-12 md:col-6">
+            <span>При проведении документов из 1С не добавлять недостающие позиции (списывать только из наличия) </span>
           </div>
-          <div class="col-12 md:col-2">
-          <InputSwitch v-model="addShortageForHold" @click="setAddShortageForHold" />
+          <div class="col-12 md:col-6">
+            <InputSwitch v-model="addShortageForHold" @click="setAddShortageForHold" />
+          </div>
+          
+          <div class="col-12 md:col-12">
+            <p> </p>
+          </div>
+
+          <div class="col-12 md:col-6">
+            <span>Ручное проведение документов из 1С </span>
+          </div>
+          <div class="col-12 md:col-6">
+            <Button label="Провести документы" @click="hold1CDocs" class="p-button-secondary p-button-rounded p-button-sm" />
           </div>
         </div>
       </AccordionTab>
@@ -198,6 +209,9 @@ export default {
     },
     deleteDocs() {
       this.$store.dispatch('deleteDocs');
+    },
+    hold1CDocs() {
+      this.$store.dispatch('hold1CDocuments');
     }
   },
 }
@@ -224,7 +238,7 @@ export default {
     margin: 0px 0px 5px 0px;
     display: inline-block;
   }
-  .horizontal {
-    justify-content: center;
+  .leftAlignment {
+    text-align: left;
   }
 </style>

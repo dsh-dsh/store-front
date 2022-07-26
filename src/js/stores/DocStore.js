@@ -159,7 +159,13 @@ export const DocStore = {
 			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token};
 			const response = await del('/api/v1/docs/hard/delete', headers, null, rootState);
 			if(response.data == 'ok') { commit('setSuccess'); }
-		}
+		},
+		async hold1CDocuments({commit, rootState}) {
+			console.log("hold1CDocuments")
+			let headers = {'Authorization': rootState.token };
+			const response = await post('/api/v1/docs/hold1c', headers, null, rootState);
+			if(response.data == 'ok') { commit('setSuccess'); }
+		},
     }
 }
 
