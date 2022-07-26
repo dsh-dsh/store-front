@@ -1,16 +1,21 @@
 
 import {get, post} from "@/js/common"
+import {Property} from '@/js/Constants';
 
 export const SettingStore = {
     state: () => {
         return {
-            defaultProperties: []
+            defaultProperties: [],
+            addShortageForHold: true
         }
     },
     mutations: {
         setDefaultProperties(state, res) {
             state.defaultProperties = res;
-        }
+        },
+        setAddShortageForHold(state, res) {
+            state.addShortageForHold = res.property == 1;
+        },
     },
     actions: {
         async getDefaultProperties({commit, rootState}) {
@@ -18,13 +23,25 @@ export const SettingStore = {
             const response = await get('/api/v1/setting?userId=' + user.id, rootState);
 			commit('setDefaultProperties', response);
         },
+        async getAddShortageForHold({commit, rootState}) {
+            const response = await get('/api/v1/setting/add/shortage', rootState);
+			commit('setAddShortageForHold', response);
+        },
         async setProperty ({rootState}, [user, type, value]) {
 			let request = {'user': user, 'type': type, 'property': value};
 			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
 			const response = await post('/api/v1/setting/property', headers, request, rootState);
             if(response.data == "ok") {
-                this.dispaatch("getDefaultProperties");
+                this.dispatch("getDefaultProperties");
             }
-        }
+        },
+        async setAddShortageForHoldProperty ({rootState}, value) {
+			let request = {'type': Property.ADD_REST_FOR_HOLD, 'property': value};
+			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
+			const response = await post('/api/v1/setting/add/shortage', headers, request, rootState);
+            if(response.data == "ok") {
+                this.dispatch("getDefaultProperties");
+            }
+        } 
     }
 }

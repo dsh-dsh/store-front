@@ -36,7 +36,7 @@ export default {
     this.$store.dispatch('getCompanies')
     this.$store.dispatch('getDocTypes')
     // this.$store.dispatch('getSocketConnection')
-    this.$store.dispatch('getDefaultProperties')
+    // this.$store.dispatch('getDefaultProperties')
     this.$store.dispatch('setDates')
   }
 }
