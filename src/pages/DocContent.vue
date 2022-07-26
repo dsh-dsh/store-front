@@ -45,7 +45,7 @@
                v-tooltip="getToolTipText(data)"></i>
             </template>
           </Column>
-          <Column field="number" header="№" sortable style="max-width:3rem" />
+          <Column field="number" header="№" sortable style="max-width:7rem" />
           <Column field="doc_type" header="Документ" sortable />
           <Column field="project.name" header="Проект" sortable />
           <Column field="date_time" header="Время" sortable dataType="date">
@@ -239,7 +239,11 @@ export default {
           this.buttonNoEnabled = false;
           this.confirmationMessage = 'Для проведения заполните все цены в документе';
         } else if(val == 'serialHold') {
-          this.confirmationMessage = 'Есть более ранние не проведенные документы. Провести их?';
+          if(this.document.is_hold == true) {
+            this.confirmationMessage = 'После этого документа есть другие проведенные документы. Отменить их проведение?';
+          } else {
+            this.confirmationMessage = 'Есть более ранние не проведенные документы. Провести их?';
+          }
         }
       },
       startDate(val) {
@@ -412,6 +416,7 @@ export default {
     closeConfirmation() {
       this.displayConfirmation = false;
 			this.displayDocument = false;
+      this.confirmationType = '';
     },
     positiveConfirmation() {
       if(this.confirmationType == 'delete' || this.confirmationType == 'unDelete') {
@@ -423,6 +428,7 @@ export default {
       } else {
         this.displayConfirmation = false;
       }
+      this.confirmationType = '';
     },
     resetDocuments() {
       this.$store.dispatch('getDocuments', this.filter);
