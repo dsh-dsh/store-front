@@ -6,7 +6,8 @@ export const SettingStore = {
     state: () => {
         return {
             defaultProperties: [],
-            addShortageForHold: true
+            addShortageForHold: true,
+            period: null
         }
     },
     mutations: {
@@ -16,6 +17,9 @@ export const SettingStore = {
         setAddShortageForHold(state, res) {
             state.addShortageForHold = res.property == 1;
         },
+        setPeriod(state, res) {
+            state.period = res;
+        }
     },
     actions: {
         async getDefaultProperties({commit, rootState}) {
@@ -42,6 +46,10 @@ export const SettingStore = {
             if(response.data == "ok") {
                 this.dispatch("getDefaultProperties");
             }
-        } 
+        },
+        async getPeriod({commit, rootState}) {
+            const response = await get('/api/v1/setting/period', rootState);
+			commit('setPeriod', response);
+        },
     }
 }

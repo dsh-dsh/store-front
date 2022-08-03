@@ -89,8 +89,8 @@ export const DocStore = {
 				document = new Document(docType, new Date());
 			} else {
 				document = await get('/api/v1/docs?id=' + id, rootState)
+				document.date_time = new Date(document.date_time);
 			}
-			document.date_time = new Date(document.date_time);
 			if(document.check_info) {
 				document.check_info.date_time = new Date(document.check_info.date_time);
 			}

@@ -16,14 +16,14 @@ export default {
     return {
     }
   },
-  computed: {
-    documents() {
-      return this.$store.state.documents
-    },
-    message() {
-      return this.$store.state.message
-    }
-  },
+  // computed: {
+  //   documents() {
+  //     return this.$store.state.documents
+  //   },
+  //   message() {
+  //     return this.$store.state.message
+  //   }
+  // },
   mounted() {
     this.$store.dispatch('installToast', this.$toast)
     this.$store.dispatch('getToken')
@@ -36,7 +36,7 @@ export default {
     this.$store.dispatch('getCompanies')
     this.$store.dispatch('getDocTypes')
     // this.$store.dispatch('getSocketConnection')
-    // this.$store.dispatch('getDefaultProperties')
+    this.$store.dispatch('getPeriod')
     this.$store.dispatch('setDates')
   }
 }

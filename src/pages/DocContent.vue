@@ -13,7 +13,7 @@
     </div>
     <div>
       <div class="border">
-        <DataTable :value="documents" @row-click="openDocument" class="p-datatable-sm" stripedRows :paginator="true" :rows="10"
+        <DataTable :value="documents" @row-click="openDocument" :rowClass="rowClass" class="p-datatable-sm" stripedRows :paginator="true" :rows="10"
           v-model:selection="selectedProduct" selectionMode="single" sortField="date_time" :sortOrder="-1"
           paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
           :rowsPerPageOptions="[10,20,50]" responsiveLayout="scroll"
@@ -167,6 +167,7 @@ export default {
         DocumentType: DocumentType,
         disabledHoldButton: false,
         disabledSaveButton: false,
+        startPeriod: null,
         menuModel: [
           {label: 'Изменить', icon: 'pi pi-pencil',
             command: () => {
@@ -205,6 +206,9 @@ export default {
       },
       exsistNotHoldenDocs() {
         return this.$store.state.ds.exsistNotHoldenDocs;
+      },
+      period() {
+        return this.$store.state.ss.period;
       }
     },
     mounted() {
@@ -214,16 +218,25 @@ export default {
       this.user = JSON.parse(localStorage.getItem('user'));
     },
     watch: {
+      period(val) {
+        this.startPeriod = new Date(val.start_date);
+        console.log(this.startPeriod);
+      },
       filter(val) {
-        this.$store.dispatch('getDocuments', val)
+        this.$store.dispatch('getDocuments', val);
       },
       success() {
-        this.$store.dispatch('getDocuments', this.filter)
+        this.$store.dispatch('getDocuments', this.filter);
       },
       document(val) {
         this.holdLable = val.is_hold? 'Отменить проведение' : (val.doc_type == this.DocumentType.MOVEMENT_DOC? 'Подтвердить получение' : 'Провести');
-        this.disabledHoldButton = false;
-        this.disabledSaveButton = false;
+        if(val.date_time < this.startPeriod) {
+          this.disabledHoldButton = true;
+          this.disabledSaveButton = true;
+        } else {
+          this.disabledHoldButton = false;
+          this.disabledSaveButton = false;
+        }
       },
       confirmationType(val) {
         this.buttonNoEnabled = true;
@@ -258,6 +271,13 @@ export default {
       }
     },
 	methods: {
+    rowClass(data) {
+      if(data.date_time < this.startPeriod) {
+        console.log("row-disabled");
+      }
+      console.log(data.date_time, this.startPeriod);
+      return data.date_time < this.startPeriod ? 'row-disabled': null;
+    },
     disableHoldButton() {
       this.disabledHoldButton = true;
     },
@@ -485,5 +505,8 @@ export default {
     color: #000000;
     background: #e3f2fd;
     border: 3px solid #607d8b;
+  }
+  .row-disabled {
+    color:#b1b1b1;
   }
 </style>

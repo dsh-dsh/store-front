@@ -333,6 +333,10 @@ export default {
             doc.doc_type = DocumentType.MOVEMENT_DOC;
             doc.time = new Date();
           }
+          if(this.type === "copy") {
+            doc.date_time = new Date();
+            this.disableSaveButton();
+          }
           return doc;
         },
         projects() {
@@ -362,14 +366,16 @@ export default {
         },
         defaultProperties() {
           return this.$store.state.ss.defaultProperties;
-        }
+        },
+        period() {
+          return this.$store.state.ss.period;        }
     },
     mounted() {
       this.$store.dispatch('getDocument', [this.docId, this.docType]);
       this.user = JSON.parse(localStorage.getItem('user'));
     },
     watch: {
-      doc(value) {
+      doc(value) {       
         if(value.doc_type == DocumentType.WITHDRAW_ORDER_DOC 
                     || value.doc_type == DocumentType.CREDIT_ORDER_DOC) {
           this.orderDoc = true;
@@ -386,15 +392,17 @@ export default {
         if(value.id == 0) {
           let author = this.users.filter(u => u.id == this.user.id).pop();
           value.author = author;
-          let projectId = this.defaultProperties.filter(prop => prop.type == Property.PROJECT).pop().property;
-          value.project = this.getProjectById(projectId);
-          if(!this.disabledStorageTo) {
-            let storageToId = this.defaultProperties.filter(prop => prop.type == Property.STORAGE_TO).pop().property;
-            value.storage_to = this.getStorageById(storageToId);
-          }
-          if(!this.disabledStorageFrom) {
-            let storageFromId = this.defaultProperties.filter(prop => prop.type == Property.STORAGE_FROM).pop().property;
-            value.storage_from = this.getStorageById(storageFromId);
+          if(this.defaultProperties.length > 0) {
+            let projectId = this.defaultProperties.filter(prop => prop.type == Property.PROJECT).pop().property;
+            value.project = this.getProjectById(projectId);
+            if(!this.disabledStorageTo) {
+              let storageToId = this.defaultProperties.filter(prop => prop.type == Property.STORAGE_TO).pop().property;
+              value.storage_to = this.getStorageById(storageToId);
+            }
+            if(!this.disabledStorageFrom) {
+              let storageFromId = this.defaultProperties.filter(prop => prop.type == Property.STORAGE_FROM).pop().property;
+              value.storage_from = this.getStorageById(storageFromId);
+            }
           }
         }
         if(value.storage_from) {
