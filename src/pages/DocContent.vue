@@ -168,21 +168,7 @@ export default {
         disabledHoldButton: false,
         disabledSaveButton: false,
         startPeriod: null,
-        menuModel: [
-          {label: 'Изменить', icon: 'pi pi-pencil',
-            command: () => {
-              this.openUpdateDocumentRedactor(this.data);
-            }},
-          {label: 'Копировать', icon: 'pi pi-copy',
-            command: () => {
-              this.openCopyDocumentRedactor(this.data);
-            }},
-          {label: this.deleteLable, icon: 'pi pi-times',
-            command: () => {
-              this.confirmationType = 'delete';
-              this.openConfirmation(this.data)
-            }}
-        ]
+        menuModel: []
       };
     },
     computed: {
@@ -216,11 +202,13 @@ export default {
       this.lastDate = this.$store.state.ds.endDate;
       this.$store.dispatch('getDocuments', this.filter)
       this.user = JSON.parse(localStorage.getItem('user'));
+      if(this.period) {
+        this.startPeriod = new Date(this.period.start_date);
+      }
     },
     watch: {
       period(val) {
         this.startPeriod = new Date(val.start_date);
-        console.log(this.startPeriod);
       },
       filter(val) {
         this.$store.dispatch('getDocuments', val);
@@ -272,10 +260,6 @@ export default {
     },
 	methods: {
     rowClass(data) {
-      if(data.date_time < this.startPeriod) {
-        console.log("row-disabled");
-      }
-      console.log(data.date_time, this.startPeriod);
       return data.date_time < this.startPeriod ? 'row-disabled': null;
     },
     disableHoldButton() {
@@ -301,43 +285,35 @@ export default {
     },
     toggleModalMenu(event, data) {
       this.data = data;
-      if(this.user.role != 'ADMIN' && data.author.id != this.user.id) {
-        this.menuModel = [
-          {label: 'Копировать', icon: 'pi pi-copy',
-            command: () => {
-              this.openCopyDocumentRedactor(this.data);
-          }}
-        ];
-        this.$refs.menu.toggle(event);
-        return;
+      this.menuModel = [];
+
+      let item = {
+        label: 'Копировать', icon: 'pi pi-copy',
+        command: () => {this.openCopyDocumentRedactor(this.data);}
+      };
+      this.menuModel.push(item);
+      if(this.user.role == 'ADMIN' || data.author.id == this.user.id) {
+        if(data.date_time >= this.startPeriod ) {
+          let item = {
+            label: 'Изменить', icon: 'pi pi-pencil',
+            command: () => this.openUpdateDocumentRedactor(this.data)
+          };
+          this.menuModel.push(item);
+          let deleteLable = '';
+          if(data.is_deleted) {
+            deleteLable = 'Отменить'
+            this.confirmationType = 'unDelete';
+          } else {
+            deleteLable = 'Удалить'
+            this.confirmationType = 'delete';
+          }
+          let delItem = {
+            label: deleteLable, icon: 'pi pi-times',
+            command: () => this.openConfirmation(data)
+          };
+          this.menuModel.push(delItem);
+          }
       }
-      if(this.menuModel.length == 1) {
-        this.menuModel = [
-          {label: 'Изменить', icon: 'pi pi-pencil',
-            command: () => {
-              this.openUpdateDocumentRedactor(this.data);
-            }},
-          {label: 'Копировать', icon: 'pi pi-copy',
-            command: () => {
-              this.openCopyDocumentRedactor(this.data);
-          }},
-          {}
-        ];
-      }
-      this.menuModel.pop();
-      let deleteLable = '';
-      if(data.is_deleted) {
-        deleteLable = 'Отменить'
-        this.confirmationType = 'unDelete';
-      } else {
-        deleteLable = 'Удалить'
-        this.confirmationType = 'delete';
-      }
-      let delItem = {label: deleteLable, icon: 'pi pi-times',
-            command: () => {
-              this.openConfirmation(data)
-            }}
-      this.menuModel.push(delItem);
       this.$refs.menu.toggle(event);
     },
     formatCurrency(value) {
