@@ -5,7 +5,7 @@
       <div class="formgrid grid">
 
         <div class="field col-12 md:col-12">
-          <h4 class="mb-2">Документ  {{ doc.doc_type }}</h4>
+          <p class="mb-2"><b>Документ  {{ doc.doc_type }}</b> (автор {{ doc.author.name }})</p>
         </div>
 
         <div class="field col-12 md:col-5 flex justify-content-between numberdatecard">
@@ -26,20 +26,13 @@
         </div>
 
         <div class="field col-12 md:col-4">
-          <label for="author" class="label">Автор</label><br>
-          <div class="p-inputgroup"> 
-            <InputText id="author" type="text" class="p-inputtext-sm" v-model="doc.author.name" />
-            <Button icon="pi pi-check" class="p-button-warning" @click="onAuthorClick"/>
-          </div>
-        </div>
-        <div class="field col-12 md:col-4">
           <label for="project" class="label">Проект</label><br>
             <div class="p-inputgroup">
               <InputText id="project" type="text" class="p-inputtext-sm" v-model="doc.project.name" />
               <Button icon="pi pi-check" class="p-button-warning" @click="onProjectClick" />
             </div>
         </div>
-        <div class="field col-12 md:col-4"></div>
+        <div class="field col-12 md:col-8"></div>
 
         <div v-if="!orderDoc" class="field col-12 md:col-4">
           <div v-if="doc.storage_from">
@@ -81,19 +74,33 @@
         </div>
         <div v-if="doc.doc_type == DocumentType.POSTING_DOC" class="field col-12 md:col-4"></div>
         
-        <div v-if="orderDoc" class="field col-12 md:col-12">
-          <div v-if="doc.individual">
+        <div v-if="orderDoc" class="field col-12 md:col-4">
+          <!-- <div v-if="doc.individual"> -->
             <label for="individual" class="label">Физ лицо</label><br>
             <div class="p-inputgroup">
               <InputText id="individual" type="text" class="p-inputtext-sm" v-model="doc.individual.name" />
               <Button icon="pi pi-check" class="p-button-warning" @click="onIndividualClick"/>
             </div>
-          </div>
+          <!-- </div> -->
         </div>
+        <div v-if="orderDoc" class="field col-12 md:col-4">
+          <!-- <div v-if="doc.payment_type"> -->
+            <label for="payment_type" class="label">Физ лицо</label><br>
+            <div class="p-inputgroup">
+              <InputText id="payment_type" type="text" class="p-inputtext-sm" v-model="doc.payment_type" />
+              <Button icon="pi pi-check" class="p-button-warning" @click="onPaymentTypeClick"/>
+            </div>
+          <!-- </div> -->
+        </div>
+        <div v-if="orderDoc" class="field col-12 md:col-4"></div>
 
-        <div v-if="orderDoc" class="field col-12 md:col-12">
+        <div v-if="orderDoc" class="field col-12 md:col-4">
           <label for="amount" class="label">сумма</label><br>
           <InputText id="amount" @change="disableHoldButton" type="text" class="p-inputtext-sm mr-1" v-model="doc.amount" />
+        </div>
+        <div v-if="orderDoc" class="field col-12 md:col-8">
+          <label for="tax" class="label">сумма</label><br>
+          <InputText id="tax" @change="disableHoldButton" type="text" class="p-inputtext-sm mr-1" v-model="doc.tax" />
         </div>
       </div>
     </div>
@@ -207,10 +214,16 @@
       </DataTable> 
     </div>  
 
+  <OverlayPanel ref="opPaymentTypes">
+    <DataTable :value="paymentTypes" v-model:selection="selectedPaymentType" selectionMode="single" 
+        @rowSelect="onPaymentTypeSelect" responsiveLayout="scroll" >
+        <Column field="value" header="Name" sortable />
+    </DataTable>
+  </OverlayPanel>
   <OverlayPanel ref="opProjects">
     <DataTable :value="projects" v-model:selection="selectedProject" selectionMode="single" 
         :paginator="true" :rows="5" @rowSelect="onProjectSelect" responsiveLayout="scroll" >
-        <Column field="name" header="Name" sortable style="width: 60%"/>
+        <Column field="name" header="Name" sortable />
     </DataTable>
   </OverlayPanel>
   <OverlayPanel ref="opUsers">
@@ -264,7 +277,7 @@ import Button from 'primevue/button';
 import OverlayPanel from 'primevue/overlaypanel';
 import Divider from 'primevue/divider';
 import {FilterMatchMode} from 'primevue/api';
-import {Property, DocumentType} from '@/js/Constants';
+import {Property, DocumentType, PaymentType} from '@/js/Constants';
 export default {
     name: 'DocContent',
     components: {
@@ -291,6 +304,7 @@ export default {
     data() {
         return {
             user: null,
+            selectedPaymentType: null,
             selectedProject: null,
             selectedStorageFrom: null,
             disabledStorageFrom: false,
@@ -323,6 +337,7 @@ export default {
             isCheck: false,
             colSpan: 3,            
             DocumentType: DocumentType,
+            paymentTypes:[]
         };
     },
     computed: {
@@ -373,6 +388,7 @@ export default {
     mounted() {
       this.$store.dispatch('getDocument', [this.docId, this.docType]);
       this.user = JSON.parse(localStorage.getItem('user'));
+      this.setPaymentTypes();
     },
     watch: {
       doc(value) {       
@@ -392,6 +408,7 @@ export default {
         if(value.id == 0) {
           let author = this.users.filter(u => u.id == this.user.id).pop();
           value.author = author;
+          console.log(value);
           if(this.defaultProperties.length > 0) {
             let projectId = this.defaultProperties.filter(prop => prop.type == Property.PROJECT).pop().property;
             value.project = this.getProjectById(projectId);
@@ -404,6 +421,9 @@ export default {
               value.storage_from = this.getStorageById(storageFromId);
             }
           }
+        }
+        if(value.payment_type) {
+          this.selectedPaymentType = value.payment_type
         }
         if(value.storage_from) {
           this.selectedStorageFrom = value.storage_from.id
@@ -434,6 +454,12 @@ export default {
       }
     },
     methods: {
+      setPaymentTypes() {
+        this.paymentTypes = [];
+        for(var i in PaymentType) {
+            this.paymentTypes.push({'value': PaymentType[i] });
+        }
+      },
       rowClass(data) {
           return data.is_composite === true ? 'row-composite': null;
       },
@@ -458,6 +484,14 @@ export default {
       },
       deleteRow(value) {
         this.doc.doc_items = this.doc.doc_items.filter( currentValue => currentValue != value );
+        this.$emit('disableHoldButton');
+      },
+      onPaymentTypeClick(event) {
+        this.$refs.opPaymentTypes.toggle(event);
+      },
+      onPaymentTypeSelect(event) {
+        this.doc.payment_type = event.data.value;
+        this.$refs.opPaymentTypes.hide();
         this.$emit('disableHoldButton');
       },
       enableFillItemRestButton() {

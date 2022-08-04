@@ -1,3 +1,4 @@
+import {DocumentType} from "@/js/Constants.js"
 export default class Document {
 	id = 0;
     number = 0;
@@ -61,13 +62,13 @@ export default class Document {
 				"is_delivery": false
 				};
 		}
-		if(docType != "РКО"  && docType != "ПКО") {
+		if(docType != DocumentType.CREDIT_ORDER_DOC 
+				&& docType != DocumentType.WITHDRAW_ORDER_DOC) {
 			this.doc_items = [];
 		}
 	}
 
 	getDefaultProject() {
-		// console.log(this.$store.state.cs.projects);
 		return {
 			"id": 0,
 			"name": ""

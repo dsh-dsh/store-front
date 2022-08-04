@@ -114,7 +114,8 @@ export const DocStore = {
 			let request = {'item_doc_dto': doc};
 			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
 			const response = await post('/api/v1/docs', headers, request, rootState);
-			if(response == 'ok') { commit('setSuccess'); }
+			console.log(response)
+			if(response.data == 'ok') { commit('setSuccess'); }
 		},
 		createRelativeDocks({commit}, doc) {
 			let writeOffDocument = new Document('Списание', doc.date_time);

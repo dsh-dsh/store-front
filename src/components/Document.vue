@@ -30,15 +30,15 @@
         </div>
         <div class="col-12 md:col-4"></div>
 
-        <div class="col-12 md:col-4">
+        <div v-if="doc.doc_items" class="col-12 md:col-4">
             <label for="storageFrom" class="label">со склада</label>
             <p id="storageFrom" class="text_field">{{ (doc.storage_from? doc.storage_from.name:'') }}</p>
         </div>
-        <div class="col-12 md:col-4">
+        <div v-if="doc.doc_items" class="col-12 md:col-4">
             <label for="storageTo" class="label">на склад</label>
             <p id="storageTo" class="text_field">{{ (doc.storage_to? doc.storage_to.name:'') }}</p>
         </div>
-        <div class="col-12 md:col-4"></div>
+        <div v-if="doc.doc_items" class="col-12 md:col-4"></div>
 
         <div v-if="doc.doc_type == DocumentType.POSTING_DOC" class="field col-12 md:col-4">
             <label for="supplier" class="label">отправитель</label>
@@ -115,12 +115,36 @@
                 <img  v-else src="../../dist/img/o.png" class="ml-2" />
             </div>
         </div>
-        </div>
-        <div v-if="doc.amount">
-        <div class="field col-12 md:col-12">
-            <label for="amount" class="label">сумма</label><br>
+    </div>
+
+    <div v-if="!doc.doc_items">
+        <div class="formgrid grid">
+            <div class="col-12 md:col-4">
+                <label for="individual" class="label">
+                    {{ (doc.doc_type == DocumentType.WITHDRAW_ORDER_DOC? 'получатель' : 'плательщик') }}
+                </label><br>
+                <p id="individual" class="text_field">{{ getName(doc.individual) }}</p>
+            </div>
+            <div class="col-12 md:col-8"></div>
+
+            <div class="field col-12 md:col-8">
+                <label for="payment_type" class="label">назначение платежа</label><br>
+                <p id="payment_type" class="text_field lm">{{ doc.payment_type }}</p>
+            </div>
+            <div class="field col-12 md:col-4"></div>
+
+            <div class="field col-12 md:col-4">
+                <label for="amount" class="label">сумма</label><br>
+                <p id="amount" class="text_field">{{ doc.amount }}</p>
+            </div>
+            <div class="field col-12 md:col-4">
+                <label for="tax" class="label">оплата налога</label><br>
+                <p id="tax" class="text_field">{{ doc.tax }}</p>
+            </div>
+            <div class="field col-12 md:col-4"></div>
         </div>
     </div>
+
     <br>
 
     <div v-if="doc.doc_items">
@@ -192,6 +216,11 @@ export default {
         }
     },
     methods: {
+        getName(value) {
+        if(value) {
+            return value.name;
+        }
+        },
         formatCurrency(value) {
             return value.toLocaleString('re-RU', {style: 'currency', currency: 'RUB'});
         },
@@ -268,6 +297,9 @@ function formatDate(date, withTime) {
   .sm {
     width: 180px;
   }
+  .lm {
+    width: 500px;
+  }
   .inline {
     display: inline;
   }
@@ -279,9 +311,9 @@ function formatDate(date, withTime) {
     margin-left: auto;
   }
   .ml-2 {
-      margin-left: 10 px;
+    margin-left: 10 px;
   }
   .mr-2 {
-      margin-right: 10 px;
+    margin-right: 10 px;
   }
 </style>

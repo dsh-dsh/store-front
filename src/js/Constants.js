@@ -18,3 +18,13 @@ export const DocumentType = {
     INVENTORY_DOC: 'Инвентаризация'
 };
 
+export const PaymentType = { 
+    TAX_PAYMENT: 'Оплата налога',
+    CLIENT_PAYMENT: 'Оплата от покупателя',
+    SUPPLIER_PAYMENT: 'Оплата поставщику',
+    OTHER_PAYMENT: 'Прочее',
+    SALARY_PAYMENT: 'Выплата заработной платы',
+    SALE_CASH_PAYMENT: 'Выручка наличными',
+    SALE_CARD_PAYMENT: 'Выручка по картам'
+};
+

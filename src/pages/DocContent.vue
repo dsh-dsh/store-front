@@ -40,15 +40,7 @@
             </i></div>
           </template>
           <Column field="is_hold" header="" dataType="boolean">
-            <template #body="{data}">
-              <!-- <i class="pi" :class="{
-                'true-icon pi-check-circle': data.is_hold, 
-                'neutral-icon pi-circle': !data.is_hold, 
-                'false-icon pi-times-circle': data.is_deleted}" 
-               v-tooltip="getToolTipText(data)"></i> -->
-               <i class="pi" :class="iconClass(data)" 
-               v-tooltip="getToolTipText(data)"></i>
-            </template>
+            <template #body="{data}"><i class="pi" :class="iconClass(data)" v-tooltip="getToolTipText(data)"></i></template>
           </Column>
           <Column field="number" header="№" sortable style="max-width:7rem">
             <template #body="{data}"><div :class="disabledClass(data)">{{data.number}}</div></template>
