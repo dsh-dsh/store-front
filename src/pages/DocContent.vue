@@ -13,7 +13,7 @@
     </div>
     <div>
       <div class="border">
-        <DataTable :value="documents" @row-click="openDocument" :rowClass="rowClass" class="p-datatable-sm" stripedRows :paginator="true" :rows="10"
+        <DataTable :value="documents" @row-click="openDocument" class="p-datatable-sm" stripedRows :paginator="true" :rows="10"
           v-model:selection="selectedProduct" selectionMode="single" sortField="date_time" :sortOrder="-1"
           paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
           :rowsPerPageOptions="[10,20,50]" responsiveLayout="scroll"
@@ -41,26 +41,43 @@
           </template>
           <Column field="is_hold" header="" dataType="boolean">
             <template #body="{data}">
-              <i class="pi" :class="{'true-icon pi-check-circle': data.is_hold, 'neutral-icon pi-circle': !data.is_hold, 'false-icon pi-times-circle': data.is_deleted}"
+              <!-- <i class="pi" :class="{
+                'true-icon pi-check-circle': data.is_hold, 
+                'neutral-icon pi-circle': !data.is_hold, 
+                'false-icon pi-times-circle': data.is_deleted}" 
+               v-tooltip="getToolTipText(data)"></i> -->
+               <i class="pi" :class="iconClass(data)" 
                v-tooltip="getToolTipText(data)"></i>
             </template>
           </Column>
-          <Column field="number" header="№" sortable style="max-width:7rem" />
-          <Column field="doc_type" header="Документ" sortable />
-          <Column field="project.name" header="Проект" sortable />
+          <Column field="number" header="№" sortable style="max-width:7rem">
+            <template #body="{data}"><div :class="disabledClass(data)">{{data.number}}</div></template>
+          </Column>
+          <Column field="doc_type" header="Документ" sortable>
+            <template #body="{data}"><div :class="disabledClass(data)">{{data.doc_type}}</div></template>
+          </Column>
+          <Column field="project.name" header="Проект" sortable >
+            <template #body="{data}"><div :class="disabledClass(data)">{{data.project.name}}</div></template>
+          </Column>
           <Column field="date_time" header="Время" sortable dataType="date">
             <template #body="{data}">
-              {{new Date(data.date_time).toLocaleDateString('ru-RU', {day: '2-digit', month: '2-digit', year: 'numeric'})}}
+              <div :class="disabledClass(data)">
+                {{new Date(data.date_time).toLocaleDateString('ru-RU', {day: '2-digit', month: '2-digit', year: 'numeric'})}}
+              </div>
             </template>
           </Column>
-          <Column field="storage_from.name" header="со склада" sortable />
-          <Column field="storage_to.name" header="на склад" sortable />
+          <Column field="storage_from.name" header="со склада" sortable>
+            <template #body="{data}"><div :class="disabledClass(data)">{{getName(data.storage_from)}}</div></template>
+          </Column>
+          <Column field="storage_to.name" header="на склад" sortable>
+            <template #body="{data}"><div :class="disabledClass(data)">{{getName(data.storage_to)}}</div></template>
+          </Column>
           <Column field="amount" header="Сумма" sortable>
-            <template #body="slotProps">
-              {{formatCurrency(slotProps.data.amount)}}
-            </template>
+            <template #body="{data}"><div :class="disabledClass(data)">{{formatCurrency(data.amount)}}</div></template>
           </Column>
-          <Column field="author.name" header="Автор" style="max-width:9rem" sortable />
+          <Column field="author.name" header="Автор" style="max-width:9rem" sortable >
+            <template #body="{data}"><div :class="disabledClass(data)">{{getName(data.author)}}</div></template>
+          </Column>
           <Column style="max-width:3rem">
             <template #body="{data}"> 
               <Button icon="pi pi-bars" class="p-button-rounded p-button-secondary p-button-text mr-2" @click="toggleModalMenu($event, data)" />
@@ -259,8 +276,31 @@ export default {
       }
     },
 	methods: {
-    rowClass(data) {
-      return data.date_time < this.startPeriod ? 'row-disabled': null;
+    getName(value) {
+      if(value) {
+        return value.name;
+      }
+    },
+    iconClass(data) {
+      let icon;
+      let color;
+      if(data.is_hold) {
+        icon = "pi-check-circle";
+        color = "true-icon";
+      } else if(!data.is_hold) {
+        icon = "pi-circle";
+        color = "neutral-icon";
+      } else if(data.is_deleted) {
+        icon = "pi-times-circle";
+        color = "false-icon";
+      }
+      if(data.date_time < this.startPeriod) {
+        color = "disabled";
+      }
+      return color + " " + icon;
+    },
+    disabledClass(data) {
+      return data.date_time < this.startPeriod? 'disabled': null;
     },
     disableHoldButton() {
       this.disabledHoldButton = true;
@@ -482,7 +522,7 @@ export default {
     background: #e3f2fd;
     border: 3px solid #607d8b;
   }
-  .row-disabled {
-    color:#b1b1b1;
+  .disabled {
+    color:#b1b1b1 !important;
   }
 </style>
