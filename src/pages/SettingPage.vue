@@ -8,6 +8,7 @@
   <MainMenu />
   <div class="content">
     <Accordion  v-model:activeIndex="activeIndex"  @tab-open="setDefaultProperties">
+
       <AccordionTab header="Реквизиты документов по умолчанию">
         <div v-if="defaultProject" class="formgrid grid">  
             <div class="col-12 md:col-4">
@@ -35,14 +36,24 @@
             </div>
         </div>
       </AccordionTab>
-      <AccordionTab header="Безвозвратное удаление документов">
+
+      <AccordionTab v-if="isAdmin" header="Безвозвратное удаление документов">
         <Button label="Удалить помеченные на удаление документы" @click="deleteDocs" class="p-button-sm p-button-text" />
       </AccordionTab>
-      <AccordionTab header="Header IV" :disabled="true">
-        <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+      <AccordionTab v-if="isAdmin" header="Закрытие периода">
+        <div class="formgrid grid leftAlignment">
+          <div class="col-12 md:col-6">
+            <span>{{ periodString }}</span> 
+          </div>
+          <div class="col-12 md:col-6">
+            <Button label="Да" @click="closePeriod" class="p-button-secondary p-button-rounded p-button-sm" />
+          </div>
+        </div>
       </AccordionTab>
+
       <AccordionTab v-if="isAdmin" header="Настройки проведения документов">
-        <div v-if="defaultProject" class="formgrid grid leftAlignment">
+        <div class="formgrid grid leftAlignment">
           <div class="col-12 md:col-6">
             <span>При проведении документов из 1С не добавлять недостающие позиции (списывать только из наличия) </span>
           </div>
@@ -51,7 +62,7 @@
           </div>
           
           <div class="col-12 md:col-12">
-            <p> </p>
+            <p></p>
           </div>
 
           <div class="col-12 md:col-6">
@@ -62,6 +73,7 @@
           </div>
         </div>
       </AccordionTab>
+
     </Accordion>
   </div>
   </div>
@@ -89,8 +101,8 @@ import OverlayPanel from 'primevue/overlaypanel';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import InputText from 'primevue/inputtext';
-import {Property} from '@/js/Constants';
 import InputSwitch from 'primevue/inputswitch';
+import {Property} from '@/js/Constants';
 
 export default {
   name: 'Settings',
@@ -117,10 +129,14 @@ export default {
       storageType: "",
       activeIndex: -1,
       isAdmin: false,
-      addShortageForHold: Boolean
+      addShortageForHold: Boolean,
+      periodString: ''
     };
   },
   computed: {
+    period() {
+      return this.$store.state.ss.period;
+    },
     defaultProperties() {
       return this.$store.state.ss.defaultProperties;
     },
@@ -141,14 +157,22 @@ export default {
       } else {
         this.isAdmin = false;
       }
+    },
+    period(val) {
+      this.periodString = 'Закрыть период? (текущий период: ' 
+            +  formatDate(new Date(val.start_date)) + ' - ' + formatDate(new Date(val.end_date)) + ')';
     }
   },
   mounted() {
     this.$store.dispatch('getDefaultProperties');
     this.$store.dispatch('getAddShortageForHold');
     this.user = JSON.parse(localStorage.getItem('user'));
+    this.$store.dispatch('getPeriod');
   },
   methods: {
+    closePeriod() {
+      this.$store.dispatch('closePeriod');
+    },
     setDefaultProperties() {
       if(this.activeIndex == 0) {
         if(this.defaultProperties.length > 0) {
@@ -215,6 +239,20 @@ export default {
     }
   },
 }
+
+function formatDate(date, withTime) {
+    let params = {
+        day: 'numeric',
+        month: 'numeric',
+        year: 'numeric'};
+    if(withTime) {
+        params.hour = 'numeric';
+        params.minute = 'numeric';
+        params.second = 'numeric';
+    }
+    return date.toLocaleString("ru-Ru", params);
+}
+
 </script>
 
 <style scoped>

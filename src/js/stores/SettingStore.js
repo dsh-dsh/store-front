@@ -51,5 +51,10 @@ export const SettingStore = {
             const response = await get('/api/v1/setting/period', rootState);
 			commit('setPeriod', response);
         },
+        async closePeriod({commit, rootState}) {
+			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
+            const response = await post('/api/v1/setting/period', headers, null, rootState);
+			commit('setPeriod', response.data);
+        }
     }
 }

@@ -3,7 +3,7 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import LoginPage from "@/pages/LoginPage.vue";
 import DocContent from "@/pages/DocContent.vue";
 import ItemContent from "@/pages/ItemContent.vue";
-import Settings from "@/pages/Settings.vue";
+import SettingPage from "@/pages/SettingPage.vue";
 import UserContent from "@/pages/UserContent.vue";
 
 const routes = [
@@ -12,7 +12,7 @@ const routes = [
   { path: '/documents/:filter?', component: DocContent, props: true },
   { path: '/items', component: ItemContent },
   { path: '/users', component: UserContent },
-  { path: '/default', component: Settings }
+  { path: '/default', component: SettingPage }
 ]
 
 export const router = createRouter({

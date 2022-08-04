@@ -43,7 +43,8 @@ export default class Document {
 		"id": 0
 		};
         base_document_id = 0;	
-	constructor(docType, dateTime){
+	constructor(docType, dateTime, number){
+		this.number = number;
 		this.doc_type = docType;
 		this.date_time = dateTime;
 		if(docType === "Чек ККМ") {

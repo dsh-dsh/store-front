@@ -86,7 +86,8 @@ export const DocStore = {
 		async getDocument({commit, rootState}, [id, docType]) {
 			let document = null;
 			if(id == 0) {
-				document = new Document(docType, new Date());
+				let docNumber = await get('/api/v1/docs/new/number?type=' + docType, rootState)
+				document = new Document(docType, new Date(), docNumber);
 			} else {
 				document = await get('/api/v1/docs?id=' + id, rootState)
 				document.date_time = new Date(document.date_time);
@@ -114,16 +115,15 @@ export const DocStore = {
 			let request = {'item_doc_dto': doc};
 			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
 			const response = await post('/api/v1/docs', headers, request, rootState);
-			console.log(response)
 			if(response.data == 'ok') { commit('setSuccess'); }
 		},
 		createRelativeDocks({commit}, doc) {
-			let writeOffDocument = new Document('Списание', doc.date_time);
+			let writeOffDocument = new Document('Списание', doc.date_time, "");
 			fillRelativeDoc(writeOffDocument, doc);
 			if(writeOffDocument.doc_items.length > 0) {
 				this.dispatch("addDocument", writeOffDocument);
 			}
-			let receiptDocument = new Document('Оприходование', doc.date_time);
+			let receiptDocument = new Document('Оприходование', doc.date_time, "");
 			fillRelativeDoc(receiptDocument, doc);
 			if(receiptDocument.doc_items.length > 0) {
 				this.dispatch("addDocument", receiptDocument);

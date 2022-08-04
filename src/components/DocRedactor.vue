@@ -408,7 +408,6 @@ export default {
         if(value.id == 0) {
           let author = this.users.filter(u => u.id == this.user.id).pop();
           value.author = author;
-          console.log(value);
           if(this.defaultProperties.length > 0) {
             let projectId = this.defaultProperties.filter(prop => prop.type == Property.PROJECT).pop().property;
             value.project = this.getProjectById(projectId);
