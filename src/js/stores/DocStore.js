@@ -97,36 +97,36 @@ export const DocStore = {
 			}
 			commit('setDocument', document)
 		},
-		async updateDocument({commit, rootState}, doc) {
+		async updateDocument({commit, rootState}, [doc, saveTime]) {
 			doc.date_time = doc.date_time.getTime();
 			if(doc.check_info) {
 				doc.check_info.date_time = doc.check_info.date_time.getTime();
 			}
 			let request = {'item_doc_dto': doc};
 			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
-			const response = await put('/api/v1/docs', headers, request, rootState);
+			const response = await put('/api/v1/docs/' + saveTime, headers, request, rootState);
 			if(response == 'ok') { commit('setSuccess'); }
 		},
-		async addDocument({commit, rootState}, doc) {
+		async addDocument({commit, rootState}, [doc, saveTime]) {
 			doc.date_time = doc.date_time.getTime();
 			if(doc.check_info) {
 				doc.check_info.date_time = doc.check_info.date_time.getTime();
 			}
 			let request = {'item_doc_dto': doc};
 			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
-			const response = await post('/api/v1/docs', headers, request, rootState);
+			const response = await post('/api/v1/docs/' + saveTime, headers, request, rootState);
 			if(response.data == 'ok') { commit('setSuccess'); }
 		},
 		createRelativeDocks({commit}, doc) {
 			let writeOffDocument = new Document('Списание', doc.date_time, "");
 			fillRelativeDoc(writeOffDocument, doc);
 			if(writeOffDocument.doc_items.length > 0) {
-				this.dispatch("addDocument", writeOffDocument);
+				this.dispatch("addDocument", [writeOffDocument, true]);
 			}
 			let receiptDocument = new Document('Оприходование', doc.date_time, "");
 			fillRelativeDoc(receiptDocument, doc);
 			if(receiptDocument.doc_items.length > 0) {
-				this.dispatch("addDocument", receiptDocument);
+				this.dispatch("addDocument", [receiptDocument, true]);
 			}
 			commit('setSuccess');
 		},

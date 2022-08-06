@@ -96,7 +96,7 @@
     </div>
     <template #footer>
       <Button label="Закрыть" icon="pi pi-times" @click="closeDocument" class="p-button-sm p-button-secondary p-button-text"/>
-      <Button v-if="docRedactor" label="Сохранить" icon="pi pi-check" @click="saveDocument" class="p-button-sm p-button-rounded p-button-secondary" autofocus :disabled="disabledSaveButton"/>
+      <Button v-if="docRedactor" label="Сохранить" icon="pi pi-check" @click="openSaveDocDialog" class="p-button-sm p-button-rounded p-button-secondary" autofocus :disabled="disabledSaveButton"/>
       <Button :label="holdLable" icon="pi pi-check" @click="holdDocument" class="p-button-sm p-button-rounded p-button-secondary" :disabled="disabledHoldButton" />
     </template>
   </Dialog>
@@ -117,6 +117,26 @@
     </template>
   </Dialog>
 
+  <Dialog header="Сохраение" class="border" v-model:visible="displaySaveDialog" :style="{width: '350px'}" :modal="true" :showHeader="false">
+      <h3>Выберете время сохранения документа</h3>
+      <div class="field-radiobutton">
+        <RadioButton id="time1" name="choseTime" value="dayStart" v-model="salectedSaveTime" />
+        <label for="time1">сохранить в начало дня</label>
+      </div>
+      <div v-if="type == 'update'" class="field-radiobutton">
+        <RadioButton id="time2" name="choseTime" value="currentTime" v-model="salectedSaveTime" />
+        <label for="time2">сохранить текущее время докумнта</label>
+      </div>
+      <div class="field-radiobutton">
+        <RadioButton id="time3" name="choseTime" value="dayEnd" v-model="salectedSaveTime" />
+        <label for="time3">сохранить в конец дня</label>
+      </div>
+    <template #footer>
+      <Button label="Отмена" icon="pi pi-times" @click="closeSaveDocDialog" class="p-button-text" />
+      <Button label="Сохранить" icon="pi pi-check" @click="saveDocument" class="p-button-text" autofocus />
+    </template>
+  </Dialog>
+
 </template>
 
 <script>
@@ -133,6 +153,7 @@ import OverlayPanel from 'primevue/overlaypanel';
 import Menu from 'primevue/menu';
 import Calendar from 'primevue/calendar';
 import {DocumentType} from '@/js/Constants';
+import RadioButton from 'primevue/radiobutton';
 
 export default {
     name: 'DocContent',
@@ -148,7 +169,8 @@ export default {
       Toolbar,
       OverlayPanel,
       Menu,
-      Calendar
+      Calendar,
+      RadioButton
     },
     props: {
         filter: String,
@@ -166,6 +188,7 @@ export default {
         docType: null,
         data: null,
         displayConfirmation: false,
+        displaySaveDialog: false,
         holdLable: '',
         confirmationMessage: '',
         confirmationType: '',
@@ -177,7 +200,8 @@ export default {
         disabledHoldButton: false,
         disabledSaveButton: false,
         startPeriod: null,
-        menuModel: []
+        menuModel: [],
+        salectedSaveTime: 'dayEnd'
       };
     },
     computed: {
@@ -214,6 +238,7 @@ export default {
       if(this.period) {
         this.startPeriod = new Date(this.period.start_date);
       }
+      this.salectedSaveTime = 'dayEnd';
     },
     watch: {
       period(val) {
@@ -254,6 +279,8 @@ export default {
           } else {
             this.confirmationMessage = 'Есть более ранние не проведенные документы. Провести их?';
           }
+        } else if(val == 'choseTime') {
+          this.confirmationMessage = 'Выберете время сохранения документа'
         }
       },
       startDate(val) {
@@ -265,6 +292,13 @@ export default {
       exsistNotHoldenDocs() {
         this.confirmationType = 'serialHold';
         this.displayConfirmation = true;
+      },
+      type(val) {
+        if(val == 'update') {
+          this.salectedSaveTime = 'currentTime';
+        } else {
+          this.salectedSaveTime = 'dayEnd';
+        }
       }
     },
 	methods: {
@@ -389,12 +423,18 @@ export default {
 		closeDocument() {
 			this.displayDocument = false;
 		},
+    choseSavingTime() {
+        this.confirmationType = 'choseTime';
+        this.displayConfirmation = true;
+      
+    },
 		saveDocument() {
+      this.displaySaveDialog = false;
       if(this.type == 'update') {
-        this.$store.dispatch('updateDocument', this.document);
+        this.$store.dispatch('updateDocument', [this.document, this.salectedSaveTime]);
       }	else {
         this.document.id = 0;
-        this.$store.dispatch('addDocument', this.document);
+        this.$store.dispatch('addDocument', [this.document, this.salectedSaveTime]);
       }	
       if(this.document.is_hold == false) {
         this.confirmationType = 'hold';
@@ -457,6 +497,12 @@ export default {
         this.displayConfirmation = false;
       }
       this.confirmationType = '';
+    },
+    openSaveDocDialog() {
+      this.displaySaveDialog = true;
+    },
+    closeSaveDocDialog() {
+      this.displaySaveDialog = false;
     },
     resetDocuments() {
       this.$store.dispatch('getDocuments', this.filter);
