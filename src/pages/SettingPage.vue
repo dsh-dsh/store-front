@@ -50,6 +50,17 @@
           <div class="col-12 md:col-6">
             <Button label="Да" @click="closePeriod" class="p-button-secondary p-button-rounded p-button-sm" />
           </div>
+          
+          <div class="col-12 md:col-12">
+            <p></p>
+          </div>
+
+          <div class="col-12 md:col-6">
+            <span>При закрытии периода переносить остатки по средней цене</span>
+          </div>
+          <div class="col-12 md:col-6">
+            <InputSwitch v-model="averagePriceForPeriodClose" @click="setAveragePriceForPeriodClose" />
+          </div>
         </div>
       </AccordionTab>
 
@@ -133,6 +144,7 @@ export default {
       activeIndex: -1,
       isAdmin: false,
       addShortageForHold: Boolean,
+      averagePriceForPeriodClose: Boolean,
       periodString: ''
     };
   },
@@ -151,6 +163,9 @@ export default {
     },
     addShortageForHoldSetting() {
       return this.$store.state.ss.addShortageForHold;
+    },
+    averagePriceForPeriodCloseSetting() {
+      return this.$store.state.ss.аveragePriceForPeriodCloseProperty;
     }
   },
   watch: {
@@ -169,6 +184,7 @@ export default {
   mounted() {
     this.$store.dispatch('getDefaultProperties');
     this.$store.dispatch('getAddShortageForHold');
+    this.$store.dispatch('getAveragePriceForPeriodCloseProperty');
     this.user = JSON.parse(localStorage.getItem('user'));
     this.$store.dispatch('getPeriod');
   },
@@ -188,6 +204,8 @@ export default {
           let storageFrom = this.defaultProperties.filter(prop => prop.type == Property.STORAGE_FROM).pop();
           if(storageFrom) this.defaultStorageFrom = this.getStorageById(storageFrom.property);
         }
+      } else if(this.activeIndex == 2) {
+        this.averagePriceForPeriodClose = this.averagePriceForPeriodCloseSetting;
       } else if(this.activeIndex == 3) {
         this.addShortageForHold = this.addShortageForHoldSetting;
       }
@@ -228,7 +246,6 @@ export default {
       this.$refs.opStorage.hide();
     },
     setAddShortageForHold() {
-      console.log(this.addShortageForHold)
       this.$store.dispatch('setAddShortageForHoldProperty', this.addShortageForHold ? 0 : 1);
     },
     setProperty(user, type, value) {
@@ -239,6 +256,9 @@ export default {
     },
     hold1CDocs() {
       this.$store.dispatch('hold1CDocuments');
+    },
+    setAveragePriceForPeriodClose() {
+      this.$store.dispatch('setAveragePriceForPeriodCloseProperty', this.averagePriceForPeriodClose ? 0 : 1);
     }
   },
 }

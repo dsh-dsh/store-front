@@ -52,7 +52,6 @@ export const ItemStore = {
 		},
 		expandKey(state, key) {
 			state.expandedKeys[key] = true;
-			// console.log("state.expandedKeys", state.expandedKeys);
 		},
         setCalculation(state, res) {
 			state.calculation = res;
@@ -103,12 +102,11 @@ export const ItemStore = {
 			commit('saveParentNode', parentNode);
 		},
 		expandNodes({state}, itemId) {
-			console.log("expandNodes", itemId)
+			console.log(itemId)
 			let node = state.itemTree[0];
             this.dispatch('expandNode', node);
         },
 		expandNode({commit}, node) {
-			// console.log("expandNode", node)
             if (node.children && node.children.length) {
 				commit('expandKey', node.key);
                 for (let child of node.children) {

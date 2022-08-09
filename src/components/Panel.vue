@@ -24,7 +24,6 @@ export default {
     }, 
     watch: {
       content(value) {
-        console.log('togle in Panel')
         this.$refs.op.toggle(value);
       }
     },

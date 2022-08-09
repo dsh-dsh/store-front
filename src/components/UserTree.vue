@@ -31,11 +31,6 @@ export default {
   mounted() {
       this.$store.dispatch('getUserTree');
   },
-  // watch: {
-  //   nodes(val) {
-  //     console.log(val)
-  //   }
-  // },
   methods: {
     onNodeSelect(node) {
       if(!node.is_node) {

@@ -7,6 +7,7 @@ export const SettingStore = {
         return {
             defaultProperties: [],
             addShortageForHold: true,
+            // averagePriceForPeriodCloseProperty: true,
             period: null
         }
     },
@@ -17,6 +18,10 @@ export const SettingStore = {
         setAddShortageForHold(state, res) {
             state.addShortageForHold = res.property == 1;
         },
+        setAveragePriceForPeriodCloseProperty(state, res) {
+            state.аveragePriceForPeriodCloseProperty = res.property == 1;
+        },
+
         setPeriod(state, res) {
             state.period = res;
         }
@@ -31,6 +36,10 @@ export const SettingStore = {
             const response = await get('/api/v1/setting/add/shortage', rootState);
 			commit('setAddShortageForHold', response);
         },
+        async getAveragePriceForPeriodCloseProperty({commit, rootState}) {
+            const response = await get('/api/v1/setting/average/price', rootState);
+			commit('setAveragePriceForPeriodCloseProperty', response);
+        },
         async setProperty ({rootState}, [user, type, value]) {
 			let request = {'user': user, 'type': type, 'property': value};
 			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
@@ -39,12 +48,21 @@ export const SettingStore = {
                 this.dispatch("getDefaultProperties");
             }
         },
-        async setAddShortageForHoldProperty ({rootState}, value) {
+        async setAddShortageForHoldProperty({rootState}, value) {
 			let request = {'type': Property.ADD_REST_FOR_HOLD, 'property': value};
 			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
 			const response = await post('/api/v1/setting/add/shortage', headers, request, rootState);
             if(response.data == "ok") {
                 this.dispatch("getDefaultProperties");
+            }
+        },
+        async setAveragePriceForPeriodCloseProperty({rootState}, value) {
+			let request = {'type': Property.AVERAGE_COST, 'property': value};
+			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
+			const response = await post('/api/v1/setting/average/price', headers, request, rootState);
+            console.log(response)
+            if(response.data == "ok") {
+                this.dispatch("getAveragePriceForPeriodCloseProperty");
             }
         },
         async getPeriod({commit, rootState}) {

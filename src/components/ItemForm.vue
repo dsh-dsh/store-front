@@ -241,7 +241,6 @@ export default {
         },
         saveItem() {
             this.item.parent_id = this.parentNode.data;
-            console.log('item', this.item)
             this.$store.dispatch("saveItem", [this.item, this.formDate]);
         },
         closeConfirmation() {
@@ -273,7 +272,6 @@ export default {
     },
     watch: {
         item(value) {
-            console.log(value)
             this.selectedUnit = value.unit;
             this.selectedWorkshop = value.workshop;
             this.retailPrice = "";

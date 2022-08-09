@@ -238,7 +238,6 @@ export default {
       this.lastDate = this.$store.state.ds.endDate;
       this.$store.dispatch('getDocuments', this.filter)
       this.user = JSON.parse(localStorage.getItem('user'));
-      console.log(this.user)
       if(this.period) {
         this.startPeriod = new Date(this.period.start_date);
       }

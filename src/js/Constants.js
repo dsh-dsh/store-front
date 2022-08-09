@@ -4,7 +4,8 @@ export const Property = {
     PROJECT: 'PROJECT', 
     STORAGE_FROM: 'STORAGE_FROM', 
     STORAGE_TO: 'STORAGE_TO',
-    ADD_REST_FOR_HOLD: 'ADD_REST_FOR_HOLD' };
+    ADD_REST_FOR_HOLD: 'ADD_REST_FOR_HOLD',
+    AVERAGE_COST : 'AVERAGE_COST' };
 
 export const DocumentType = { 
     POSTING_DOC: 'Поступление',
