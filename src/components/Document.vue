@@ -190,6 +190,7 @@ export default {
             checkDate: '',
             isInventory: false,
             isCheck: false,
+            isPosting: false,
             colSpan: 3,
             DocumentType: DocumentType,
             enableRedactoring: false

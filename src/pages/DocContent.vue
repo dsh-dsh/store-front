@@ -1,6 +1,7 @@
 <template>
   <Toolbar class="top-menu">
     <template #end>
+      <UserAvatar />
       <Button label="logout" @click="logout()" class="p-button-sm p-button-rounded" />
     </template>
   </Toolbar>
@@ -148,6 +149,7 @@ import DocTabs from '@/components/DocTabs';
 import DocRedactor from '@/components/DocRedactor.vue';
 import Document from '@/components/Document.vue';
 import MainMenu from '@/components/MainMenu.vue';
+import UserAvatar from '@/components/UserAvatar.vue';
 import Toolbar from 'primevue/toolbar';
 import OverlayPanel from 'primevue/overlaypanel';
 import Menu from 'primevue/menu';
@@ -166,6 +168,7 @@ export default {
       DocRedactor,
       Document,
       MainMenu,
+      UserAvatar,
       Toolbar,
       OverlayPanel,
       Menu,
@@ -235,6 +238,7 @@ export default {
       this.lastDate = this.$store.state.ds.endDate;
       this.$store.dispatch('getDocuments', this.filter)
       this.user = JSON.parse(localStorage.getItem('user'));
+      console.log(this.user)
       if(this.period) {
         this.startPeriod = new Date(this.period.start_date);
       }

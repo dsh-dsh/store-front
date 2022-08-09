@@ -1,6 +1,7 @@
 <template>
   <Toolbar class="top-menu">
     <template #end>
+      <UserAvatar />
       <Button label="logout" @click="logout()" class="p-button-sm p-button-rounded" />
     </template>
   </Toolbar>
@@ -15,6 +16,7 @@
 import ItemTree from '@/components/ItemTree.vue';
 import ItemForm from '@/components/ItemForm.vue';
 import MainMenu from '@/components/MainMenu.vue';
+import UserAvatar from '@/components/UserAvatar.vue';
 import Toolbar from 'primevue/toolbar';
 import Button from 'primevue/button';
 
@@ -25,7 +27,8 @@ export default {
     ItemForm,
     MainMenu,
     Toolbar,
-    Button
+    Button,
+    UserAvatar
   },
   data() {
     return {
