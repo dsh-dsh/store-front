@@ -10,7 +10,7 @@
                     <Button label="Перемещение" class="p-button-rounded p-button-secondary p-button-outlined" @click="onRequestClick"/>
                 </div>
                 <div class="mr-2">
-                    <Button label="Изменить" class="p-button-sm p-button-rounded p-button-secondary" @click="onUpdateClick" :disabled="enableRedactoring" />
+                    <Button label="Изменить" class="p-button-sm p-button-rounded p-button-secondary" @click="onUpdateClick" :disabled="disableRedactoring" />
                 </div>
                 <div>
                     <Button label="Копировать" class="p-button-sm p-button-rounded p-button-secondary" @click="onCopyClick"/>
@@ -193,7 +193,7 @@ export default {
             isPosting: false,
             colSpan: 3,
             DocumentType: DocumentType,
-            enableRedactoring: false
+            disableRedactoring: false
         };
     },
     props: {
@@ -234,6 +234,9 @@ export default {
         onCopyClick() {
             this.$emit('openCopyDoc', this.doc);
         },
+        setEnableRedactoring(user, value) {
+            this.disableRedactoring = (user.id != value.author.id && user.role != 'ADMIN');
+        }
     },
     mounted() {
         this.$store.dispatch('getDocument', [this.docId, ""]);
@@ -262,7 +265,7 @@ export default {
                 this.colSpan++;
             }
             let user = JSON.parse(localStorage.getItem('user'));
-            this.enableRedactoring = user.id != value.author.id; 
+            this.setEnableRedactoring(user, value); 
         }
     }
 }

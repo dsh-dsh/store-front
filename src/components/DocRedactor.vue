@@ -367,7 +367,7 @@ export default {
           return this.$store.state.cs.companies;
         },
         items() {
-          return this.$store.state.cs.items;
+          return this.$store.state.is.items;
         },
         totalAmount() {
           let total = 0;
@@ -581,10 +581,13 @@ export default {
         this.$emit('disableHoldButton');
       },
       onItemClick(event) {
+        this.$store.dispatch('getItems', this.doc.date_time);
         this.itemSelectType = 'update';
         this.$refs.opItems.toggle(event);
       },
       onAddItemClick(event) {
+        console.log(this.items)
+        this.$store.dispatch('getItems', this.doc.date_time);
         this.itemSelectType = 'add';
         this.$refs.opItems.toggle(event);
       },

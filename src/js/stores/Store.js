@@ -50,7 +50,6 @@ const store = createStore({
 		},
 		setSuccess (state) {
 			state.success++;
-			console.log("success")
 		},
     },
 
