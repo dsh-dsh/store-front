@@ -78,6 +78,17 @@
           </div>
 
           <div class="col-12 md:col-6">
+            <span>При проведении документов списания и перемещения персчитывать стоимость позиций в соответствии со списываемыми партиями</span>
+          </div>
+          <div class="col-12 md:col-6">
+            <InputSwitch v-model="averagePriceForDocs" @click="setAveragePriceForDocs" />
+          </div>
+          
+          <div class="col-12 md:col-12">
+            <p></p>
+          </div>
+
+          <div class="col-12 md:col-6">
             <span>Ручное проведение документов из 1С </span>
           </div>
           <div class="col-12 md:col-6">
@@ -145,6 +156,7 @@ export default {
       isAdmin: false,
       addShortageForHold: Boolean,
       averagePriceForPeriodClose: Boolean,
+      averagePriceForDocs: Boolean,
       periodString: ''
     };
   },
@@ -166,6 +178,9 @@ export default {
     },
     averagePriceForPeriodCloseSetting() {
       return this.$store.state.ss.аveragePriceForPeriodCloseProperty;
+    },
+    averagePriceForDocsSetting() {
+      return this.$store.state.ss.аveragePriceForDocsProperty;
     }
   },
   watch: {
@@ -185,6 +200,7 @@ export default {
     this.$store.dispatch('getDefaultProperties');
     this.$store.dispatch('getAddShortageForHold');
     this.$store.dispatch('getAveragePriceForPeriodCloseProperty');
+    this.$store.dispatch('getAveragePriceForDocsProperty');
     this.user = JSON.parse(localStorage.getItem('user'));
     this.$store.dispatch('getPeriod');
   },
@@ -208,6 +224,7 @@ export default {
         this.averagePriceForPeriodClose = this.averagePriceForPeriodCloseSetting;
       } else if(this.activeIndex == 3) {
         this.addShortageForHold = this.addShortageForHoldSetting;
+        this.averagePriceForDocs = this.averagePriceForDocsSetting;
       }
     },
     logout() {
@@ -259,6 +276,9 @@ export default {
     },
     setAveragePriceForPeriodClose() {
       this.$store.dispatch('setAveragePriceForPeriodCloseProperty', this.averagePriceForPeriodClose ? 0 : 1);
+    },
+    setAveragePriceForDocs() {
+      this.$store.dispatch('setAveragePriceForDocsProperty', this.averagePriceForDocs ? 0 : 1);
     }
   },
 }

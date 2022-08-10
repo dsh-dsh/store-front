@@ -319,7 +319,8 @@ export default {
       } else if(!data.is_hold) {
         icon = "pi-circle";
         color = "neutral-icon";
-      } else if(data.is_deleted) {
+      }
+      if(data.is_deleted) {
         icon = "pi-times-circle";
         color = "false-icon";
       }

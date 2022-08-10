@@ -246,9 +246,19 @@
         <Column field="name" header="Name" sortable />
     </DataTable>
   </OverlayPanel>
-  <OverlayPanel ref="opItems">
-    <DataTable :value="items" v-model:selection="selectedItem" selectionMode="single" 
-        :paginator="true" :rows="5" @rowSelect="onItemSelect" responsiveLayout="scroll" >
+
+  <!-- <OverlayPanel ref="opItems"> -->
+  <Dialog header="Подтверждение" class="border dialog" v-model:visible="displayItems" :modal="true" :showHeader="false">
+    <br>
+    <DataTable :value="items" class="p-datatable-sm" v-model:selection="selectedItem" selectionMode="single" 
+                v-model:filters="filters" filterDisplay="menu" :globalFilterFields="['name']"
+                @rowSelect="onItemSelect" :scrollable="true" scrollHeight="500px" width="900px" :loading="loading">
+        <template #header>
+          <div class="flex justify-content-start">
+              <InputText class="p-inputtext-sm mr-2" v-model="filters['global'].value" placeholder="поиск" autofocus />
+              <Button icon="pi pi-times" class="p-button-rounded p-button-text p-button-plain p-button-sm" @click="clearFilter"/>
+          </div>
+        </template>
         <template #loading>
           <div class="flex justify-content-center">
             <i class="pi pi-spin pi-spinner" style="font-size: 2rem">
@@ -260,9 +270,14 @@
             <span> {{getItemRestOnStorage(data, storage)}} </span>
           </template>
         </Column>
-        <Column field="price" header="Цена" sortable />
+        <Column field="price" header="Последняя цена" sortable />
     </DataTable>
-  </OverlayPanel>
+    <br>
+    <template #footer>
+      <Button label="закрыть" icon="pi pi-times" @click="closeDialog" class="p-button-text p-button-sm" />
+    </template>
+  </Dialog>
+  <!-- </OverlayPanel> -->
 </template>
 
 <script>
@@ -271,13 +286,15 @@ import InputText from 'primevue/inputtext';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import InputSwitch from 'primevue/inputswitch';
-import ColumnGroup from 'primevue/columngroup';     //optional for column grouping
+import ColumnGroup from 'primevue/columngroup'; 
 import Row from 'primevue/row'; 
 import Button from 'primevue/button';
 import OverlayPanel from 'primevue/overlaypanel';
 import Divider from 'primevue/divider';
-import {FilterMatchMode} from 'primevue/api';
+import {FilterMatchMode, FilterOperator} from 'primevue/api';
 import {Property, DocumentType, PaymentType} from '@/js/Constants';
+import Dialog from 'primevue/dialog';
+
 export default {
     name: 'DocContent',
     components: {
@@ -290,7 +307,8 @@ export default {
         Row,
         Button,
         OverlayPanel,
-        Divider
+        Divider,
+        Dialog
     },
     props: {
         docId: Number,
@@ -302,43 +320,43 @@ export default {
         disableSaveButton: null
     },
     data() {
-        return {
-            user: null,
-            selectedPaymentType: null,
-            selectedProject: null,
-            selectedStorageFrom: null,
-            disabledStorageFrom: false,
-            selectedStorageTo: null,
-            disabledStorageTo: false,
-            is_hold: true,
-            selectedRow: null,
-            selectedUsers: null,
-            selectedRecipient: null,
-            disabledRecipient: false,
-            selectedSupplier: null,
-            disabledSupplier: false,
-            userType: null,
-            companyType: null,
-            selectedCompany: null,
-            storageType: null,
-            selectedStorage: null,
-            selectedItem: null,
-            dateInput: '',
-            checkDateInput: '',
-            currentField: null,
-            currentData: null,
-            itemSelectType: String,
-            filters: {
-                'name': {value: null, matchMode: FilterMatchMode.CONTAINS}
-            },
-            disabledFillItemRest: true,
-            orderDoc: false,
-            isInventory: false,
-            isCheck: false,
-            colSpan: 3,            
-            DocumentType: DocumentType,
-            paymentTypes:[]
-        };
+      return {
+        filters: null,
+        loading: false,
+        user: null,
+        selectedPaymentType: null,
+        selectedProject: null,
+        selectedStorageFrom: null,
+        disabledStorageFrom: false,
+        selectedStorageTo: null,
+        disabledStorageTo: false,
+        is_hold: true,
+        selectedRow: null,
+        selectedUsers: null,
+        selectedRecipient: null,
+        disabledRecipient: false,
+        selectedSupplier: null,
+        disabledSupplier: false,
+        userType: null,
+        companyType: null,
+        selectedCompany: null,
+        storageType: null,
+        selectedStorage: null,
+        selectedItem: null,
+        dateInput: '',
+        checkDateInput: '',
+        currentField: null,
+        currentData: null,
+        itemSelectType: String,
+        disabledFillItemRest: true,
+        orderDoc: false,
+        isInventory: false,
+        isCheck: false,
+        colSpan: 3,            
+        DocumentType: DocumentType,
+        paymentTypes:[],
+        displayItems: false
+      };
     },
     computed: {
         doc() {
@@ -385,7 +403,11 @@ export default {
         period() {
           return this.$store.state.ss.period;        }
     },
+    created() {
+        this.initFilters();
+    },
     mounted() {
+      // this.loading = true;
       this.$store.dispatch('getDocument', [this.docId, this.docType]);
       this.user = JSON.parse(localStorage.getItem('user'));
       this.setPaymentTypes();
@@ -450,9 +472,21 @@ export default {
       },
       dateInput(value) {
         this.doc.date_time = value;
+      },
+      items() {
+        this.loading = false;
       }
     },
     methods: {
+      clearFilter() {
+        this.initFilters();
+      },
+      initFilters() {
+        this.filters = {
+          'global': {value: null, matchMode: FilterMatchMode.CONTAINS},
+          'name': {operator: FilterOperator.AND, constraints: [{value: null, matchMode: FilterMatchMode.STARTS_WITH}]}
+        }
+      },
       setPaymentTypes() {
         this.paymentTypes = [];
         for(var i in PaymentType) {
@@ -585,10 +619,11 @@ export default {
         this.itemSelectType = 'update';
         this.$refs.opItems.toggle(event);
       },
-      onAddItemClick(event) {
+      onAddItemClick() { //event) {
         this.$store.dispatch('getItems', this.doc.date_time);
         this.itemSelectType = 'add';
-        this.$refs.opItems.toggle(event);
+        // this.$refs.opItems.toggle(event);
+        this.displayItems = true;
       },
       onCellEditInit(event) {
         let { data, field } = event;
@@ -598,12 +633,13 @@ export default {
         }
       },
       onItemSelect(event) {
+        this.displayItems = false;
         if(this.itemSelectType == 'update') {
           this.updateItem(event.data.id, event.data.name, event.data.price, event.data.is_composite);
         } else {
           this.addItem(event.data.id, event.data.name, event.data.price, event.data.is_composite);
         }
-        this.$refs.opItems.hide();
+        // this.$refs.opItems.hide();
         this.$emit('disableHoldButton');
       },
       updateItem(item_id, item_name, item_price, is_composite){
@@ -630,8 +666,10 @@ export default {
         if(this.doc.doc_items.filter(item => item.item_id === item_id).length == 0) {
           this.doc.doc_items.push(new Item(this.doc.id, item_id, item_name, 0.0, item_price, 0.0, 0.0, is_composite));
         }
+      },
+      closeDialog() {
+        this.displayItems = false;
       }
-      
     }
 }
 
@@ -736,5 +774,10 @@ class Item {
   }
   .ml-1 {
       margin-left: 10 px;
+  }
+  .dialog {
+    width: 900px; 
+    height: 600px; 
+    background-color: white;
   }
 </style>
