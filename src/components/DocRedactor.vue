@@ -248,7 +248,7 @@
   </OverlayPanel>
 
   <!-- <OverlayPanel ref="opItems"> -->
-  <Dialog header="Подтверждение" class="border dialog" v-model:visible="displayItems" :modal="true" :showHeader="false">
+  <Dialog header="Подбор номенклатуры" class="border dialog" v-model:visible="displayItems" :modal="true" :showHeader="false"> 
     <br>
     <DataTable :value="items" class="p-datatable-sm" v-model:selection="selectedItem" selectionMode="single" 
                 v-model:filters="filters" filterDisplay="menu" :globalFilterFields="['name']"
@@ -267,7 +267,8 @@
         <Column field="name" header="Name" sortable />
         <Column v-for="storage of storages" :header="storage.name" :key="storage.id">
           <template #body="{data}">
-            <span> {{getItemRestOnStorage(data, storage)}} </span>
+            <div :class="boldClass(doc, storage)"> {{getItemRestOnStorage(data, storage)}} </div>
+            <!-- <span> {{getItemRestOnStorage(data, storage)}} </span> -->
           </template>
         </Column>
         <Column field="price" header="Последняя цена" sortable />
@@ -487,6 +488,10 @@ export default {
           'name': {operator: FilterOperator.AND, constraints: [{value: null, matchMode: FilterMatchMode.STARTS_WITH}]}
         }
       },
+      closeDialog() {
+        this.displayItems = false;
+        this.clearFilter();
+      },
       setPaymentTypes() {
         this.paymentTypes = [];
         for(var i in PaymentType) {
@@ -494,7 +499,20 @@ export default {
         }
       },
       rowClass(data) {
-          return data.is_composite === true ? 'row-composite': null;
+        return data.is_composite === true ? 'row-composite': null;
+      },
+      boldClass(doc, storage) {  
+        let currentStorage;
+        if(doc.doc_type == DocumentType.WRITE_OFF_DOC 
+            || doc.doc_type == DocumentType.MOVEMENT_DOC 
+            || doc.doc_type == DocumentType.CHECK_DOC) {
+          currentStorage = doc.storage_from;
+        } else {
+          currentStorage = doc.storage_to;
+        }
+        if(currentStorage.id == storage.id) {
+          return 'b';
+        }
       },
       disableHoldButton() {
         this.$emit('disableHoldButton');
@@ -666,9 +684,6 @@ export default {
         if(this.doc.doc_items.filter(item => item.item_id === item_id).length == 0) {
           this.doc.doc_items.push(new Item(this.doc.id, item_id, item_name, 0.0, item_price, 0.0, 0.0, is_composite));
         }
-      },
-      closeDialog() {
-        this.displayItems = false;
       }
     }
 }
