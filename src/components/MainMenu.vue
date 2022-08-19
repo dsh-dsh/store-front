@@ -17,7 +17,7 @@ export default {
         {
           label: "Документы",
           icon: "pi pi-fw pi-file",
-          to: '/documents'
+          to: '/documents/posting'
         },
         {
           label: "Номенклатура",
@@ -32,7 +32,7 @@ export default {
         {
           label: "Настройки",
           icon: "pi pi-fw pi-cog",
-          to: "/default"
+          to: "/settings"
         },
       ],
     };

@@ -163,7 +163,7 @@ export const DocStore = {
 		},
 		async hold1CDocuments({commit, rootState}) {
 			let headers = {'Authorization': rootState.token };
-			const response = await post('/api/v1/docs/hold1c', headers, null, rootState);
+			const response = await post('/api/v1/1с/hold', headers, null, rootState);
 			if(response.data == 'ok') { commit('setSuccess'); }
 		},
     }

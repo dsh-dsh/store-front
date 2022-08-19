@@ -7,12 +7,12 @@ import SettingPage from "@/pages/SettingPage.vue";
 import UserContent from "@/pages/UserContent.vue";
 
 const routes = [
-  { path: '/', redirect: '/documents' },
+  { path: '/', redirect: '/documents/posting' },
   { path: '/login', component: LoginPage },
   { path: '/documents/:filter?', component: DocContent, props: true },
   { path: '/items', component: ItemContent },
   { path: '/users', component: UserContent },
-  { path: '/default', component: SettingPage }
+  { path: '/settings', component: SettingPage }
 ]
 
 export const router = createRouter({
