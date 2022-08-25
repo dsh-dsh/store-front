@@ -89,10 +89,10 @@
           </div>
 
           <div class="col-12 md:col-6">
-            <span>Ручное проведение документов из 1С </span>
+            <span>Ручное проведение документов из 1С. Есть не проведенные чеки от: {{ unholdenCheckDate }} </span>
           </div>
           <div class="col-12 md:col-6">
-            <Button label="Провести документы" @click="hold1CDocs" class="p-button-secondary p-button-rounded p-button-sm" />
+            <Button label="Провести документы" @click="hold1CDocs" class="p-button-secondary p-button-rounded p-button-sm" :disabled="disabledHoldChecksButton"/>
           </div>
         </div>
       </AccordionTab>
@@ -157,7 +157,8 @@ export default {
       addShortageForHold: Boolean,
       averagePriceForPeriodClose: Boolean,
       averagePriceForDocs: Boolean,
-      periodString: ''
+      periodString: '',
+      disabledHoldChecksButton: true
     };
   },
   computed: {
@@ -181,6 +182,9 @@ export default {
     },
     averagePriceForDocsSetting() {
       return this.$store.state.ss.аveragePriceForDocsProperty;
+    },
+    unholdenCheckDate() {
+      return this.$store.state.ds.unholdenCheckDate;
     }
   },
   watch: {
@@ -194,6 +198,9 @@ export default {
     period(val) {
       this.periodString = 'Закрыть период? (текущий период: ' 
             +  formatDate(new Date(val.start_date)) + ' - ' + formatDate(new Date(val.end_date)) + ')';
+    },
+    unholdenCheckDate(val) {
+      this.disabledHoldChecksButton = val == "";
     }
   },
   mounted() {
@@ -203,6 +210,7 @@ export default {
     this.$store.dispatch('getAveragePriceForDocsProperty');
     this.user = JSON.parse(localStorage.getItem('user'));
     this.$store.dispatch('getPeriod');
+    this.$store.dispatch('checkUnholden1CDocuments');
   },
   methods: {
     closePeriod() {

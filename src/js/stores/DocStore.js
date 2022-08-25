@@ -30,7 +30,8 @@ export const DocStore = {
 			itemRest: 0,
 			startDate: 0,
 			endDate: 0,
-			exsistNotHoldenDocs: 0
+			exsistNotHoldenDocs: 0,
+			unholdenCheckDate: ""
         }
     },
     mutations: {
@@ -58,6 +59,9 @@ export const DocStore = {
 		},
 		setExsistNotHoldenDocs(state) {
 			state.exsistNotHoldenDocs++;
+		},
+		setUnholdenCheckDate(state, res) {
+			state.unholdenCheckDate = res;
 		}
     },
     actions: {
@@ -130,7 +134,6 @@ export const DocStore = {
 			}
 			commit('setSuccess');
 		},
-		
 		async deleteDocument({commit, rootState}, doc) {
 			doc.date_time = doc.date_time.getTime();
 			let request = {'item_doc_dto': doc};
@@ -165,6 +168,10 @@ export const DocStore = {
 			let headers = {'Authorization': rootState.token };
 			const response = await post('/api/v1/1с/hold', headers, null, rootState);
 			if(response.data == 'ok') { commit('setSuccess'); }
+		},
+		async checkUnholden1CDocuments({commit, rootState}) {
+			const response = await get('/api/v1/1с/check', rootState);
+			commit('setUnholdenCheckDate', response)
 		},
     }
 }
