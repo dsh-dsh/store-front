@@ -9,7 +9,8 @@ export const CatalogStore = {
             units: [],
             projects: [],
             storages: [],
-            users: []
+            users: [],
+            items: []
         }
     },
     mutations: {
@@ -33,6 +34,9 @@ export const CatalogStore = {
 		},
 		setProject (state, res) {
 			state.projects = res;
+		},
+		setItems (state, res) {
+			state.items = res;
 		}
     },
     actions: {
@@ -63,6 +67,10 @@ export const CatalogStore = {
 		async getCompanies({rootState, commit}) {
 			const response = await get('/api/v1/catalogs/companies', rootState)
 			commit('setCompanies', response)
+		},
+		async getItems({rootState, commit}) {
+			const response = await get('/api/v1/items/list', rootState)
+			commit('setItems', response)
 		},
     }
 }

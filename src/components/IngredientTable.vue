@@ -1,52 +1,60 @@
 <template>
-    <div class="ingrHeader">
-      <div>Ингредиенты</div>
-      <div><Button icon="pi pi-plus" @click="addNewIngredient" class="p-button-text p-button-rounded" /></div>
-    </div>
-    <div class="border contentRight">
-      
-       <!-- v-model:filters="filters" filterDisplay="row"  -->
-      <DataTable :value="this.ingredients" editMode="cell" @cell-edit-complete="onCellEditComplete"
-       class="p-datatable-sm editable-cells-table">
-        <Column style="width: 2.2rem">
-          <template #body="{data}">
-            <img @click="onIngredientClick(data)" src="../../dist/img/ii.png" />
-          </template>
-        </Column>
-        <Column field="name" header="Наименование"></Column>
-        <Column field="gross.quantity" header="Брутто">
-          <template #editor="{ data, field }">
-            <InputText v-model="data[field]" />
-          </template>
-        </Column>
-        <Column field="netto.quantity" header="Нетто">
-          <template #editor="{ data, field }">
-            <InputText v-model="data[field]" />
-          </template>
-        </Column>
-        <!-- field="enable.quantity" dataType="boolean" -->
-        <Column  style="width:3rem">
-          <template #body="{data}">
-            <img v-if="data.enable.quantity == 1.0" @click="toogleDeleted(data)" src="../../dist/img/v.png" />
-            <img v-else @click="toogleDeleted(data)" src="../../dist/img/x.png" />
-          </template>
-          <!-- <template #filter="{filterModel,filterCallback}">
-            <TriStateCheckbox v-model="filterModel.value" @change="filterCallback()"/>
-          </template> -->
-        </Column>
-      </DataTable>
-    </div>
-    <OverlayPanel ref="opItems">
-      <DataTable :value="items" v-model:selection="selectedItem" selectionMode="single" 
-          :paginator="true" :rows="5" @rowSelect="onItemSelect" responsiveLayout="scroll" >
-          <Column field="name" header="Name" sortable />
-          <Column v-for="storage of storages" :header="storage.name" :key="storage.id">
-            <template #body="{data}">
-              <span> {{getItemRestOnStorage(data, storage)}} </span>
-            </template>
-          </Column>
-      </DataTable>
-    </OverlayPanel>
+  <div class="ingrHeader">
+    <div>Ингредиенты</div>
+    <div><Button icon="pi pi-plus" @click="addNewIngredient" class="p-button-text p-button-rounded" /></div>
+  </div>
+  <div class="border contentRight">
+    
+    <DataTable :value="this.ingredients" editMode="cell" @cell-edit-complete="onCellEditComplete"
+      class="p-datatable-sm editable-cells-table">
+      <Column style="width: 2.2rem">
+        <template #body="{data}">
+          <img @click="onIngredientClick(data)" src="../../dist/img/ii.png" />
+        </template>
+      </Column>
+      <Column field="name" header="Наименование"></Column>
+      <Column field="gross.quantity" header="Брутто">
+        <template #editor="{ data, field }">
+          <InputText v-model="data[field]" />
+        </template>
+      </Column>
+      <Column field="netto.quantity" header="Нетто">
+        <template #editor="{ data, field }">
+          <InputText v-model="data[field]" />
+        </template>
+      </Column>
+      <Column  style="width:3rem">
+        <template #body="{data}">
+          <img v-if="data.enable.quantity == 1.0" @click="toogleDeleted(data)" src="../../dist/img/v.png" />
+          <img v-else @click="toogleDeleted(data)" src="../../dist/img/x.png" />
+        </template>
+      </Column>
+    </DataTable>
+  </div>
+    
+  <Dialog header="Подбор номенклатуры" class="border dialog" v-model:visible="displayItems" :modal="true" :showHeader="false"> 
+    <br>
+    <DataTable :value="items" class="p-datatable-sm" v-model:selection="selectedItem" selectionMode="single" 
+                v-model:filters="filters" filterDisplay="menu" :globalFilterFields="['name']"
+                @rowSelect="onItemSelect" :scrollable="true" scrollHeight="500px" width="900px" :loading="loading">
+        <template #header>
+          <div class="flex justify-content-start">
+              <InputText class="p-inputtext-sm mr-2" v-model="filters['global'].value" placeholder="поиск" autofocus />
+              <Button icon="pi pi-times" class="p-button-rounded p-button-text p-button-plain p-button-sm" @click="clearFilter"/>
+          </div>
+        </template>
+        <template #loading>
+          <div class="flex justify-content-center">
+            <i class="pi pi-spin pi-spinner" style="font-size: 2rem">
+          </i></div>
+        </template>
+        <Column field="name" header="Name" sortable />
+    </DataTable>
+    <br>
+    <template #footer>
+      <Button label="закрыть" icon="pi pi-times" @click="closeDialog" class="p-button-text p-button-sm" />
+    </template>
+  </Dialog>
 </template>
 
 <script>
@@ -54,25 +62,31 @@ import 'primeicons/primeicons.css';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
-import OverlayPanel from 'primevue/overlaypanel';
+import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
-import {FilterMatchMode} from 'primevue/api';
-// import TriStateCheckbox from 'primevue/tristatecheckbox';
+import {FilterMatchMode, FilterOperator} from 'primevue/api';
 export default {
   name: 'IngredientTable',
   components: {
     DataTable, 
     Column, 
     Button, 
-    OverlayPanel, 
+    Dialog,
     InputText,
-    // TriStateCheckbox
   },
   data() {
     return {
+      filters:[],
       selectedItem: null,
-      filters:[]
+      loading: false,
+      displayItems: false
     };
+  },
+  created() {
+      this.initFilters();
+  },
+  mounted() {
+    this.$store.dispatch('getItems');
   },
   computed: {
     items() {
@@ -89,14 +103,19 @@ export default {
     }
   },
   watch: {
+    items() {
+      this.loading = false;
+    }
   },
   methods: {
-    getItemRestOnStorage(item, storage) {
-      for(let rest of item.rest_list) {
-        if(rest.storage.id == storage.id) {
-          return rest.quantity;
-        }
+    initFilters() {
+      this.filters = {
+        'global': {value: null, matchMode: FilterMatchMode.CONTAINS},
+        'name': {operator: FilterOperator.AND, constraints: [{value: null, matchMode: FilterMatchMode.STARTS_WITH}]}
       }
+    },
+    clearFilter() {
+      this.initFilters();
     },
     onIngredientClick(ingredient) {
       let item = this.$store.state.is.item;
@@ -113,12 +132,12 @@ export default {
         ingredient.enable.date = timestamp;
       }
     },
-    addNewIngredient(event) {
-      this.$refs.opItems.toggle(event);
+    addNewIngredient() {
+      this.displayItems = true;
     },
     onItemSelect(event) {
+      this.displayItems = false;
       this.addItem(event.data);
-      this.$refs.opItems.hide();
     },
     addItem(item) {
       this.$store.dispatch('addIngredient', item);
@@ -133,19 +152,10 @@ export default {
         data[fieldArr[0]].date = timestamp;
       }
     },
-    initFilters() {
-      this.filters = {
-        // 'global': {value: null, matchMode: FilterMatchMode.CONTAINS},
-        // 'name': {operator: FilterOperator.AND, constraints: [{value: null, matchMode: FilterMatchMode.STARTS_WITH}]},
-        // 'country.name': {operator: FilterOperator.AND, constraints: [{value: null, matchMode: FilterMatchMode.STARTS_WITH}]},
-        // 'representative': {value: null, matchMode: FilterMatchMode.IN},
-        // 'date': {operator: FilterOperator.AND, constraints: [{value: null, matchMode: FilterMatchMode.DATE_IS}]},
-        // 'balance': {operator: FilterOperator.AND, constraints: [{value: null, matchMode: FilterMatchMode.EQUALS}]},
-        // 'status': {operator: FilterOperator.OR, constraints: [{value: null, matchMode: FilterMatchMode.EQUALS}]},
-        // 'activity': {value: null, matchMode: FilterMatchMode.BETWEEN},
-        'enable.quantity': {value: null, matchMode: FilterMatchMode.EQUALS}
-      }
-    }
+    closeDialog() {
+      this.displayItems = false;
+      this.clearFilter();
+    },
   }
 }
 

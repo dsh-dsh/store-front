@@ -408,7 +408,6 @@ export default {
         this.initFilters();
     },
     mounted() {
-      // this.loading = true;
       this.$store.dispatch('getDocument', [this.docId, this.docType]);
       this.user = JSON.parse(localStorage.getItem('user'));
       this.setPaymentTypes();
@@ -633,12 +632,12 @@ export default {
         this.$emit('disableHoldButton');
       },
       onItemClick(event) {
-        this.$store.dispatch('getItems', this.doc.date_time);
+        this.$store.dispatch('getItemsWithRest', this.doc.date_time);
         this.itemSelectType = 'update';
         this.$refs.opItems.toggle(event);
       },
       onAddItemClick() { //event) {
-        this.$store.dispatch('getItems', this.doc.date_time);
+        this.$store.dispatch('getItemsWithRest', this.doc.date_time);
         this.itemSelectType = 'add';
         // this.$refs.opItems.toggle(event);
         this.displayItems = true;

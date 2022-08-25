@@ -56,7 +56,7 @@ export const ItemStore = {
         setCalculation(state, res) {
 			state.calculation = res;
 		},
-		setItems (state, res) {
+		setItemsWithRest (state, res) {
 			state.items = res;
 		}
     },
@@ -130,11 +130,11 @@ export const ItemStore = {
 			let calculation = await get('/api/v1/items/calculation' + '?date=' + state.itemDate.getTime() + '&id=' + itemId, rootState);
 			commit('setCalculation', calculation);
 		},
-		async getItems({rootState, commit}, time) {
+		async getItemsWithRest({rootState, commit}, time) {
 			if(time.getTime() != this.timeOfRest) {
 				this.timeOfRest = time.getTime();
 				const response = await get('/api/v1/items/list?time=' + this.timeOfRest, rootState)
-				commit('setItems', response)
+				commit('setItemsWithRest', response)
 			}
 		},
     }
