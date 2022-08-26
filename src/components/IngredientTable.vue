@@ -32,17 +32,17 @@
     </DataTable>
   </div>
     
-  <Dialog header="Подбор номенклатуры" class="border dialog" v-model:visible="displayItems" :modal="true" :showHeader="false"> 
-    <br>
+  <Dialog header="Подбор номенклатуры" class="border lol" v-model:visible="displayItems" :modal="true" :closable="false"
+      :contentStyle="{height: '100%'}" :style="{width: '900px', height: '500px'}"> 
+    <template #header>
+      <div> 
+        <InputText class="p-inputtext-sm mr-2" v-model="filters['global'].value" placeholder="поиск" autofocus />
+        <Button icon="pi pi-times" class="p-button-rounded p-button-text p-button-plain p-button-sm" @click="clearFilter"/>
+      </div>
+    </template>
     <DataTable :value="items" class="p-datatable-sm" v-model:selection="selectedItem" selectionMode="single" 
                 v-model:filters="filters" filterDisplay="menu" :globalFilterFields="['name']"
-                @rowSelect="onItemSelect" :scrollable="true" scrollHeight="500px" width="900px" :loading="loading">
-        <template #header>
-          <div class="flex justify-content-start">
-              <InputText class="p-inputtext-sm mr-2" v-model="filters['global'].value" placeholder="поиск" autofocus />
-              <Button icon="pi pi-times" class="p-button-rounded p-button-text p-button-plain p-button-sm" @click="clearFilter"/>
-          </div>
-        </template>
+                @rowSelect="onItemSelect" :scrollable="false" :loading="loading">
         <template #loading>
           <div class="flex justify-content-center">
             <i class="pi pi-spin pi-spinner" style="font-size: 2rem">
@@ -175,5 +175,13 @@ function atStartOfDay(date) {
   }
   .m0 {
     padding: 0.5rem 0.1rem;
+  }
+  .lol, :deep(.lol) {
+    height : 500px;
+    width : 900px;
+  }
+  .p-dialog, :deep(.p-dialog) {
+    height : 500px;
+    width : 900px;
   }
 </style>
