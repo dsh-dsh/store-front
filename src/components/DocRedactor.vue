@@ -247,8 +247,38 @@
     </DataTable>
   </OverlayPanel>
 
+  <Dialog header="Подбор номенклатуры" class="border" v-model:visible="displayItems" :modal="true" :closable="false"
+      :contentStyle="{height: '100%'}" :style="{width: '900px', height: '500px'}"> 
+    <template #header>
+      <div> 
+        <InputText class="p-inputtext-sm mr-2" v-model="filters['global'].value" placeholder="поиск" autofocus />
+        <Button icon="pi pi-times" class="p-button-rounded p-button-text p-button-plain p-button-sm" @click="clearFilter"/>
+      </div>
+    </template>
+    <DataTable :value="items" class="p-datatable-sm" v-model:selection="selectedItem" selectionMode="single" 
+                v-model:filters="filters" filterDisplay="menu" :globalFilterFields="['name']"
+                @rowSelect="onItemSelect" :scrollable="false" :loading="loading">
+        <template #loading>
+          <div class="flex justify-content-center">
+            <i class="pi pi-spin pi-spinner" style="font-size: 2rem">
+          </i></div>
+        </template>
+        <Column field="name" header="Name" sortable />
+        <Column v-for="storage of storages" :header="storage.name" :key="storage.id">
+          <template #body="{data}">
+            <div :class="boldClass(doc, storage)"> {{getItemRestOnStorage(data, storage)}} </div>
+          </template>
+        </Column>
+        <Column field="price" header="Последняя цена" sortable />
+    </DataTable>
+    <br>
+    <template #footer>
+      <Button label="закрыть" icon="pi pi-times" @click="closeDialog" class="p-button-text p-button-sm" />
+    </template>
+  </Dialog>
+
   <!-- <OverlayPanel ref="opItems"> -->
-  <Dialog header="Подбор номенклатуры" class="border dialog" v-model:visible="displayItems" :modal="true" :showHeader="false"> 
+  <!-- <Dialog header="Подбор номенклатуры" class="border dialog" v-model:visible="displayItems" :modal="true" :showHeader="false"> 
     <br>
     <DataTable :value="items" class="p-datatable-sm" v-model:selection="selectedItem" selectionMode="single" 
                 v-model:filters="filters" filterDisplay="menu" :globalFilterFields="['name']"
@@ -268,7 +298,6 @@
         <Column v-for="storage of storages" :header="storage.name" :key="storage.id">
           <template #body="{data}">
             <div :class="boldClass(doc, storage)"> {{getItemRestOnStorage(data, storage)}} </div>
-            <!-- <span> {{getItemRestOnStorage(data, storage)}} </span> -->
           </template>
         </Column>
         <Column field="price" header="Последняя цена" sortable />
@@ -277,7 +306,7 @@
     <template #footer>
       <Button label="закрыть" icon="pi pi-times" @click="closeDialog" class="p-button-text p-button-sm" />
     </template>
-  </Dialog>
+  </Dialog> -->
   <!-- </OverlayPanel> -->
 </template>
 
@@ -636,10 +665,9 @@ export default {
         this.itemSelectType = 'update';
         this.$refs.opItems.toggle(event);
       },
-      onAddItemClick() { //event) {
+      onAddItemClick() {
         this.$store.dispatch('getItemsWithRest', this.doc.date_time);
         this.itemSelectType = 'add';
-        // this.$refs.opItems.toggle(event);
         this.displayItems = true;
       },
       onCellEditInit(event) {
@@ -656,7 +684,6 @@ export default {
         } else {
           this.addItem(event.data.id, event.data.name, event.data.price, event.data.is_composite);
         }
-        // this.$refs.opItems.hide();
         this.$emit('disableHoldButton');
       },
       updateItem(item_id, item_name, item_price, is_composite){
@@ -793,5 +820,9 @@ class Item {
     width: 900px; 
     height: 600px; 
     background-color: white;
+  }
+  .p-dialog, :deep(.p-dialog) {
+    height : 500px;
+    width : 900px;
   }
 </style>

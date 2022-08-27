@@ -32,7 +32,7 @@
     </DataTable>
   </div>
     
-  <Dialog header="Подбор номенклатуры" class="border lol" v-model:visible="displayItems" :modal="true" :closable="false"
+  <Dialog header="Подбор номенклатуры" class="border" v-model:visible="displayItems" :modal="true" :closable="false"
       :contentStyle="{height: '100%'}" :style="{width: '900px', height: '500px'}"> 
     <template #header>
       <div> 
@@ -175,10 +175,6 @@ function atStartOfDay(date) {
   }
   .m0 {
     padding: 0.5rem 0.1rem;
-  }
-  .lol, :deep(.lol) {
-    height : 500px;
-    width : 900px;
   }
   .p-dialog, :deep(.p-dialog) {
     height : 500px;
