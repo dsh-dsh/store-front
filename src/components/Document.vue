@@ -54,7 +54,7 @@
     <div v-if="doc.check_info">
         <Divider align="left">
             <div class="inline-flex align-items-center">
-            <i class="pi pi-user mr-2"></i>
+            <i class="pi pi-paperclip mr-2"></i>
             информация из чека ККМ
             </div>
         </Divider>
@@ -151,14 +151,16 @@
       <DataTable :value="doc.doc_items" editMode="cell" class="p-datatable-sm" responsiveLayout="scroll">
         <Column field="item_name" header="Наименование" key="item_name"></Column>
         <Column field="quantity" header="Количество" key="quantity"></Column>
-        <Column v-if="isInventory" field="quantity_fact" header="Фактически" key="quantity_fact"></Column>
+        <Column v-if="isInventory" field="quantity_fact" header="Количество факт." key="quantity_fact"></Column>
         <Column field="price" header="Цена" key="price"></Column>
         <Column field="amount" header="Сумма" key="price"></Column>
+        <Column v-if="isInventory" field="amount_fact" header="Сумма факт." key="amount_fact"></Column>
         <Column v-if="isCheck" field="discount" header="Скидка" key="discount"></Column>
         <ColumnGroup type="footer">
           <Row>
-              <Column footer="сумма:" :colspan="colSpan" footerStyle="text-align:right" />
-              <Column :footer="totalAmount" />
+            <Column footer="сумма:" :colspan="colSpan" footerStyle="text-align:right" />
+            <Column :footer="totalAmount" />
+            <Column v-if="isInventory" :footer="totalAmountFact" />
           </Row>
         </ColumnGroup>
       </DataTable> 
@@ -212,6 +214,13 @@ export default {
           let total = 0;
           for(let item of this.doc.doc_items) {
               total += (item.price * item.quantity) - item.discount;
+          }
+          return this.formatCurrency(total);
+        },
+        totalAmountFact() {
+          let total = 0;
+          for(let item of this.doc.doc_items) {
+              total += item.price * item.quantity_fact;
           }
           return this.formatCurrency(total);
         }

@@ -166,12 +166,17 @@ export const DocStore = {
 		},
 		async hold1CDocuments({commit, rootState}) {
 			let headers = {'Authorization': rootState.token };
-			const response = await post('/api/v1/1с/hold', headers, null, rootState);
+			const response = await post('/api/v1/1c/hold', headers, null, rootState);
 			if(response.data == 'ok') { commit('setSuccess'); }
 		},
 		async checkUnholden1CDocuments({commit, rootState}) {
-			const response = await get('/api/v1/1с/check', rootState);
+			const response = await get('/api/v1/1c/check', rootState);
 			commit('setUnholdenCheckDate', response)
+		},
+		async getAAA({commit, rootState}) {
+			let headers = {'Authorization': rootState.token };
+			const response = await post('/api/v1/1c/number/3', headers, null, rootState);
+			if(response.data == 'ok') { commit('setSuccess'); }
 		},
     }
 }

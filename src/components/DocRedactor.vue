@@ -108,7 +108,7 @@
     <div v-if="doc.check_info">
       <Divider align="left">
         <div class="inline-flex align-items-center">
-          <i class="pi pi-user mr-2"></i>
+          <i class="pi pi-paperclip mr-2"></i>
           информация из чека ККМ
         </div>
       </Divider>
@@ -180,7 +180,7 @@
             <InputText @change="disableHoldButton" v-model="data[field]" autofocus />
           </template>
         </Column>
-        <Column v-if="isInventory" field="quantity_fact" header="Фактически" key="quantity_fact">
+        <Column v-if="isInventory" field="quantity_fact" header="Количество факт." key="quantity_fact">
           <template #editor="{ data, field }">
             <InputText @change="disableHoldButton" v-model="data[field]" autofocus />
           </template>
@@ -191,6 +191,11 @@
           </template>
         </Column>
         <Column field="amount" header="Сумма" key="amount">
+          <template #editor="{ data, field }">
+            <InputText @change="disableHoldButton" v-model="data[field]" autofocus />
+          </template>
+        </Column>
+        <Column v-if="isInventory" field="amount_fact" header="Сумма факт." key="amount_fact">
           <template #editor="{ data, field }">
             <InputText @change="disableHoldButton" v-model="data[field]" autofocus />
           </template>
@@ -208,7 +213,8 @@
         <ColumnGroup type="footer">
           <Row>
               <Column footer="сумма:" :colspan="colSpan" footerStyle="text-align:right" />
-              <Column :footer="totalAmount" :colspan="2" />
+              <Column :footer="totalAmount" />
+            <Column v-if="isInventory" :footer="totalAmountFact" :colspan="2" />
           </Row>
         </ColumnGroup>
       </DataTable> 
@@ -277,37 +283,6 @@
     </template>
   </Dialog>
 
-  <!-- <OverlayPanel ref="opItems"> -->
-  <!-- <Dialog header="Подбор номенклатуры" class="border dialog" v-model:visible="displayItems" :modal="true" :showHeader="false"> 
-    <br>
-    <DataTable :value="items" class="p-datatable-sm" v-model:selection="selectedItem" selectionMode="single" 
-                v-model:filters="filters" filterDisplay="menu" :globalFilterFields="['name']"
-                @rowSelect="onItemSelect" :scrollable="true" scrollHeight="500px" width="900px" :loading="loading">
-        <template #header>
-          <div class="flex justify-content-start">
-              <InputText class="p-inputtext-sm mr-2" v-model="filters['global'].value" placeholder="поиск" autofocus />
-              <Button icon="pi pi-times" class="p-button-rounded p-button-text p-button-plain p-button-sm" @click="clearFilter"/>
-          </div>
-        </template>
-        <template #loading>
-          <div class="flex justify-content-center">
-            <i class="pi pi-spin pi-spinner" style="font-size: 2rem">
-          </i></div>
-        </template>
-        <Column field="name" header="Name" sortable />
-        <Column v-for="storage of storages" :header="storage.name" :key="storage.id">
-          <template #body="{data}">
-            <div :class="boldClass(doc, storage)"> {{getItemRestOnStorage(data, storage)}} </div>
-          </template>
-        </Column>
-        <Column field="price" header="Последняя цена" sortable />
-    </DataTable>
-    <br>
-    <template #footer>
-      <Button label="закрыть" icon="pi pi-times" @click="closeDialog" class="p-button-text p-button-sm" />
-    </template>
-  </Dialog> -->
-  <!-- </OverlayPanel> -->
 </template>
 
 <script>
@@ -421,6 +396,13 @@ export default {
           let total = 0;
           for(let item of this.doc.doc_items) {
               total += item.amount - item.discount;
+          }
+          return this.formatCurrency(total);
+        },
+        totalAmountFact() {
+          let total = 0;
+          for(let item of this.doc.doc_items) {
+              total += item.price * item.quantity_fact;
           }
           return this.formatCurrency(total);
         },
@@ -590,10 +572,15 @@ export default {
         if(field != 'item_name') {
           data[field] = newValue;
         }
-        if(field === 'quantity' || field === 'price' || field === 'discount') {
+        if(field === 'quantity' || field === 'quantity_fact' || field === 'price' || field === 'discount') {
           data['amount'] = data['price'] * data['quantity'];
-        } else if(field === 'amount') {
+          data['amount_fact'] = data['price'] * data['quantity_fact'];
+        } else if(field === 'amount_fact') {
+          data['price'] = data['amount_fact'] / data['quantity_fact'];
+          data['amount'] = data['price'] * data['quantity'];
+        }else if(field === 'amount') {
           data['price'] = data['amount'] / data['quantity'];
+          data['amount_fact'] = data['price'] * data['quantity_fact'];
         }
       },
       formatCurrency(value) {
@@ -816,11 +803,11 @@ class Item {
   .ml-1 {
       margin-left: 10 px;
   }
-  .dialog {
+  /* .dialog {
     width: 900px; 
     height: 600px; 
     background-color: white;
-  }
+  } */
   .p-dialog, :deep(.p-dialog) {
     height : 500px;
     width : 900px;

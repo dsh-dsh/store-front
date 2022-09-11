@@ -138,6 +138,9 @@
     </template>
   </Dialog>
 
+      <Button label="aaa" icon="pi pi-times" @click="aaa" class="p-button-text" />
+
+
 </template>
 
 <script>
@@ -305,6 +308,9 @@ export default {
       }
     },
 	methods: {
+    aaa() {
+        this.$store.dispatch('getAAA');
+    },
     getName(value) {
       if(value) {
         return value.name;
