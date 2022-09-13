@@ -138,9 +138,6 @@
     </template>
   </Dialog>
 
-      <Button label="aaa" icon="pi pi-times" @click="aaa" class="p-button-text" />
-
-
 </template>
 
 <script>

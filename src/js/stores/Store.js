@@ -66,7 +66,7 @@ const store = createStore({
 			context.commit('getToken')
 		}, 
 		getMessage(context, message) {
-			context.state.toast?.add({severity:'error', summary: 'Info Message', detail: message, life: 1000})
+			context.state.toast?.add({severity:'error', summary: 'Info Message', detail: message, life: 3000})
 		},
 		installToast(context, toast) {
 			context.commit('installToast', toast)

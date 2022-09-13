@@ -67,7 +67,6 @@ export const SettingStore = {
 			let request = {'type': Property.AVERAGE_COST, 'property': value};
 			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
 			const response = await post('/api/v1/setting/average/price/period', headers, request, rootState);
-            console.log(response)
             if(response.data == "ok") {
                 this.dispatch("getAveragePriceForPeriodCloseProperty");
             }
@@ -76,7 +75,6 @@ export const SettingStore = {
 			let request = {'type': Property.AVERAGE_COST, 'property': value};
 			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
 			const response = await post('/api/v1/setting/average/price/docs', headers, request, rootState);
-            console.log(response)
             if(response.data == "ok") {
                 this.dispatch("getAveragePriceForDocsProperty");
             }
