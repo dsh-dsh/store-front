@@ -11,6 +11,7 @@ export async function get(url, state) {
 }
 
 export async function post(url, headers, body, state) {
+	console.log(host, url);
     return fetch(host + url, {
 		method: 'POST',
 		headers: headers,

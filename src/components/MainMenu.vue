@@ -1,15 +1,29 @@
 <template>
-  <div class="main_menu">
-    <MegaMenu :model="items" orientation="vertical" />
+  <div class="mb-3">
+    <Menubar :model="items">
+      <template #start>
+        <img alt="logo" src="../../src/assets/img/storelogo.png" height="30" class="mr-2">
+      </template>
+      <template #end>
+        <div class="conteiner">
+        <UserAvatar />
+        <Button label="logout" @click="logout()" class="p-button-sm p-button-rounded" />
+        </div>
+      </template>
+    </Menubar>
   </div>
 </template>
 
 <script>
-import MegaMenu from 'primevue/megamenu'
+import Menubar from 'primevue/menubar';
+import UserAvatar from '@/components/UserAvatar.vue';
+import Button from 'primevue/button';
 export default {
   name: 'MainMenu',
   components: {
-    MegaMenu,
+    Menubar,
+    UserAvatar,
+    Button
   },
   data() {
     return {
@@ -39,3 +53,12 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+  .conteiner {
+    display: flex;
+  }
+  .mb-3 {
+    margin-bottom: 30px;
+  }
+</style>

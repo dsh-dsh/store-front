@@ -3,13 +3,13 @@
     <div>Ингредиенты</div>
     <div><Button icon="pi pi-plus" @click="addNewIngredient" class="p-button-text p-button-rounded" /></div>
   </div>
-  <div class="border contentRight">
+  <div>
     
     <DataTable :value="this.ingredients" editMode="cell" @cell-edit-complete="onCellEditComplete"
-      class="p-datatable-sm editable-cells-table">
+      class="p-datatable-sm editable-cells-table"  responsiveLayout="scroll">
       <Column style="width: 2.2rem">
         <template #body="{data}">
-          <img @click="onIngredientClick(data)" src="../../dist/img/ii.png" />
+          <img @click="onIngredientClick(data)" src="../../src/assets/img/ii.png" />
         </template>
       </Column>
       <Column field="name" header="Наименование"></Column>
@@ -25,15 +25,15 @@
       </Column>
       <Column  style="width:3rem">
         <template #body="{data}">
-          <img v-if="data.enable.quantity == 1.0" @click="toogleDeleted(data)" src="../../dist/img/v.png" />
-          <img v-else @click="toogleDeleted(data)" src="../../dist/img/x.png" />
+          <img v-if="data.enable.quantity == 1.0" @click="toogleDeleted(data)" src="../../src/assets/img/v.png" />
+          <img v-else @click="toogleDeleted(data)" src="../../src/assets/img/x.png" />
         </template>
       </Column>
     </DataTable>
   </div>
     
-  <Dialog header="Подбор номенклатуры" class="border" v-model:visible="displayItems" :modal="true" :closable="false"
-      :contentStyle="{height: '100%'}" :style="{width: '900px', height: '500px'}"> 
+  <Dialog header="Подбор номенклатуры" v-model:visible="displayItems" :modal="true" :closable="false"
+      :contentStyle="{height: '100%'}" :style="{width: '90%', height: '90%'}"> 
     <template #header>
       <div> 
         <InputText class="p-inputtext-sm mr-2" v-model="filters['global'].value" placeholder="поиск" autofocus />
@@ -42,7 +42,7 @@
     </template>
     <DataTable :value="items" class="p-datatable-sm" v-model:selection="selectedItem" selectionMode="single" 
                 v-model:filters="filters" filterDisplay="menu" :globalFilterFields="['name']"
-                @rowSelect="onItemSelect" :scrollable="false" :loading="loading">
+                @rowSelect="onItemSelect" responsiveLayout="scroll" :loading="loading">
         <template #loading>
           <div class="flex justify-content-center">
             <i class="pi pi-spin pi-spinner" style="font-size: 2rem">

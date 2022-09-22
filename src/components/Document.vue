@@ -91,28 +91,28 @@
             </div>
             <div class="col-12 md:col-2 center">
                 <p>возврат </p>
-                <img  v-if="doc.check_info.is_return" src="../../dist/img/v.png" class="ml-2" />
-                <img  v-else src="../../dist/img/o.png" class="ml-2" />
+                <img  v-if="doc.check_info.is_return" src="../../src/assets/img/v.png" class="ml-2" />
+                <img  v-else src="../../src/assets/img/o.png" class="ml-2" />
             </div>
             <div class="col-12 md:col-2 center">
                 <p>пробит </p>
-                <img  v-if="doc.check_info.is_KKM_checked" src="../../dist/img/v.png" class="ml-2" />
-                <img  v-else src="../../dist/img/o.png" class="ml-2" />
+                <img  v-if="doc.check_info.is_KKM_checked" src="../../src/assets/img/v.png" class="ml-2" />
+                <img  v-else src="../../src/assets/img/o.png" class="ml-2" />
             </div>
             <div class="col-12 md:col-2 center">
                 <p>оплачен </p>
-                <img  v-if="doc.check_info.is_payed" src="../../dist/img/v.png" class="ml-2" />
-                <img  v-else src="../../dist/img/o.png" class="ml-2" />
+                <img  v-if="doc.check_info.is_payed" src="../../src/assets/img/v.png" class="ml-2" />
+                <img  v-else src="../../src/assets/img/o.png" class="ml-2" />
             </div>
             <div class="col-12 md:col-2 center">
                 <p>эквайринг </p>
-                <img  v-if="doc.check_info.is_payed_by_card" src="../../dist/img/v.png" class="ml-2" />
-                <img  v-else src="../../dist/img/o.png" class="ml-2" />
+                <img  v-if="doc.check_info.is_payed_by_card" src="../../src/assets/img/v.png" class="ml-2" />
+                <img  v-else src="../../src/assets/img/o.png" class="ml-2" />
             </div>
             <div class="col-12 md:col-2 center">
                 <p>доставка </p>
-                <img  v-if="doc.check_info.is_delivery" src="../../dist/img/v.png" class="ml-2" />
-                <img  v-else src="../../dist/img/o.png" class="ml-2" />
+                <img  v-if="doc.check_info.is_delivery" src="../../src/assets/img/v.png" class="ml-2" />
+                <img  v-else src="../../src/assets/img/o.png" class="ml-2" />
             </div>
         </div>
     </div>

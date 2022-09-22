@@ -1,4 +1,4 @@
-export const host = "http://localhost:8081";
+export const host = location.hostname == "localhost" ? "http://localhost:8081" : "";
 
 export const Property = { 
     PROJECT: 'PROJECT', 
@@ -11,7 +11,6 @@ export const DocumentType = {
     POSTING_DOC: 'Поступление',
     RECEIPT_DOC: 'Оприходование',
     MOVEMENT_DOC: 'Перемещение',
-    WRITE_OFF_DOC: 'Списание',
     CHECK_DOC: 'Чек ККМ',
     CREDIT_ORDER_DOC: 'ПКО',
     WITHDRAW_ORDER_DOC: 'Расходный кассовый ордер',

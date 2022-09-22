@@ -1,16 +1,9 @@
 <template>
-  <Toolbar class="top-menu">
-    <template #end>
-      <UserAvatar />
-      <Button label="logout" @click="logout()" class="p-button-sm p-button-rounded" />
-    </template>
-  </Toolbar>
-  <div class="conteiner">
   <MainMenu />
   <div class="content">
     <div class="flex justify-content-between mb-2">
       <DocTabs :filter="filter" />
-      <Button label="Новый документ" @click="chooseDocType" class="p-button-rounded p-button-secondary p-button-outlined" />
+      <Button icon="pi pi-plus" @click="chooseDocType" class="p-button-rounded p-button-secondary p-button-outlined mr-2" />
     </div>
     <div>
       <div class="border">
@@ -86,9 +79,8 @@
       </div>  
     </div>
   </div>
-  </div>
 
-  <Dialog v-model:visible="displayDocument" :style="{width: '80vw'}" :modal="true"  :showHeader="showDialogHeader">
+  <Dialog v-model:visible="displayDocument" :style="{width: '90%'}" :modal="true"  :showHeader="showDialogHeader">
     <div v-if="docRedactor">
       <DocRedactor :docId="docId" @disable-hold-button="disableHoldButton" @disable-save-button="disableSaveButton" :type="type" :docType="docType"/>
     </div>
@@ -149,8 +141,6 @@ import DocTabs from '@/components/DocTabs';
 import DocRedactor from '@/components/DocRedactor.vue';
 import Document from '@/components/Document.vue';
 import MainMenu from '@/components/MainMenu.vue';
-import UserAvatar from '@/components/UserAvatar.vue';
-import Toolbar from 'primevue/toolbar';
 import OverlayPanel from 'primevue/overlaypanel';
 import Menu from 'primevue/menu';
 import Calendar from 'primevue/calendar';
@@ -168,8 +158,6 @@ export default {
       DocRedactor,
       Document,
       MainMenu,
-      UserAvatar,
-      Toolbar,
       OverlayPanel,
       Menu,
       Calendar,
@@ -204,7 +192,29 @@ export default {
         disabledSaveButton: false,
         startPeriod: null,
         menuModel: [],
-        salectedSaveTime: 'dayEnd'
+        salectedSaveTime: 'dayEnd',
+        items: [
+        {
+          label: "Документы",
+          icon: "pi pi-fw pi-file",
+          to: '/documents/posting'
+        },
+        {
+          label: "Номенклатура",
+          icon: "pi pi-fw pi-shopping-bag",
+          to: "/items"
+        },
+        {
+          label: "Пользователи",
+          icon: "pi pi-fw pi-users",
+          to: "/users"
+        },
+        {
+          label: "Настройки",
+          icon: "pi pi-fw pi-cog",
+          to: "/settings"
+        },
+      ],
       };
     },
     computed: {
@@ -519,22 +529,10 @@ export default {
 
 </script>
 <style scoped>
-  .top-menu {
-    background-color: rgb(55, 59, 65);
-    margin-bottom: 15px;
-  }
-  .conteiner {
-    display: flex;
-  }
-  .buttonContainer {
-    display: flex;
-    margin-bottom: 8px;
-  }
   .content {
     display: flex;
     flex-direction: column;
-    flex: 0 0 80%;
-    margin-left: 30px;
+    flex: 0 0 100%;
   }
   .border {
     border: 1px solid #dee2e6;
@@ -560,12 +558,6 @@ export default {
   }
   .horizontal {
     justify-content: center;
-  }
-  .logout {
-    font-weight: bold;
-    color: #000000;
-    background: #e3f2fd;
-    border: 3px solid #607d8b;
   }
   .disabled {
     color:#b1b1b1 !important;

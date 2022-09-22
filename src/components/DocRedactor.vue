@@ -212,8 +212,8 @@
         </Column>
         <ColumnGroup type="footer">
           <Row>
-              <Column footer="сумма:" :colspan="colSpan" footerStyle="text-align:right" />
-              <Column :footer="totalAmount" />
+            <Column footer="сумма:" :colspan="colSpan" footerStyle="text-align:right" />
+            <Column :footer="totalAmount" :colspan="colSpan2" />
             <Column v-if="isInventory" :footer="totalAmountFact" :colspan="2" />
           </Row>
         </ColumnGroup>
@@ -254,7 +254,7 @@
   </OverlayPanel>
 
   <Dialog header="Подбор номенклатуры" class="border" v-model:visible="displayItems" :modal="true" :closable="false"
-      :contentStyle="{height: '100%'}" :style="{width: '900px', height: '500px'}"> 
+      :contentStyle="{height: '100%'}" :style="{width: '90%', height: '90%'}"> 
     <template #header>
       <div> 
         <InputText class="p-inputtext-sm mr-2" v-model="filters['global'].value" placeholder="поиск" autofocus />
@@ -263,7 +263,7 @@
     </template>
     <DataTable :value="items" class="p-datatable-sm" v-model:selection="selectedItem" selectionMode="single" 
                 v-model:filters="filters" filterDisplay="menu" :globalFilterFields="['name']"
-                @rowSelect="onItemSelect" :scrollable="false" :loading="loading">
+                @rowSelect="onItemSelect" responsiveLayout="scroll" :loading="loading">
         <template #loading>
           <div class="flex justify-content-center">
             <i class="pi pi-spin pi-spinner" style="font-size: 2rem">
@@ -275,7 +275,7 @@
             <div :class="boldClass(doc, storage)"> {{getItemRestOnStorage(data, storage)}} </div>
           </template>
         </Column>
-        <Column field="price" header="Последняя цена" sortable />
+        <Column field="price" header="цена" sortable />
     </DataTable>
     <br>
     <template #footer>
@@ -357,7 +357,8 @@ export default {
         orderDoc: false,
         isInventory: false,
         isCheck: false,
-        colSpan: 3,            
+        colSpan: 3,  
+        colSpan2: 2,              
         DocumentType: DocumentType,
         paymentTypes:[],
         displayItems: false
@@ -465,11 +466,12 @@ export default {
         }
         if(value.doc_type == DocumentType.CHECK_DOC) {
           this.isCheck = true;
-          this.colSpan++;
+          this.colSpan2++;
         }
         if(value.doc_type == DocumentType.INVENTORY_DOC) {
           this.isInventory = true;
           this.colSpan++;
+          this.colSpan2--;
         }
         this.selectedProject = value.project
         this.dateInput = value.date_time;

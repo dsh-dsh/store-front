@@ -226,12 +226,16 @@ export default {
     .longinput {
         width: 250px;
     }
+    .textinput {
+        width: 520px;
+        height: 100px;
+    }
     .itemform {
         width: 580px;
         text-align: left;
         border: 1px solid #dee2e6;
         border-radius: 3px;
-        margin-left: 30px;
+        margin-left: 20px;
     }
     .border {
         border: 1px solid #dee2e6;

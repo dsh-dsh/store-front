@@ -105,7 +105,7 @@
                     <IngredientTable />
                 </div>
 
-                <div class="col-12 md:col-6">
+                <div class="col-12 md:col-12">
                     <span class="p-float-label">
                         <Textarea id="comment" class="textinput" v-model="item.comment" rows="4" cols="30" />
                         <label for="comment">Комментарий</label>
@@ -337,7 +337,7 @@ class Price {
         text-align: left;
         border: 1px solid #dee2e6;
         border-radius: 3px;
-        margin-left: 30px;
+        margin-left: 20px;
     }
     .checkBoxLabel {
         margin: 00px 0px 20px 0px;

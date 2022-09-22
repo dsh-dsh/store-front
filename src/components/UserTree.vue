@@ -56,6 +56,5 @@ export default {
 <style scoped>
   .tree {
     width: 250pt;
-    margin-left: 30px;
   }
 </style>

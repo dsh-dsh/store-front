@@ -1,12 +1,6 @@
 <template>
-  <Toolbar class="top-menu">
-    <template #end>
-      <UserAvatar />
-      <Button label="logout" @click="logout()" class="p-button-sm p-button-rounded" />
-    </template>
-  </Toolbar>
+  <MainMenu />
   <div class="conteiner">
-    <MainMenu />
     <UserTree />
     <UserForm />
   </div>
@@ -16,19 +10,13 @@
 import UserTree from '@/components/UserTree.vue';
 import UserForm from '@/components/UserForm.vue';
 import MainMenu from '@/components/MainMenu.vue';
-import UserAvatar from '@/components/UserAvatar.vue';
-import Toolbar from 'primevue/toolbar';
-import Button from 'primevue/button';
 
 export default {
   name: 'UserContent',
   components: {
     UserTree, 
     UserForm,
-    MainMenu,
-    UserAvatar,
-    Toolbar,
-    Button
+    MainMenu
   },
   data() {
     return {
@@ -45,11 +33,8 @@ export default {
 </script>
 
 <style scoped>
-  .top-menu {
-    background-color: rgb(55, 59, 65);
-    margin-bottom: 15px;
-  }
   .conteiner {
     display: flex;
+    flex: 0 0 100%;
   }
 </style>
