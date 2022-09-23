@@ -197,7 +197,7 @@ export default {
         {
           label: "Документы",
           icon: "pi pi-fw pi-file",
-          to: '/documents/posting'
+          to: '/documents/default'
         },
         {
           label: "Номенклатура",
