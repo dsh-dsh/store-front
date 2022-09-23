@@ -7,7 +7,7 @@
       <template #end>
         <div class="conteiner">
         <UserAvatar />
-        <Button label="logout" @click="logout()" class="p-button-sm p-button-rounded" />
+        <Button icon="pi pi-arrow-circle-right" @click="logout()" class="p-button-rounded p-button-secondary p-button-text" />
         </div>
       </template>
     </Menubar>
@@ -51,6 +51,11 @@ export default {
       ],
     };
   },
+  methods: {
+    logout() {
+      this.$store.dispatch('logout');
+    }
+  }
 }
 </script>
 

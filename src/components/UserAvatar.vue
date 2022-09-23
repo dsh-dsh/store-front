@@ -1,7 +1,7 @@
 <template>
     <div class="name" v-if="user">
-      <Avatar :label="label" class="avatar mr-1" shape="circle"  />
-      {{user.first_name + " " + user.last_name + " (" + user.role + ")"}}
+      <Avatar :label="label" class="avatar" shape="circle"  />
+      {{user.first_name + " " + user.last_name}}
     </div>
 </template>
 
@@ -30,11 +30,11 @@ export default {
 </script>
 <style scoped>
   .name {
-    color: #dee2e6;
-    margin: 0px 20px 0px 0px;
+    color: #121e2b;
+    margin: 0px 0px 0px 0px;
   }
   .avatar {
-    background-color:#9c27b0; 
-    color: #dee2e6;
+    background-color:#3b8882; 
+    color: #eff1f3;
   }
 </style>

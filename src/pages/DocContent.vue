@@ -42,9 +42,9 @@
           <Column field="doc_type" header="Документ" sortable>
             <template #body="{data}"><div :class="disabledClass(data)">{{data.doc_type}}</div></template>
           </Column>
-          <Column field="project.name" header="Проект" sortable >
+          <!-- <Column field="project.name" header="Проект" sortable >
             <template #body="{data}"><div :class="disabledClass(data)">{{data.project.name}}</div></template>
-          </Column>
+          </Column> -->
           <Column field="date_time" header="Время" sortable dataType="date">
             <template #body="{data}">
               <div :class="disabledClass(data)">
@@ -483,9 +483,6 @@ export default {
         }
       }
       return true;
-    },
-    logout() {
-      this.$store.dispatch('logout');
     },
     chooseDocType(event) {
         this.$refs.opDocTypes.toggle(event);

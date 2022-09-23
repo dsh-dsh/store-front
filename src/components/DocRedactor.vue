@@ -649,10 +649,10 @@ export default {
         this.$refs.opStorage.hide();
         this.$emit('disableHoldButton');
       },
-      onItemClick(event) {
+      onItemClick() {
         this.$store.dispatch('getItemsWithRest', this.doc.date_time);
         this.itemSelectType = 'update';
-        this.$refs.opItems.toggle(event);
+        this.displayItems = true;
       },
       onAddItemClick() {
         this.$store.dispatch('getItemsWithRest', this.doc.date_time);

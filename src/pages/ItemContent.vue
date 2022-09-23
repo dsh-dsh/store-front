@@ -21,14 +21,7 @@ export default {
   data() {
     return {
     };
-  },
-  computed: {
-  },
-  methods: {
-    logout() {
-      this.$store.dispatch('logout');
-    }
-  },
+  }
 }
 </script>
 
