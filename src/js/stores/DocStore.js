@@ -1,6 +1,6 @@
 import Document from "@/js/model/Document"
 import {get, post, put, del} from "@/js/common"
-import DocItem from "../model/DocItem";
+import DocItem from "@/js/model/DocItem";
 import {DocumentType} from '@/js/Constants';
 
 function fillRelativeDoc(relativeDoc, inventiryDoc) {

@@ -75,22 +75,18 @@
         <div v-if="doc.doc_type == DocumentType.POSTING_DOC" class="field col-12 md:col-4"></div>
         
         <div v-if="orderDoc" class="field col-12 md:col-4">
-          <!-- <div v-if="doc.individual"> -->
             <label for="individual" class="label">Физ лицо</label><br>
             <div class="p-inputgroup">
               <InputText id="individual" type="text" class="p-inputtext-sm" v-model="doc.individual.name" />
               <Button icon="pi pi-check" class="p-button-warning" @click="onIndividualClick"/>
             </div>
-          <!-- </div> -->
         </div>
         <div v-if="orderDoc" class="field col-12 md:col-4">
-          <!-- <div v-if="doc.payment_type"> -->
             <label for="payment_type" class="label">Физ лицо</label><br>
             <div class="p-inputgroup">
               <InputText id="payment_type" type="text" class="p-inputtext-sm" v-model="doc.payment_type" />
               <Button icon="pi pi-check" class="p-button-warning" @click="onPaymentTypeClick"/>
             </div>
-          <!-- </div> -->
         </div>
         <div v-if="orderDoc" class="field col-12 md:col-4"></div>
 
@@ -166,13 +162,15 @@
       </div>
     </div>
     <div v-if="doc.doc_items">
+      
       <Button icon="pi pi-plus" @click="onAddItemClick" class="p-button-text p-button-rounded" />
+
       <DataTable :value="doc.doc_items" :rowClass="rowClass" editMode="cell" @cell-edit-init="onCellEditInit"
           @cell-edit-complete="onCellEditComplete" class="p-datatable-sm editable-cells-table" responsiveLayout="scroll">
         <Column field="item_name" header="Наименование" key="item_name">
           <template #editor="{ data, field }">
             <InputText @change="disableHoldButton" v-model="data[field]" autofocus/>
-            <Button icon="pi pi-check" class="p-button-warning" @click="onItemClick"/>
+            <Button icon="pi pi-check" class="p-button-warning" @click="onItemClick(data)"/>
           </template>
         </Column>
         <Column field="quantity" header="Количество" key="quantity">
@@ -253,35 +251,7 @@
     </DataTable>
   </OverlayPanel>
 
-  <Dialog header="Подбор номенклатуры" class="border" v-model:visible="displayItems" :modal="true" :closable="false"
-      :contentStyle="{height: '100%'}" :style="{width: '90%', height: '90%'}"> 
-    <template #header>
-      <div> 
-        <InputText class="p-inputtext-sm mr-2" v-model="filters['global'].value" placeholder="поиск" autofocus />
-        <Button icon="pi pi-times" class="p-button-rounded p-button-text p-button-plain p-button-sm" @click="clearFilter"/>
-      </div>
-    </template>
-    <DataTable :value="items" class="p-datatable-sm" v-model:selection="selectedItem" selectionMode="single" 
-                v-model:filters="filters" filterDisplay="menu" :globalFilterFields="['name']"
-                @rowSelect="onItemSelect" responsiveLayout="scroll" :loading="loading">
-        <template #loading>
-          <div class="flex justify-content-center">
-            <i class="pi pi-spin pi-spinner" style="font-size: 2rem">
-          </i></div>
-        </template>
-        <Column field="name" header="Name" sortable />
-        <Column v-for="storage of storages" :header="storage.name" :key="storage.id">
-          <template #body="{data}">
-            <div :class="boldClass(doc, storage)"> {{getItemRestOnStorage(data, storage)}} </div>
-          </template>
-        </Column>
-        <Column field="price" header="цена" sortable />
-    </DataTable>
-    <br>
-    <template #footer>
-      <Button label="закрыть" icon="pi pi-times" @click="closeDialog" class="p-button-text p-button-sm" />
-    </template>
-  </Dialog>
+  <ItemChoose :displayItems="displayItems" :currentStorage="doc.storage_to"  :dateTime="doc.date_time" :multiplySelect="multiplySelectItems" @new-item-list="addItemsToDoc"/>
 
 </template>
 
@@ -298,7 +268,7 @@ import OverlayPanel from 'primevue/overlaypanel';
 import Divider from 'primevue/divider';
 import {FilterMatchMode, FilterOperator} from 'primevue/api';
 import {Property, DocumentType, PaymentType} from '@/js/Constants';
-import Dialog from 'primevue/dialog';
+import ItemChoose from '@/components/ItemChoose.vue';
 
 export default {
     name: 'DocContent',
@@ -313,7 +283,7 @@ export default {
         Button,
         OverlayPanel,
         Divider,
-        Dialog
+        ItemChoose
     },
     props: {
         docId: Number,
@@ -352,7 +322,6 @@ export default {
         checkDateInput: '',
         currentField: null,
         currentData: null,
-        itemSelectType: String,
         disabledFillItemRest: true,
         orderDoc: false,
         isInventory: false,
@@ -361,7 +330,10 @@ export default {
         colSpan2: 2,              
         DocumentType: DocumentType,
         paymentTypes:[],
-        displayItems: false
+        displayItems: 1,
+        multiplySelectItems: false,
+        currentItem: undefined
+
       };
     },
     computed: {
@@ -501,8 +473,8 @@ export default {
         }
       },
       closeDialog() {
-        this.displayItems = false;
-        this.clearFilter();
+        // this.displayItems = false;
+        // this.clearFilter();
       },
       setPaymentTypes() {
         this.paymentTypes = [];
@@ -649,15 +621,16 @@ export default {
         this.$refs.opStorage.hide();
         this.$emit('disableHoldButton');
       },
-      onItemClick() {
+      onItemClick(item) {
+        this.currentItem = item;
+        this.multiplySelectItems = false;
         this.$store.dispatch('getItemsWithRest', this.doc.date_time);
-        this.itemSelectType = 'update';
-        this.displayItems = true;
+        this.displayItems++;
       },
       onAddItemClick() {
+        this.multiplySelectItems = true;
         this.$store.dispatch('getItemsWithRest', this.doc.date_time);
-        this.itemSelectType = 'add';
-        this.displayItems = true;
+        this.displayItems++;
       },
       onCellEditInit(event) {
         let { data, field } = event;
@@ -666,68 +639,72 @@ export default {
           this.currentData = data;
         }
       },
-      onItemSelect(event) {
-        this.displayItems = false;
-        if(this.itemSelectType == 'update') {
-          this.updateItem(event.data.id, event.data.name, event.data.price, event.data.is_composite);
+      // onItemSelect(event) {
+      //   this.displayItems = false;
+      //   if(this.itemSelectType == 'update') {
+      //     this.updateItem(event.data.id, event.data.name, event.data.price, event.data.is_composite);
+      //   } else {
+      //     this.addItem(event.data.id, event.data.name, event.data.price, event.data.is_composite);
+      //   }
+      //   this.$emit('disableHoldButton');
+      // },
+      // updateItem(item_id, item_name, item_price, is_composite){
+      //   this.currentData['item_id'] = item_id;
+      //   this.currentData['item_name'] = item_name;
+      //   this.currentData['price'] = item_price;
+      //   this.currentData['is_composite'] = is_composite;
+      //   if(this.doc.doc_type == DocumentType.POSTING_DOC || this.doc.doc_type == DocumentType.RECEIPT_DOC) {
+      //     if(is_composite == true) {
+      //       this.$emit('disableSaveButton', true);
+      //     } 
+      //     else {
+      //       if(!checkComposite(this.doc.doc_items)) {
+      //         this.$emit('disableSaveButton', false);
+      //       }
+      //     }
+      //   }
+      // },
+      // addItem(item_id, item_name, item_price, is_composite) {
+      //   if(is_composite == true 
+      //       && (this.doc.doc_type == DocumentType.POSTING_DOC || this.doc.doc_type == DocumentType.RECEIPT_DOC)) {
+      //     this.$emit('disableSaveButton', true);
+      //   }
+      //   if(this.doc.doc_items.filter(item => item.item_id === item_id).length == 0) {
+      //     this.doc.doc_items.push(new DocItem(item_id, item_name, 0.0, item_price, 0.0, this.doc.id, is_composite));
+      //   }
+      // },
+      addItemsToDoc(newItemList) {
+        if(newItemList.length == 0) return;
+        if(this.multiplySelectItems) {
+          this.currentItem = undefined;
+          for(const item of newItemList) {
+            this.currentItem = this.doc.doc_items.filter(i => i.item_id == item.item_id).pop();
+            if (this.currentItem == undefined) {
+              this.doc.doc_items.push(item);
+            } else {
+              this.currentItem.quantity = item.quantity;
+              this.currentItem.amount = this.currentItem.price * this.currentItem.quantity;
+            }
+            this.currentItem = undefined;
+          }
         } else {
-          this.addItem(event.data.id, event.data.name, event.data.price, event.data.is_composite);
+          let item = newItemList[0];
+          if (this.currentItem != undefined) {
+              let currentItem = this.doc.doc_items.filter(i => i.item_id == this.currentItem.item_id).pop();
+              currentItem.item_name = item.item_name;
+              currentItem.item_id = item.item_id;
+          }
+          this.currentItem = undefined;
         }
         this.$emit('disableHoldButton');
-      },
-      updateItem(item_id, item_name, item_price, is_composite){
-        this.currentData['item_id'] = item_id;
-        this.currentData['item_name'] = item_name;
-        this.currentData['price'] = item_price;
-        this.currentData['is_composite'] = is_composite;
-        if(this.doc.doc_type == DocumentType.POSTING_DOC || this.doc.doc_type == DocumentType.RECEIPT_DOC) {
-          if(is_composite == true) {
-            this.$emit('disableSaveButton', true);
-          } 
-          else {
-            if(!checkComposite(this.doc.doc_items)) {
-              this.$emit('disableSaveButton', false);
-            }
-          }
-        }
-      },
-      addItem(item_id, item_name, item_price, is_composite) {
-        if(is_composite == true 
-            && (this.doc.doc_type == DocumentType.POSTING_DOC || this.doc.doc_type == DocumentType.RECEIPT_DOC)) {
-          this.$emit('disableSaveButton', true);
-        }
-        if(this.doc.doc_items.filter(item => item.item_id === item_id).length == 0) {
-          this.doc.doc_items.push(new Item(this.doc.id, item_id, item_name, 0.0, item_price, 0.0, 0.0, is_composite));
-        }
       }
     }
 }
 
-function checkComposite(docItems) {
-  let itemArr = docItems.filter(item => item.is_composite == true);
-  return itemArr.length > 0;
-}
-
-class Item {
-    document_id = 0;
-    item_id = 0;
-    item_name = "";
-    quantity = 0.0;
-    price = 0.0;
-    discount = 0.0;
-    quantity_fact = 0.0;
-    is_composite = false;
-    constructor(document_id, item_id, item_name, quantity, price, discount, quantity_fact, is_composite) {
-        this.document_id = document_id;
-        this.item_id = item_id;
-        this.item_name = item_name;
-        this.quantity = quantity;
-        this.price = price;
-        this.discount = discount;
-        this.quantity_fact = quantity_fact;
-        this.is_composite = is_composite;
-    }
-}
+// function checkComposite(docItems) {
+//   let itemArr = docItems.filter(item => item.is_composite == true);
+//   return itemArr.length > 0;
+// }
 
 </script>
 
@@ -739,13 +716,13 @@ class Item {
     display: flex;
     margin: 8px;
   }
-  .column {
+  /* .column {
     display: flex;
     flex-direction: column;
-  }
-  .row {
+  } */
+  /* .row {
     display: flex;
-  }
+  } */
   .border {
     border: 1px solid #dee2e6;
     border-radius: 3px;
