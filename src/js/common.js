@@ -6,20 +6,19 @@ export async function get(url, state) {
       headers: {'Authorization': state.token}
     })
 	.then(res  => res.json())
-	.then(data => handleResponce(data, state))
-    .then(data => data.data);
+	.then(res => handleResponce(res, state))
+    .then(res => res.data);
 }
 
 export async function post(url, headers, body, state) {
-	console.log(host, url);
     return fetch(host + url, {
 		method: 'POST',
 		headers: headers,
 		body: JSON.stringify(body)
     })
     .then(res => res.json())
-	.then(data => handleResponce(data, state))
-    .then(data => data);
+	.then(res => handleResponce(res, state))
+    .then(res => res.data);
 }
 
 export async function put(url, headers, body, state) {
@@ -29,8 +28,8 @@ export async function put(url, headers, body, state) {
 		body: JSON.stringify(body)
 	})
 	.then(res => res.json())
-	.then(data => handleResponce(data, state))
-	.then(data => data.data);
+	.then(res => handleResponce(res, state))
+	.then(res => res.data);
 }
 
 export async function del(url, headers, body, state) {
@@ -40,8 +39,8 @@ export async function del(url, headers, body, state) {
 		body: JSON.stringify(body)
 	})
 	.then(res => res.json())
-	.then(data => handleResponce(data, state))
-	.then(data => data.data);
+	.then(res => handleResponce(res, state))
+	.then(res => res.data);
 }
 
 function handleResponce(data, state) {

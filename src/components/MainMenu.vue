@@ -39,6 +39,11 @@ export default {
           to: "/items"
         },
         {
+          label: "Контрагенты",
+          icon: "pi pi-fw pi-clone",
+          to: "/companies"
+        },
+        {
           label: "Пользователи",
           icon: "pi pi-fw pi-users",
           to: "/users"

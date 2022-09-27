@@ -315,9 +315,6 @@ export default {
       }
     },
 	methods: {
-    aaa() {
-        this.$store.dispatch('getAAA');
-    },
     getName(value) {
       if(value) {
         return value.name;

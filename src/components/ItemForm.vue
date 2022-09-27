@@ -46,7 +46,7 @@
                 </div>
 
                 <div class="field col-12 md:col-6">
-                    <div id="aaa" class="p-inputgroup longinput">
+                    <div id="unit" class="p-inputgroup longinput">
                         <InputText id="unit" type="text" placeholder="Еденица" v-model="selectedUnit.name" />
                         <Button icon="pi pi-check" class="p-button-warning" @click="onUnitClick"/>
                     </div>
