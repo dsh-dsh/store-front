@@ -35,13 +35,17 @@ export const UserStore = {
 		async savePerson({rootState, commit}, person) {
 			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
 			let response;
+			let dtoPerson = new Person(0, person.id, person.first_name, person.last_name, person.email, person.phone, person.role, person.parent_id);
+			dtoPerson.birth_date = person.birth_date.getTime();
+			console.log(dtoPerson)
 			if(person.id == 0) {			
-				response = await post('/api/v1/users', headers, person, rootState);
+				response = await post('/api/v1/users', headers, dtoPerson, rootState);
 			} else {
-				response = await put('/api/v1/users/', headers, person, rootState);
+				response = await put('/api/v1/users/', headers, dtoPerson, rootState);
 			}
-			if(response.data == 'ok') { 
+			if(response == 'ok') { 
 				commit('setSuccess'); 
+				this.dispatch('getUserTree');
 			}
 			commit('setPerson', new Person(new Date()));
 		},

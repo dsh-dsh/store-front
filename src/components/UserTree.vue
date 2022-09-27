@@ -9,7 +9,7 @@
 import Tree from 'primevue/tree';
 
 export default {
-  name: 'ItemTree',
+  name: 'UserTree',
   components: {
     Tree
   },

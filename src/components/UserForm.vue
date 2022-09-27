@@ -21,10 +21,10 @@
                 </div>
 
                 <div class="field col-12 md:col-6">
-                    <span class="p-float-label">
+                    <!-- <span class="p-float-label">
                         <InputText id="password" class="longinput" type="text" v-model="currentPerson.password" disabled/>
                         <label for="password">Пароль</label>
-                    </span>
+                    </span> -->
                 </div>
                 <div class="field col-12 md:col-6">
                     <span class="p-float-label">
@@ -49,16 +49,16 @@
 
                 <div class="field col-12 md:col-6">
                     <span class="p-float-label">
-                        <Calendar id="birthdate" v-model="currentPerson.birth_date" @date-select="setDate" class="longinput" 
+                        <Calendar id="birthdate" v-model="currentPerson.birth_date" class="longinput" 
                                 :showIcon="true" :showButtonBar="true" dateFormat="dd.mm.yy" />
                         <label for="birthdate">день рождения</label>
                     </span>
                 </div>
                 <div class="field col-12 md:col-6">
-                    <div id="aaa" class="p-inputgroup longinput">
+                    <!-- <div id="project" class="p-inputgroup longinput">
                         <InputText id="unit" type="text" placeholder="Проект" v-model="selectedProject.name" />
                         <Button icon="pi pi-check" class="p-button-warning" @click="onProjectClick"/>
-                    </div>
+                    </div> -->
                 </div>
 
                 <div class="field col-12 md:col-12">
@@ -118,12 +118,12 @@
         </template>
     </Dialog>
     
-    <OverlayPanel ref="opProjects">
+    <!-- <OverlayPanel ref="opProjects">
         <DataTable :value="projects" v-model:selection="selectedProject" selectionMode="single" 
             :paginator="true" :rows="5" @rowSelect="onProjectSelect" responsiveLayout="scroll" >
             <Column field="name" header="Name" sortable style="width: 60%"/>
         </DataTable>
-    </OverlayPanel>
+    </OverlayPanel> -->
 
 </template>
 
@@ -134,10 +134,10 @@ import Checkbox from 'primevue/checkbox';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import {Person} from "@/js/model/Person"
-import OverlayPanel from 'primevue/overlaypanel';
+// import OverlayPanel from 'primevue/overlaypanel';
 import Textarea from 'primevue/textarea';
-import Column from 'primevue/column';
-import DataTable from 'primevue/datatable';
+// import Column from 'primevue/column';
+// import DataTable from 'primevue/datatable';
 
 export default {
     name: 'UserForm',
@@ -147,30 +147,34 @@ export default {
         Button,
         Dialog,
         Checkbox,
-        OverlayPanel,
+        // OverlayPanel,
         Textarea,
-        Column,
-        DataTable
+        // Column,
+        // DataTable
     },
     data() {
         return {
             displayConfirmation: false,
             confirmationMessage: "",
             currentPerson: new Person(new Date()),
-            selectedProject: {name: ""}
+            // selectedProject: {name: ""}
         }
     },
     computed: {
         person() {
             return this.$store.state.us.person;
         },
-        projects() {
-          return this.$store.state.cs.projects
+        parentNode() {
+            return this.$store.state.is.parentNode;
         },
+        // projects() {
+        //   return this.$store.state.cs.projects
+        // },
     },
     watch: {
         person(val) {
             this.currentPerson = val;
+            console.log(this.currentPerson)
         }
     },
     methods: {
@@ -182,26 +186,22 @@ export default {
             this.currentPerson.project = event.data;
             this.$refs.opProjects.hide();
         },
-        setDate(value) {
-            this.$store.dispatch('setDate', value);
-        },
         addNewPerson() {
-            this.$store.dispatch('send');
             this.$store.dispatch('getPerson', 0);
         },
         savePerson() {
-            this.item.parent_id = this.parentNode.data;
-            this.$store.dispatch("savePerson", this.person);
+            this.currentPerson.parent_id = this.parentNode.data;
+            this.$store.dispatch("savePerson", this.currentPerson);
         },
         closeConfirmation() {
             this.displayConfirmation = false;
         },
         positiveConfirmation() {
-            this.saveItem();
+            this.savePerson();
             this.displayConfirmation = false;
         },
         onSave() {
-            this.confirmationMessage = "Сохранить "+ this.item.name + " в " + this.parentNode.label + "?";
+            this.confirmationMessage = "Сохранить "+ this.currentPerson.first_name + " " + this.currentPerson.last_name + "?";
             this.displayConfirmation = true;
         }
     },
