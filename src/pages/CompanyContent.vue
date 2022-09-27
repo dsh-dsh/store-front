@@ -1,21 +1,21 @@
 <template>
   <MainMenu />
   <div class="conteiner">
-    <UserTree />
-    <UserForm />
+    <CompanyTree />
+    <CompanyForm />
   </div>
 </template>
 
 <script>
-import UserTree from '@/components/UserTree.vue';
-import UserForm from '@/components/UserForm.vue';
+import CompanyTree from '@/components/CompanyTree.vue';
+import CompanyForm from '@/components/CompanyForm.vue';
 import MainMenu from '@/components/MainMenu.vue';
 
 export default {
   name: 'CompanyContent',
   components: {
-    UserTree, 
-    UserForm,
+    CompanyTree, 
+    CompanyForm,
     MainMenu
   },
   data() {
