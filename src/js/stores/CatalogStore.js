@@ -10,7 +10,8 @@ export const CatalogStore = {
             projects: [],
             storages: [],
             users: [],
-            items: []
+            items: [],
+			itemDirList: []
         }
     },
     mutations: {
@@ -37,7 +38,10 @@ export const CatalogStore = {
 		},
 		setItems (state, res) {
 			state.items = res;
-		}
+		},
+		setItemDirList (state, res) {
+			state.itemDirList = res;
+		},
     },
     actions: {
 		async getDocTypes({rootState, commit}) {
@@ -71,6 +75,10 @@ export const CatalogStore = {
 		async getItems({rootState, commit}) {
 			const response = await get('/api/v1/items/list', rootState)
 			commit('setItems', response)
+		},
+		async getItemDirList({rootState, commit}) {
+			const response = await get('/api/v1/items/dirs/list', rootState)
+			commit('setItemDirList', response)
 		},
     }
 }

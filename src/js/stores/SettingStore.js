@@ -9,6 +9,8 @@ export const SettingStore = {
             addShortageForHold: true,
             averagePriceForPeriodCloseProperty: Boolean,
             аveragePriceForDocsProperty: Boolean,
+            ourCompanyIdProperty: 0,
+            ingredientDirIdProperty: 0,
             period: null
         }
     },
@@ -21,6 +23,12 @@ export const SettingStore = {
         },
         setAveragePriceForPeriodCloseProperty(state, res) {
             state.аveragePriceForPeriodCloseProperty = res.property == 1;
+        },
+        setOurCompanyProperty(state, res) {
+            state.ourCompanyIdProperty = res.property;
+        },
+        setIngredientDirIdProperty(state, res) {
+            state.ingredientDirIdProperty = res.property;
         },
         getAveragePriceForDocsProperty(state, res) {
             state.аveragePriceForDocsProperty = res.property == 1;
@@ -47,6 +55,14 @@ export const SettingStore = {
             const response = await get('/api/v1/setting/average/price/docs', rootState);
 			commit('setAveragePriceForDocsProperty', response);
         },
+        async getOurCompanyProperty({commit, rootState}) {
+            const response = await get('/api/v1/setting/our/company', rootState);
+			commit('setOurCompanyProperty', response);
+        },
+        async getIngredientDirIdProperty({commit, rootState}) {
+            const response = await get('/api/v1/setting/ingredient/dir', rootState);
+			commit('setIngredientDirIdProperty', response);
+        },
         async setProperty ({rootState}, [user, type, value]) {
 			let request = {'user': user, 'type': type, 'property': value};
 			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
@@ -56,7 +72,7 @@ export const SettingStore = {
             }
         },
         async setAddShortageForHoldProperty({rootState}, value) {
-			let request = {'type': Property.ADD_REST_FOR_HOLD, 'property': value};
+			let request = {'type': Property.ADD_REST_FOR_HOLD_1C_DOCS, 'property': value};
 			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
 			const response = await post('/api/v1/setting/add/shortage', headers, request, rootState);
             if(response.data == "ok") {
@@ -64,7 +80,7 @@ export const SettingStore = {
             }
         },
         async setAveragePriceForPeriodCloseProperty({rootState}, value) {
-			let request = {'type': Property.AVERAGE_COST, 'property': value};
+			let request = {'type': Property.PERIOD_AVERAGE_PRICE, 'property': value};
 			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
 			const response = await post('/api/v1/setting/average/price/period', headers, request, rootState);
             if(response.data == "ok") {
@@ -72,11 +88,27 @@ export const SettingStore = {
             }
         },
         async setAveragePriceForDocsProperty({rootState}, value) {
-			let request = {'type': Property.AVERAGE_COST, 'property': value};
+			let request = {'type': Property.DOCS_AVERAGE_PRICE, 'property': value};
 			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
 			const response = await post('/api/v1/setting/average/price/docs', headers, request, rootState);
             if(response.data == "ok") {
                 this.dispatch("getAveragePriceForDocsProperty");
+            }
+        },
+        async setOurCompanyProperty({rootState}, value) {
+			let request = {'type': Property.OUR_COMPANY_ID, 'property': value};
+			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
+			const response = await post('/api/v1/setting/our/company', headers, request, rootState);
+            if(response.data == "ok") {
+                this.dispatch("getOurCompanyProperty");
+            }
+        },
+        async setIngredientDirIdProperty({rootState}, value) {
+			let request = {'type': Property.INGREDIENT_DIR_ID, 'property': value};
+			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
+			const response = await post('/api/v1/setting/ingredient/dir', headers, request, rootState);
+            if(response.data == "ok") {
+                this.dispatch("getIngredientDirIdProperty");
             }
         },
         async getPeriod({commit, rootState}) {

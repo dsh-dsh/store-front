@@ -89,6 +89,33 @@
       </div>
     </AccordionTab>
 
+    <AccordionTab v-if="isAdmin" header="Настройки каталогов"><div class="formgrid grid leftAlignment">
+        <div class="col-12 md:col-4">
+          <span>Наша компания </span>
+        </div>
+        <div class="col-12 md:col-4">
+          <div class="p-inputgroup">
+            <InputText type="text" class="p-inputtext-sm  input" v-model="companyName" />
+            <Button icon="pi pi-check" class="p-button-sm p-button-warning" @click="onSupplierClick"/>
+          </div>
+        </div>
+        <div class="col-12 md:col-4"></div>
+
+        <div class="col-12 md:col-12"><br></div>
+        
+        <div class="col-12 md:col-4">
+          <span>Каталог ингредиентов </span>
+        </div>
+        <div class="col-12 md:col-4">
+          <div class="p-inputgroup">
+            <InputText type="text" class="p-inputtext-sm  input" v-model="ingredientDirName" />
+            <Button icon="pi pi-check" class="p-button-sm p-button-warning" @click="onItemDirClick"/>
+          </div>
+        </div>
+        <div class="col-12 md:col-4"></div>
+      </div>
+    </AccordionTab>
+
   </Accordion>
     
   <OverlayPanel ref="opProjects">
@@ -101,6 +128,19 @@
     <DataTable :value="storages" v-model:selection="selectedStorage" selectionMode="single" 
         :paginator="true" :rows="5" @rowSelect="onStorageSelect" responsiveLayout="scroll" >
         <Column field="name" header="Name" sortable />
+    </DataTable>
+  </OverlayPanel>
+  <OverlayPanel ref="opCompanies">
+    <DataTable :value="companies" v-model:selection="selectedCompany" selectionMode="single" 
+        :paginator="true" :rows="7" @rowSelect="onCompanySelect" responsiveLayout="scroll" >
+        <Column field="name" header="Name" sortable style="width: 60%"/>
+        <Column field="inn" header="email" sortable style="width: 40%"></Column>
+    </DataTable>
+  </OverlayPanel>
+  <OverlayPanel ref="opItemDirs">
+    <DataTable :value="itemDirList" v-model:selection="selectedItemDir" selectionMode="single" 
+        :paginator="true" :rows="7" @rowSelect="onItemDirSelect" responsiveLayout="scroll" >
+        <Column field="name" header="Name" sortable/>
     </DataTable>
   </OverlayPanel>
 </template>
@@ -145,7 +185,13 @@ export default {
       averagePriceForPeriodClose: Boolean,
       averagePriceForDocs: Boolean,
       periodString: '',
-      disabledHoldChecksButton: true
+      disabledHoldChecksButton: true,
+      selectedCompany: null,
+      companyName: "",
+      companyId: 0,
+      ingredientDirId: 0,
+      ingredientDirName: "",
+      selectedItemDir: null
     };
   },
   computed: {
@@ -161,6 +207,9 @@ export default {
     storages() {
       return this.$store.state.cs.storages
     },
+    companies() {
+      return this.$store.state.cs.companies;
+    },
     addShortageForHoldSetting() {
       return this.$store.state.ss.addShortageForHold;
     },
@@ -170,8 +219,17 @@ export default {
     averagePriceForDocsSetting() {
       return this.$store.state.ss.аveragePriceForDocsProperty;
     },
+    ourCompanyIdSetting() {
+      return this.$store.state.ss.ourCompanyIdProperty;
+    },
+    ingredientDirIdSetting() {
+      return this.$store.state.ss.ingredientDirIdProperty;
+    },
     unholdenCheckDate() {
       return this.$store.state.ds.unholdenCheckDate;
+    },
+    itemDirList() {
+      return this.$store.state.cs.itemDirList;
     }
   },
   watch: {
@@ -188,16 +246,26 @@ export default {
     },
     unholdenCheckDate(val) {
       this.disabledHoldChecksButton = val == "";
-    }
+    },
+    // ourCompanyIdSetting(val) {
+    //   this.companyId = val;
+    //   this.companyName = this.companies.filter(c => c.id == val).pop().name;
+    // },
+    // ingredientDirIdSetting(val) {
+    //   this.ingredientDirId = val;
+    //   this.ingredientDirName  = this.itemDirList.filter(i => i.id == val).pop().name;
+    // }
   },
   mounted() {
+    this.user = JSON.parse(localStorage.getItem('user'));
     this.$store.dispatch('getDefaultProperties');
     this.$store.dispatch('getAddShortageForHold');
     this.$store.dispatch('getAveragePriceForPeriodCloseProperty');
     this.$store.dispatch('getAveragePriceForDocsProperty');
-    this.user = JSON.parse(localStorage.getItem('user'));
     this.$store.dispatch('getPeriod');
     this.$store.dispatch('checkUnholden1CDocuments');
+    this.$store.dispatch('getOurCompanyProperty');
+    this.$store.dispatch('getIngredientDirIdProperty');
   },
   methods: {
     closePeriod() {
@@ -220,6 +288,11 @@ export default {
       } else if(this.activeIndex == 3) {
         this.addShortageForHold = this.addShortageForHoldSetting;
         this.averagePriceForDocs = this.averagePriceForDocsSetting;
+      } else if(this.activeIndex == 4) {
+        this.companyId = this.ourCompanyIdSetting;
+        this.companyName = this.companies.filter(c => c.id == this.ourCompanyIdSetting).pop().name;
+        this.ingredientDirId = this.ingredientDirIdSetting;
+        this.ingredientDirName  = this.itemDirList.filter(i => i.id == this.ingredientDirIdSetting).pop().name;
       }
     },
     logout() {
@@ -274,7 +347,25 @@ export default {
     },
     setAveragePriceForDocs() {
       this.$store.dispatch('setAveragePriceForDocsProperty', this.averagePriceForDocs ? 0 : 1);
-    }
+    },
+    onSupplierClick(event) {
+      this.$refs.opCompanies.toggle(event);
+    },
+    onCompanySelect(event) {
+      this.companyName = event.data.name;
+      this.companyId = event.data.id; 
+      this.$store.dispatch('setOurCompanyProperty', this.companyId);
+      this.$refs.opCompanies.hide();
+    },
+    onItemDirClick(event) {
+      this.$refs.opItemDirs.toggle(event);
+    },
+    onItemDirSelect(event) {
+      this.ingredientDirName = event.data.name;
+      this.ingredientDirId = event.data.id;
+      this.$store.dispatch('setIngredientDirIdProperty', this.ingredientDirId);
+      this.$refs.opItemDirs.hide();
+    },
   },
 }
 
@@ -301,6 +392,9 @@ function formatDate(date, withTime) {
     display: flex;
     flex-direction: column;
     flex: 0 0 100%;
+  }
+  .input {
+    width: 200 px;
   }
   .ml-5 {
     margin: 0px 0px 0px 50px;

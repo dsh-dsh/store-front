@@ -55,6 +55,6 @@ export default {
 </script>
 <style scoped>
   .tree {
-    width: 250pt;
+    width: 300pt;
   }
 </style>

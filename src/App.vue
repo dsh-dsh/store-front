@@ -29,6 +29,7 @@ export default {
     this.$store.dispatch('getDefaultProperties')
     this.$store.dispatch('getPeriod')
     this.$store.dispatch('setDates')
+    this.$store.dispatch('getItemDirList')
   }
 }
 </script>
