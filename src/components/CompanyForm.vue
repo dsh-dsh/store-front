@@ -4,6 +4,7 @@
             <div class="header">
                 <Button label="Новый пользователь" @click="addNewCompany" class="p-button-rounded p-button-secondary p-button-sm" />
             </div>
+            <br>
             <div class="formgrid grid form">
 
                 <div class="field col-12 md:col-6">
@@ -13,15 +14,15 @@
                     </span>
                 </div>
                 <div class="field col-12 md:col-6">
-                    <span class="p-float-label">
+                    <!-- <span class="p-float-label">
                         <InputText id="printname" class="longinput" type="text" v-model="currentCompany.inn" />
                         <label for="printname">ИНН</label>
-                    </span>
+                    </span> -->
                 </div>
 
                 <div class="field col-12 md:col-6">
                     <span class="p-float-label">
-                        <InputText id="password" class="longinput" type="text" v-model="currentCompany.kpp" disabled/>
+                        <InputText id="password" class="longinput" type="text" v-model="currentCompany.kpp" />
                         <label for="password">КПП</label>
                     </span>
                 </div>
@@ -124,8 +125,8 @@ export default {
     }
     .header {
         text-align: end;
-        background-color: #dee2e6;
-        padding: 20px;
+        background-color: #eff1f3;
+        padding: 10px;
     }
     .form {
         margin: 20px;

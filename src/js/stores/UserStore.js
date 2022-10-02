@@ -37,7 +37,6 @@ export const UserStore = {
 			let response;
 			let dtoPerson = new Person(0, person.id, person.first_name, person.last_name, person.email, person.phone, person.role, person.parent_id);
 			dtoPerson.birth_date = person.birth_date.getTime();
-			console.log(dtoPerson)
 			if(person.id == 0) {			
 				response = await post('/api/v1/users', headers, dtoPerson, rootState);
 			} else {

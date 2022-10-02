@@ -2,14 +2,15 @@
 <template>
     <div>
         <div class="itemform">
+            <div class="header">
+                <Button label="Новая номенклатура" @click="addNewItem" class="p-button-rounded p-button-secondary p-button-sm" />
+            </div>
             <Breadcrumb :home="homeCrumb" :model="crumbs">
                 <template #item="{item}">
                     <span @click="onCrumbClick(item)" class="crumb">{{item.label}}</span>
                 </template>
             </Breadcrumb>
-            <div class="header">
-                <Button label="Новая номенклатура" @click="addNewItem" class="p-button-rounded p-button-secondary p-button-sm" />
-            </div>
+            <br>
             <div class="formgrid grid form">
 
                 <div class="field col-12 md:col-12">
@@ -308,6 +309,9 @@ class Price {
 </script>
 
 <style scoped>
+    .p-breadcrumb {
+        border: 0px;
+    }
     .crumb {
         cursor: pointer;
     }
@@ -316,8 +320,8 @@ class Price {
     }
     .header {
         text-align: end;
-        background-color: #dee2e6;
-        padding: 20px;
+        background-color: #eff1f3;
+        padding: 10px;
     }
     .contentRight {
         text-align: end;

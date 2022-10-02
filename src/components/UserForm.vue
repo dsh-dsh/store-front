@@ -174,7 +174,6 @@ export default {
     watch: {
         person(val) {
             this.currentPerson = val;
-            console.log(this.currentPerson)
         }
     },
     methods: {
@@ -212,13 +211,16 @@ export default {
 </script>
 
 <style scoped>
+    .m-5 {
+        margin: 50px;
+    }
     .field {
         margin-bottom: 30px;
     }
     .header {
         text-align: end;
-        background-color: #dee2e6;
-        padding: 20px;
+        background-color: #eff1f3;
+        padding: 10px;
     }
     .form {
         margin: 20px;
