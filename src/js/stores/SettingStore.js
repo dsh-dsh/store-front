@@ -67,7 +67,7 @@ export const SettingStore = {
 			let request = {'user': user, 'type': type, 'property': value};
 			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
 			const response = await post('/api/v1/setting/property', headers, request, rootState);
-            if(response.data == "ok") {
+            if(response == "ok") {
                 this.dispatch("getDefaultProperties");
             }
         },
@@ -75,7 +75,7 @@ export const SettingStore = {
 			let request = {'type': Property.ADD_REST_FOR_HOLD_1C_DOCS, 'property': value};
 			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
 			const response = await post('/api/v1/setting/add/shortage', headers, request, rootState);
-            if(response.data == "ok") {
+            if(response == "ok") {
                 this.dispatch("getDefaultProperties");
             }
         },
@@ -83,7 +83,7 @@ export const SettingStore = {
 			let request = {'type': Property.PERIOD_AVERAGE_PRICE, 'property': value};
 			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
 			const response = await post('/api/v1/setting/average/price/period', headers, request, rootState);
-            if(response.data == "ok") {
+            if(response == "ok") {
                 this.dispatch("getAveragePriceForPeriodCloseProperty");
             }
         },
@@ -91,7 +91,7 @@ export const SettingStore = {
 			let request = {'type': Property.DOCS_AVERAGE_PRICE, 'property': value};
 			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
 			const response = await post('/api/v1/setting/average/price/docs', headers, request, rootState);
-            if(response.data == "ok") {
+            if(response == "ok") {
                 this.dispatch("getAveragePriceForDocsProperty");
             }
         },
@@ -99,7 +99,7 @@ export const SettingStore = {
 			let request = {'type': Property.OUR_COMPANY_ID, 'property': value};
 			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
 			const response = await post('/api/v1/setting/our/company', headers, request, rootState);
-            if(response.data == "ok") {
+            if(response == "ok") {
                 this.dispatch("getOurCompanyProperty");
             }
         },
@@ -107,7 +107,7 @@ export const SettingStore = {
 			let request = {'type': Property.INGREDIENT_DIR_ID, 'property': value};
 			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
 			const response = await post('/api/v1/setting/ingredient/dir', headers, request, rootState);
-            if(response.data == "ok") {
+            if(response == "ok") {
                 this.dispatch("getIngredientDirIdProperty");
             }
         },
@@ -118,7 +118,7 @@ export const SettingStore = {
         async closePeriod({commit, rootState}) {
 			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
             const response = await post('/api/v1/setting/period', headers, null, rootState);
-			commit('setPeriod', response.data);
+			commit('setPeriod', response);
         }
     }
 }

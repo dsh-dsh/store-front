@@ -23,16 +23,11 @@ export const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  // redirect to login page if not logged in and trying to access a restricted page
   const publicPages = ['/login'];
   const authRequired = !publicPages.includes(to.path);
-  // localStorage.setItem('user', {'token': "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjdXN0b21lckBtYWlsLnJ1IiwiZXhwIjoxNjU0OTI2MzI5fQ.YZj9WwPj19M4k-VGvcNmJTcOQiy92OvUAkd2nMiEAe0"})
-  // localStorage.removeItem('user')
   let loggedIn = JSON.parse(localStorage.getItem('user'));
-
   if (authRequired && !loggedIn) {
     return next('/login');
   }
-
   next();
 })

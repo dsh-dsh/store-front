@@ -28,10 +28,9 @@ const store = createStore({
 			success: 0,
 			message: String,
 			toast: null,
-			token: String,
+			token: "",
 		}
     },
-
     mutations: {
 		setUser (state, res) {
 			if(res) {
@@ -59,7 +58,8 @@ const store = createStore({
 		async login(context, body) {
 			let headers = {'Content-Type': 'application/json' }
 			const response = await post('/api/v1/auth/login', headers, body, context.state)
-			context.commit('setUser', response.data)
+			context.commit('setUser', response)
+			this.dispatch('getInitialData')
 		},
 		async logout(context) {
 			context.commit('setUser', null)
@@ -73,6 +73,23 @@ const store = createStore({
 		installToast(context, toast) {
 			context.commit('installToast', toast)
 		},
+		getInitialData(context) {
+			this.dispatch('getToken')
+			if(context.state.token != "") {
+				this.dispatch('installToast')
+				this.dispatch('getWorkShops')
+				this.dispatch('getUnits')
+				this.dispatch('getProjects')
+				this.dispatch('getStorages')
+				this.dispatch('getUsers')
+				this.dispatch('getCompanies')
+				this.dispatch('getDocTypes')
+				this.dispatch('getDefaultProperties')
+				this.dispatch('getPeriod')
+				this.dispatch('setDates')
+				this.dispatch('getItemDirList')
+			}
+		}
     }
 })
 
