@@ -331,7 +331,7 @@ export default {
       this.$refs.opStorage.hide();
     },
     setAddShortageForHold() {
-      this.$store.dispatch('setAddShortageForHoldProperty', this.addShortageForHold ? 0 : 1);
+      this.$store.dispatch('setAddShortageForHoldProperty', this.addShortageForHold ? 1 : 0);
     },
     setProperty(user, type, value) {
       this.$store.dispatch('setProperty', [user, type, value]);

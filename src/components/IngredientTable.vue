@@ -29,6 +29,13 @@
           <img v-else @click="toogleDeleted(data)" src="../../src/assets/img/x.png" />
         </template>
       </Column>
+      <ColumnGroup type="footer">
+        <Row>
+          <Column colspan="2" />
+          <Column :footer="totalGross" />
+          <Column :footer="totalNetto" colspan="2" />
+        </Row>
+      </ColumnGroup>
     </DataTable>
   </div>
     
@@ -58,6 +65,8 @@
 </template>
 
 <script>
+import ColumnGroup from 'primevue/columngroup'; 
+import Row from 'primevue/row'; 
 import 'primeicons/primeicons.css';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
@@ -68,6 +77,8 @@ import {FilterMatchMode, FilterOperator} from 'primevue/api';
 export default {
   name: 'IngredientTable',
   components: {
+    ColumnGroup,
+    Row,
     DataTable, 
     Column, 
     Button, 
@@ -108,6 +119,25 @@ export default {
     }
   },
   methods: {
+    totalNetto() {
+      // let total = 0;
+      // for(let ingredient of this.ingredients) {
+      //     total += ingredient.netto.quantity;
+      // }
+      // console.log(total)
+      return this.formatCurrency(2);
+    },
+    totalGross() {
+      // let total = 0;
+      // for(let ingredient of this.ingredients) {
+      //     total += ingredient.gross.quantity;
+      // }
+      // console.log(total)
+      return this.formatCurrency(1);
+    },
+    formatCurrency(value) {
+      return value.toLocaleString('re-RU', {style: 'currency', currency: 'RUB'});
+    },
     initFilters() {
       this.filters = {
         'global': {value: null, matchMode: FilterMatchMode.CONTAINS},

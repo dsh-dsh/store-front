@@ -1,46 +1,52 @@
 <template>
     <Dialog header="Подбор номенклатуры" class="border" v-model:visible="displayDialog" :modal="true" :closable="false"
-      :contentStyle="{height: '100%'}" :style="{width: '90%', height: '90%'}"> 
+      :contentStyle="{height: '100%'}" :style="{width: '90%', height: '900px'}"> 
         <template #header>
-        <div> 
-            <InputText class="p-inputtext-sm mr-2" v-model="filters['global'].value" placeholder="поиск" autofocus />
-            <Button icon="pi pi-times" class="p-button-rounded p-button-text p-button-plain p-button-sm" @click="clearFilter"/>
-        </div>
+
         </template>
-        <DataTable :value="items" class="p-datatable-sm" v-model:selection="selectedItem" selectionMode="single" 
-                    v-model:filters="filters" filterDisplay="menu" :globalFilterFields="['name']"
-                    @rowSelect="onItemSelect" responsiveLayout="scroll">
-            <template #loading>
-            <div class="flex justify-content-center">
-                <i class="pi pi-spin pi-spinner" style="font-size: 2rem">
-            </i></div>
-            </template>
-            <Column field="name" header="Наименование" sortable />
-            <Column v-for="storage of storages" :header="storage.name" :key="storage.id">
-            <template #body="{data}">
-                <div :class="boldClass(currentStorage, storage)"> {{getItemRestOnStorage(data, storage)}} </div>
-            </template>
-            </Column>
-            <Column field="price" header="цена" sortable />
-        </DataTable>
-        
-        <Divider v-if="multiplySelect" align="left">
-            <div class="inline-flex align-items-center">
-                <i class="pi pi-copy mr-2"></i>
+        <div class="container">
+            <DataTable :value="items" class="p-datatable-sm" v-model:selection="selectedItem" selectionMode="single" 
+                        v-model:filters="filters" filterDisplay="menu" :globalFilterFields="['name']"
+                        @rowSelect="onItemSelect" :scrollable="true" scrollHeight="450px"> 
+                        <!-- responsiveLayout="scroll"> -->
+                <template #loading>
+                <div class="flex justify-content-center">
+                    <i class="pi pi-spin pi-spinner" style="font-size: 2rem">
+                </i></div>
+                </template>
+                <Column field="name" header="Наименование" sortable />
+                <Column v-for="storage of storages" :header="storage.name" :key="storage.id" style="max-width:7rem" >
+                <template #body="{data}">
+                    <div :class="boldClass(currentStorage, storage)"> {{getItemRestOnStorage(data, storage)}} </div>
+                </template>
+                </Column>
+                <Column field="price" header="цена" sortable  style="max-width:7rem" />
+            </DataTable>
+
+            <Divider v-if="multiplySelect" align="left">
+                <div class="inline-flex align-items-center">
+                    <i class="pi pi-copy mr-2"></i>
+                </div>
+            </Divider> 
+            
+            <div class="formgrid grid form" :style="{height: '200px'}">
+                <div class="col-12 md:col-3">
+                    <InputText class="p-inputtext-sm mr-2" v-model="filters['global'].value" placeholder="поиск" autofocus />
+                    <Button icon="pi pi-times" class="p-button-rounded p-button-text p-button-plain p-button-sm" @click="clearFilter"/>
+                </div>
+                <div class="col-12 md:col-9">
+                    <DataTable v-if="multiplySelect" :value="chosenItems" class="p-datatable-sm" @rowSelect="onItemSelect"
+                        :scrollable="true" scrollHeight="200px" :style="{width: '100%', height: '200px'}">
+                        <Column field="item_name" header="Наименование" />
+                        <Column field="quantity" header="Количество"  style="max-width:7rem" />
+                        <Column field="price" header="цена"  style="max-width:7rem" />
+                    </DataTable>
+                </div>
             </div>
-        </Divider>
-
-        <DataTable v-if="multiplySelect" :value="chosenItems" class="p-datatable-sm" @rowSelect="onItemSelect"
-            responsiveLayout="scroll" :style="{width: '60%'}">
-            <Column field="item_name" header="Наименование" />
-            <Column field="quantity" header="Количество" />
-            <Column field="price" header="цена" />
-        </DataTable>
-
-        <br>
+        </div>
         <template #footer>
-        <Button label="закрыть" icon="pi pi-times" @click="closeDialog" class="p-button-text p-button-sm" />
-        <Button v-if="multiplySelect" label="ОК" @click="addItemsToDoc" class="p-button-secondary p-button-rounded p-button-sm" />
+            <Button label="закрыть" icon="pi pi-times" @click="closeDialog" class="p-button-text p-button-sm" />
+            <Button v-if="multiplySelect" label="ОК" @click="addItemsToDoc" class="p-button-secondary p-button-rounded p-button-sm" />
         </template>
     </Dialog>
 
@@ -177,6 +183,10 @@ export default {
 <style scoped>
   .b {
     font-weight: bold;
+  }
+  .container {
+    display: flex;
+    flex-direction: column;
   }
 </style>
 
