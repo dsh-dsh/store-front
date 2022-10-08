@@ -82,7 +82,9 @@
 
   <Dialog v-model:visible="displayDocument" :style="{width: '90%'}" :modal="true"  :showHeader="showDialogHeader">
     <div v-if="docRedactor">
-      <DocRedactor :docId="docId" @disable-hold-button="disableHoldButton" @disable-save-button="disableSaveButton" :type="type" :docType="docType"/>
+      <DocRedactor :docId="docId" 
+      @disable-hold-button="disableHoldButton" @disable-save-button="disableSaveButton" @disable-current-time="disableCurrentTime"
+      :type="type" :docType="docType"/>
     </div>
     <div v-else>
       <Document :docId="docId" @copy-to-request-doc="openRequestDocRedactor" @open-update-doc="openUpdateDocumentRedactor" @open-copy-doc="openCopyDocumentRedactor" />
@@ -116,9 +118,9 @@
         <RadioButton id="time1" name="choseTime" value="dayStart" v-model="salectedSaveTime" />
         <label for="time1">сохранить в начало дня</label>
       </div>
-      <div v-if="type == 'update'" class="field-radiobutton">
-        <RadioButton id="time2" name="choseTime" value="currentTime" v-model="salectedSaveTime" />
-        <label for="time2">сохранить текущее время докумнта</label>
+      <div v-if="type == 'update' & disabledCurrentTime == false" class="field-radiobutton">
+        <RadioButton id="time2" name="choseTime" value="currentTime" v-model="salectedSaveTime"  :disabled="disabledCurrentTime"/>
+        <label for="time2">сохранить текущее время документа</label>
       </div>
       <div class="field-radiobutton">
         <RadioButton id="time3" name="choseTime" value="dayEnd" v-model="salectedSaveTime" />
@@ -193,6 +195,7 @@ export default {
         startPeriod: null,
         menuModel: [],
         salectedSaveTime: 'dayEnd',
+        disabledCurrentTime: false,
         items: [
         {
           label: "Документы",
@@ -347,6 +350,10 @@ export default {
     },
     disableSaveButton(value) {
       this.disabledSaveButton = value;
+    },
+    disableCurrentTime(){
+      this.disabledCurrentTime = true;
+      this.salectedSaveTime = 'dayEnd';
     },
     setStartDate(date) {
       this.$store.dispatch('setStartDate', date)

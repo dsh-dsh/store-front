@@ -15,7 +15,7 @@
           </div>
           <div class="mt-3 mb-3">
             <label for="time" class="label">Дата</label><br>
-            <Calendar id="time" @change="disableHoldButton" @date-select="disableHoldButton" v-model="dateInput" dateFormat="dd.mm.yy" :showIcon="true" />
+            <Calendar id="time" @change="disableHoldButton('date')" @date-select="disableHoldButton('date')" v-model="dateInput" dateFormat="dd.mm.yy" :showIcon="true" />
           </div>
         </div>
         <div class="field col-12 md:col-7 center right">
@@ -292,7 +292,8 @@ export default {
     },
     emits: {
         disableHoldButton: null,
-        disableSaveButton: null
+        disableSaveButton: null,
+        disableCurrentTime: null
     },
     data() {
       return {
@@ -498,7 +499,11 @@ export default {
           return 'b';
         }
       },
-      disableHoldButton() {
+      disableHoldButton(inputName) {
+        if(inputName == 'date') {
+          console.log("date");
+          this.$emit('disableCurrentTime');
+        }
         this.$emit('disableHoldButton');
       },
       disableSaveButton() {
