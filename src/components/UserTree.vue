@@ -1,7 +1,8 @@
 <template>
   <div class="tree">
     <Tree :value="nodes" :expandedKeys="expandedKeys" selectionMode="single" v-model:selectionKeys="selectedKey" 
-    :metaKeySelection="false" @node-collapse="onNodeCollapse" @node-expand="onNodeExpand" @node-select="onNodeSelect"></Tree>
+    :metaKeySelection="false" @node-collapse="onNodeCollapse" @node-expand="onNodeExpand" @node-select="onNodeSelect"
+    scrollHeight="900px"></Tree>
   </div>
 </template>
 
