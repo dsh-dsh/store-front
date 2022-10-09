@@ -150,12 +150,12 @@
     <div v-if="doc.doc_items">
       <DataTable :value="doc.doc_items" editMode="cell" class="p-datatable-sm" responsiveLayout="scroll">
         <Column field="item_name" header="Наименование" key="item_name"></Column>
-        <Column field="quantity" header="Количество" key="quantity"></Column>
-        <Column v-if="isInventory" field="quantity_fact" header="Количество факт." key="quantity_fact"></Column>
-        <Column field="price" header="Цена" key="price"></Column>
-        <Column field="amount" header="Сумма" key="price"></Column>
-        <Column v-if="isInventory" field="amount_fact" header="Сумма факт." key="amount_fact"></Column>
-        <Column v-if="isCheck" field="discount" header="Скидка" key="discount"></Column>
+        <Column field="quantity" header="Кол-во" key="quantity" style="width:7rem"></Column>
+        <Column v-if="isInventory" field="quantity_fact" header="Кол-во факт." key="quantity_fact" style="width:7rem"></Column>
+        <Column field="price" header="Цена" key="price" style="width:7rem"></Column>
+        <Column field="amount" header="Сумма" key="price" style="width:7rem"></Column>
+        <Column v-if="isInventory" field="amount_fact" header="Сумма факт." key="amount_fact" style="width:7rem"></Column>
+        <Column v-if="isCheck" field="discount" header="Скидка" key="discount" style="width:7rem"></Column>
         <ColumnGroup type="footer">
           <Row>
             <Column footer="сумма:" :colspan="colSpan" footerStyle="text-align:right" />

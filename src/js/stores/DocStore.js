@@ -122,15 +122,15 @@ export const DocStore = {
 			if(response == 'ok') { commit('setSuccess'); }
 		},
 		createRelativeDocks({commit}, doc) {
-			let writeOffDocument = new Document('Списание', doc.date_time, "");
+			let writeOffDocument = new Document(DocumentType.WRITE_OFF_DOC, doc.date_time, "");
 			fillRelativeDoc(writeOffDocument, doc);
 			if(writeOffDocument.doc_items.length > 0) {
-				this.dispatch("addDocument", [writeOffDocument, true]);
+				this.dispatch("addDocument", [writeOffDocument, 'dayEnd']);
 			}
-			let receiptDocument = new Document('Оприходование', doc.date_time, "");
+			let receiptDocument = new Document(DocumentType.RECEIPT_DOC, doc.date_time, "");
 			fillRelativeDoc(receiptDocument, doc);
 			if(receiptDocument.doc_items.length > 0) {
-				this.dispatch("addDocument", [receiptDocument, true]);
+				this.dispatch("addDocument", [receiptDocument, 'dayEnd']);
 			}
 			commit('setSuccess');
 		},

@@ -166,46 +166,39 @@
       <Button icon="pi pi-plus" @click="onAddItemClick" class="p-button-text p-button-rounded" />
 
       <DataTable :value="doc.doc_items" :rowClass="rowClass" editMode="cell" @cell-edit-init="onCellEditInit"
-          @cell-edit-complete="onCellEditComplete" class="p-datatable-sm editable-cells-table" responsiveLayout="scroll">
+          @cell-edit-complete="onCellEditComplete" class="p-datatable-sm editable-cells-table"> 
         <Column field="item_name" header="Наименование" key="item_name">
           <template #editor="{ data, field }">
             <InputText @change="disableHoldButton" v-model="data[field]" autofocus/>
             <Button icon="pi pi-check" class="p-button-warning" @click="onItemClick(data)"/>
           </template>
         </Column>
-        <Column field="quantity" header="Количество" key="quantity">
+        <Column field="quantity" header="Кол-во" key="quantity" style="width:7rem">
           <template #editor="{ data, field }">
-            <InputText @change="disableHoldButton" v-model="data[field]" autofocus />
+            <InputNumber @change="disableHoldButton" v-model="data[field]" :minFractionDigits="3" :maxFractionDigits="3" autofocus />
           </template>
         </Column>
-        <Column v-if="isInventory" field="quantity_fact" header="Количество факт." key="quantity_fact">
+        <Column v-if="isInventory" field="quantity_fact" header="Кол-во факт." key="quantity_fact" style="width:7rem">
           <template #editor="{ data, field }">
-            <InputText @change="disableHoldButton" v-model="data[field]" autofocus />
+            <InputNumber @change="disableHoldButton" v-model="data[field]" :minFractionDigits="3" :maxFractionDigits="3" autofocus />
           </template>
         </Column>
-        <Column field="price" header="Цена" key="price">
+        <Column field="price" header="Цена" key="price" style="width:7rem">
           <template #editor="{ data, field }">
-            <InputText @change="disableHoldButton" v-model="data[field]" autofocus />
+            <InputNumber @change="disableHoldButton" v-model="data[field]" :minFractionDigits="2" :maxFractionDigits="2" autofocus />
           </template>
         </Column>
-        <Column field="amount" header="Сумма" key="amount">
+        <Column field="amount" header="Сумма" key="amount" style="width:7rem"></Column>
+        <Column v-if="isInventory" field="amount_fact" header="Сумма факт." key="amount_fact" style="width:7rem"></Column>
+        <Column v-if="isCheck" field="discount" header="Скидка" key="discount" style="width:7rem">
           <template #editor="{ data, field }">
-            <InputText @change="disableHoldButton" v-model="data[field]" autofocus />
-          </template>
-        </Column>
-        <Column v-if="isInventory" field="amount_fact" header="Сумма факт." key="amount_fact">
-          <template #editor="{ data, field }">
-            <InputText @change="disableHoldButton" v-model="data[field]" autofocus />
-          </template>
-        </Column>
-        <Column v-if="isCheck" field="discount" header="Скидка" key="discount">
-          <template #editor="{ data, field }">
-            <InputText @change="disableHoldButton" v-model="data[field]" autofocus />
+            <InputNumber @change="disableHoldButton" v-model="data[field]" :minFractionDigits="2" :maxFractionDigits="2" autofocus />
           </template>
         </Column>
         <Column style="width:1rem">
           <template #body="{data}">
-            <Button icon="pi pi-minus" class="p-button-rounded p-button-secondary p-button-text mr-2" @click="deleteRow(data)" />
+            <Button icon="pi pi-minus" class="p-button-rounded p-button-secondary p-button-text mr-2" 
+            @click="deleteRow(data)" style="max-width:7rem" />
           </template>
         </Column>
         <ColumnGroup type="footer">
@@ -269,6 +262,7 @@ import Divider from 'primevue/divider';
 import {FilterMatchMode, FilterOperator} from 'primevue/api';
 import {Property, DocumentType, PaymentType} from '@/js/Constants';
 import ItemChoose from '@/components/ItemChoose.vue';
+import InputNumber from 'primevue/inputnumber';
 
 export default {
     name: 'DocContent',
@@ -283,7 +277,8 @@ export default {
         Button,
         OverlayPanel,
         Divider,
-        ItemChoose
+        ItemChoose,
+        InputNumber
     },
     props: {
         docId: Number,
@@ -473,10 +468,6 @@ export default {
           'name': {operator: FilterOperator.AND, constraints: [{value: null, matchMode: FilterMatchMode.STARTS_WITH}]}
         }
       },
-      closeDialog() {
-        // this.displayItems = false;
-        // this.clearFilter();
-      },
       setPaymentTypes() {
         this.paymentTypes = [];
         for(var i in PaymentType) {
@@ -501,7 +492,6 @@ export default {
       },
       disableHoldButton(inputName) {
         if(inputName == 'date') {
-          console.log("date");
           this.$emit('disableCurrentTime');
         }
         this.$emit('disableHoldButton');
@@ -552,15 +542,17 @@ export default {
           data[field] = newValue;
         }
         if(field === 'quantity' || field === 'quantity_fact' || field === 'price' || field === 'discount') {
-          data['amount'] = data['price'] * data['quantity'];
-          data['amount_fact'] = data['price'] * data['quantity_fact'];
-        } else if(field === 'amount_fact') {
-          data['price'] = data['amount_fact'] / data['quantity_fact'];
-          data['amount'] = data['price'] * data['quantity'];
-        }else if(field === 'amount') {
-          data['price'] = data['amount'] / data['quantity'];
-          data['amount_fact'] = data['price'] * data['quantity_fact'];
+          data['amount'] = this.formatPrice((data['price'] * data['quantity']) - data['discount']);
+          if(this.doc.doc_type == this.DocumentType.INVENTORY_DOC) {
+            data['amount_fact'] = this.formatPrice(data['price'] * data['quantity_fact']);
+          }
         }
+      },
+      formatPrice(value) {
+        return value.toFixed(2);
+      },
+      formatQuantity(value) {
+        return value.toFixed(3);
       },
       formatCurrency(value) {
         return value.toLocaleString('re-RU', {style: 'currency', currency: 'RUB'});
