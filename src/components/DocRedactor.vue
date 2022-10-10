@@ -680,7 +680,7 @@ export default {
               this.doc.doc_items.push(item);
             } else {
               this.currentItem.quantity = item.quantity;
-              this.currentItem.amount = this.currentItem.price * this.currentItem.quantity;
+              this.currentItem.amount = this.formatPrice(this.currentItem.price * this.currentItem.quantity);
             }
             this.currentItem = undefined;
           }

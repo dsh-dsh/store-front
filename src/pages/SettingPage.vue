@@ -81,7 +81,7 @@
         </div>
 
         <div class="col-12 md:col-6">
-          <span>Ручное проведение документов из 1С. Есть не проведенные чеки от: {{ unholdenCheckDate }} </span>
+          <span>Ручное проведение документов из 1С. Есть не проведенные чеки от:  {{ unholdenCheckDate }} </span>
         </div>
         <div class="col-12 md:col-6">
           <Button label="Провести документы" @click="hold1CDocs" class="p-button-secondary p-button-rounded p-button-sm" :disabled="disabledHoldChecksButton"/>
@@ -243,18 +243,7 @@ export default {
     period(val) {
       this.periodString = 'Закрыть период? (текущий период: ' 
             +  formatDate(new Date(val.start_date)) + ' - ' + formatDate(new Date(val.end_date)) + ')';
-    },
-    unholdenCheckDate(val) {
-      this.disabledHoldChecksButton = val == "";
-    },
-    // ourCompanyIdSetting(val) {
-    //   this.companyId = val;
-    //   this.companyName = this.companies.filter(c => c.id == val).pop().name;
-    // },
-    // ingredientDirIdSetting(val) {
-    //   this.ingredientDirId = val;
-    //   this.ingredientDirName  = this.itemDirList.filter(i => i.id == val).pop().name;
-    // }
+    }
   },
   mounted() {
     this.user = JSON.parse(localStorage.getItem('user'));
@@ -288,6 +277,7 @@ export default {
       } else if(this.activeIndex == 3) {
         this.addShortageForHold = this.addShortageForHoldSetting;
         this.averagePriceForDocs = this.averagePriceForDocsSetting;
+        this.disabledHoldChecksButton = this.unholdenCheckDate == "";
       } else if(this.activeIndex == 4) {
         this.companyId = this.ourCompanyIdSetting;
         this.companyName = this.companies.filter(c => c.id == this.ourCompanyIdSetting).pop().name;
