@@ -4,7 +4,7 @@
     <div><Button icon="pi pi-plus" @click="addNewIngredient" class="p-button-text p-button-rounded" /></div>
   </div>
   <div>
-    
+     <!-- @cell-edit-init="onCellEditInit" -->
     <DataTable :value="this.ingredients" editMode="cell" @cell-edit-complete="onCellEditComplete"
       class="p-datatable-sm editable-cells-table"  responsiveLayout="scroll">
       <Column style="width: 2.2rem">
@@ -14,13 +14,13 @@
       </Column>
       <Column field="name" header="Наименование"></Column>
       <Column field="gross.quantity" header="Брутто">
-        <template #editor="{ data, field }">
-          <InputText v-model="data[field]" />
+        <template #editor="{ data }">
+          <InputNumber v-model="data['gross']['quantity']" :minFractionDigits="3" :maxFractionDigits="3" autofocus />
         </template>
       </Column>
       <Column field="netto.quantity" header="Нетто">
-        <template #editor="{ data, field }">
-          <InputText v-model="data[field]" />
+        <template #editor="{ data }">
+          <InputNumber v-model="data['netto']['quantity']" :minFractionDigits="3" :maxFractionDigits="3" autofocus />
         </template>
       </Column>
       <Column  style="width:3rem">
@@ -73,6 +73,7 @@ import Column from 'primevue/column';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
+import InputNumber from 'primevue/inputnumber';
 import {FilterMatchMode, FilterOperator} from 'primevue/api';
 export default {
   name: 'IngredientTable',
@@ -84,6 +85,7 @@ export default {
     Button, 
     Dialog,
     InputText,
+    InputNumber
   },
   data() {
     return {
@@ -173,9 +175,8 @@ export default {
       this.$store.dispatch('addIngredient', item);
     },
     onCellEditComplete(event) {
-      let { data, newValue, field } = event;
+      let { data, field } = event;
       let fieldArr = field.split(".");
-      data[fieldArr[0]].quantity = newValue;
       let timestamp = atStartOfDay(this.itemDate).getTime();
       if(data[fieldArr[0]].date != timestamp) {
         data[fieldArr[0]].id = 0;

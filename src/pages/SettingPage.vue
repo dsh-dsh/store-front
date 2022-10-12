@@ -59,7 +59,7 @@
     <AccordionTab v-if="isAdmin" header="Настройки проведения документов">
       <div class="formgrid grid leftAlignment">
         <div class="col-12 md:col-6">
-          <span>При проведении документов из 1С не добавлять недостающие позиции (списывать только из наличия) </span>
+          <span>При проведении документов из 1С добавлять недостающие позиции </span>
         </div>
         <div class="col-12 md:col-6">
           <InputSwitch v-model="addShortageForHold" @click="setAddShortageForHold" />
@@ -321,7 +321,7 @@ export default {
       this.$refs.opStorage.hide();
     },
     setAddShortageForHold() {
-      this.$store.dispatch('setAddShortageForHoldProperty', this.addShortageForHold ? 1 : 0);
+      this.$store.dispatch('setAddShortageForHoldProperty', this.addShortageForHold ? 0 : 1);
     },
     setProperty(user, type, value) {
       this.$store.dispatch('setProperty', [user, type, value]);
