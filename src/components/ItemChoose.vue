@@ -15,6 +15,7 @@
                 </i></div>
                 </template>
                 <Column field="name" header="Наименование" sortable />
+                <Column field="unit" header="Еденица" sortable />
                 <Column v-for="storage of storages" :header="storage.name" :key="storage.id" style="max-width:7rem" >
                 <template #body="{data}">
                     <div :class="boldClass(currentStorage, storage)"> {{getItemRestOnStorage(data, storage)}} </div>
