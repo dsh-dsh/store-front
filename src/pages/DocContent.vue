@@ -471,7 +471,7 @@ export default {
     holdDocument() {
       this.displayConfirmation = false;
       if(this.checkPrices()) {
-        this.$store.dispatch('holdDocument', this.document.id);
+        this.$store.dispatch('holdDocument', [this.document.id, this.document.is_hold]);
         this.displayDocument = false;
       } else {
         this.confirmationType = 'price';

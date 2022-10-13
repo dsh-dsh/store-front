@@ -141,9 +141,10 @@ export const DocStore = {
 			const response = await del('/api/v1/docs', headers, request, rootState);
 			if(response == 'ok') { commit('setSuccess'); }
 		},
-		async holdDocument({commit, rootState}, docId) {
+		async holdDocument({commit, rootState}, [docId, isHold]) {
 			let headers = {'Authorization': rootState.token };
-			const response = await post('/api/v1/docs/hold/' + docId, headers, null, rootState);
+			let path = isHold? '/api/v1/docs/un/hold/' : '/api/v1/docs/hold/';
+			const response = await post(path + docId, headers, null, rootState);
 			if(response.type == 1) {
 				commit('setExsistNotHoldenDocs');
 			}
