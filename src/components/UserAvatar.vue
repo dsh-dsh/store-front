@@ -22,9 +22,17 @@ export default {
   },
   mounted() {
     this.user = JSON.parse(localStorage.getItem('user'));
-    this.label = this.user.last_name.substring(0, 1);
+    this.label = this.getLabel();
   },
   methods: {
+    getLabel() {
+      if(this.user.first_name.length > 0) {
+        console.log("-" + this.user.first_name + "-")
+        return this.user.first_name.substring(0, 1);
+      } else {
+        return this.user.last_name.substring(0, 1);
+      }
+    }
   },
 }
 </script>
