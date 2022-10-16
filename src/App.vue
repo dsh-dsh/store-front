@@ -24,18 +24,7 @@ export default {
   mounted() {
     this.$store.dispatch('getInitialData')
     this.$store.dispatch('installToast', this.$toast)
-    // this.$store.dispatch('getToken')
-    // this.$store.dispatch('getWorkShops')
-    // this.$store.dispatch('getUnits')
-    // this.$store.dispatch('getProjects')
-    // this.$store.dispatch('getStorages')
-    // this.$store.dispatch('getUsers')
-    // this.$store.dispatch('getCompanies')
-    // this.$store.dispatch('getDocTypes')
-    // this.$store.dispatch('getDefaultProperties')
-    // this.$store.dispatch('getPeriod')
-    // this.$store.dispatch('setDates')
-    // this.$store.dispatch('getItemDirList')
+    this.$store.dispatch('getHoldingDialogProperty');
   }
 }
 </script>

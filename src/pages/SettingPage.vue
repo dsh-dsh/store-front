@@ -59,6 +59,16 @@
     <AccordionTab v-if="isAdmin" header="Настройки проведения документов">
       <div class="formgrid grid leftAlignment">
         <div class="col-12 md:col-6">
+          <span>Проводить чеки </span>
+        </div>
+        <div class="col-12 md:col-6">
+          <InputSwitch v-model="checkHoldingEnable" @click="setCheckHoldingEnable" />
+        </div>
+        
+        <div class="col-12 md:col-12">
+          <p></p>
+        </div>
+        <div class="col-12 md:col-6">
           <span>При проведении документов из 1С добавлять недостающие позиции </span>
         </div>
         <div class="col-12 md:col-6">
@@ -89,7 +99,8 @@
       </div>
     </AccordionTab>
 
-    <AccordionTab v-if="isAdmin" header="Настройки каталогов"><div class="formgrid grid leftAlignment">
+    <AccordionTab v-if="isAdmin" header="Настройки каталогов">
+      <div class="formgrid grid leftAlignment">
         <div class="col-12 md:col-4">
           <span>Наша компания </span>
         </div>
@@ -111,6 +122,18 @@
             <InputText type="text" class="p-inputtext-sm  input" v-model="ingredientDirName" />
             <Button icon="pi pi-check" class="p-button-sm p-button-warning" @click="onItemDirClick"/>
           </div>
+        </div>
+        <div class="col-12 md:col-4"></div>
+      </div>
+    </AccordionTab>
+
+    <AccordionTab v-if="isAdmin" header="Настройки интерфеса">
+      <div class="formgrid grid leftAlignment">
+        <div class="col-12 md:col-4">
+          <span>Запрашивать проведение при сохранении документа </span>
+        </div>
+        <div class="col-12 md:col-4">
+          <InputSwitch v-model="holdingDialog" @click="setHoldingDialogProperty" />
         </div>
         <div class="col-12 md:col-4"></div>
       </div>
@@ -191,6 +214,8 @@ export default {
       companyId: 0,
       ingredientDirId: 0,
       ingredientDirName: "",
+      holdingDialog: Boolean,
+      checkHoldingEnable: Boolean,
       selectedItemDir: null
     };
   },
@@ -225,6 +250,12 @@ export default {
     ingredientDirIdSetting() {
       return this.$store.state.ss.ingredientDirIdProperty;
     },
+    holdingDialogSetting() {
+      return this.$store.state.ss.holdingDialogProperty;
+    },
+    checkHoldingEnableSetting() {
+      return this.$store.state.ss.checkHoldingEnableProperty;
+    },
     unholdenCheckDate() {
       return this.$store.state.ds.unholdenCheckDate;
     },
@@ -255,6 +286,8 @@ export default {
     this.$store.dispatch('checkUnholden1CDocuments');
     this.$store.dispatch('getOurCompanyProperty');
     this.$store.dispatch('getIngredientDirIdProperty');
+    this.$store.dispatch('getHoldingDialogProperty');
+    this.$store.dispatch('getCheckHoldingEnableProperty');
   },
   methods: {
     closePeriod() {
@@ -275,6 +308,7 @@ export default {
       } else if(this.activeIndex == 2) {
         this.averagePriceForPeriodClose = this.averagePriceForPeriodCloseSetting;
       } else if(this.activeIndex == 3) {
+        this.checkHoldingEnable = this.checkHoldingEnableSetting;
         this.addShortageForHold = this.addShortageForHoldSetting;
         this.averagePriceForDocs = this.averagePriceForDocsSetting;
         this.disabledHoldChecksButton = this.unholdenCheckDate == "";
@@ -283,6 +317,8 @@ export default {
         this.companyName = this.companies.filter(c => c.id == this.ourCompanyIdSetting).pop().name;
         this.ingredientDirId = this.ingredientDirIdSetting;
         this.ingredientDirName  = this.itemDirList.filter(i => i.id == this.ingredientDirIdSetting).pop().name;
+      } else if(this.activeIndex == 5) {
+        this.holdingDialog = this.holdingDialogSetting;
       }
     },
     logout() {
@@ -337,6 +373,12 @@ export default {
     },
     setAveragePriceForDocs() {
       this.$store.dispatch('setAveragePriceForDocsProperty', this.averagePriceForDocs ? 0 : 1);
+    },
+    setHoldingDialogProperty() {
+      this.$store.dispatch('setHoldingDialogEnableProperty', this.holdingDialog ? 0 : 1);
+    },
+    setCheckHoldingEnable() {
+      this.$store.dispatch('setCheckHoldingEnableProperty', this.checkHoldingEnable ? 0 : 1);
     },
     onSupplierClick(event) {
       this.$refs.opCompanies.toggle(event);

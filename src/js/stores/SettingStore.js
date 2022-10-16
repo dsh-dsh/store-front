@@ -11,6 +11,8 @@ export const SettingStore = {
             аveragePriceForDocsProperty: Boolean,
             ourCompanyIdProperty: 0,
             ingredientDirIdProperty: 0,
+            holdingDialogProperty: Boolean,
+            checkHoldingEnableProperty: Boolean,
             period: null
         }
     },
@@ -24,15 +26,21 @@ export const SettingStore = {
         setAveragePriceForPeriodCloseProperty(state, res) {
             state.аveragePriceForPeriodCloseProperty = res.property == 1;
         },
+        setAveragePriceForDocsProperty(state, res) {
+            state.аveragePriceForDocsProperty = res.property == 1;
+        },
         setOurCompanyProperty(state, res) {
             state.ourCompanyIdProperty = res.property;
         },
         setIngredientDirIdProperty(state, res) {
             state.ingredientDirIdProperty = res.property;
         },
-        getAveragePriceForDocsProperty(state, res) {
-            state.аveragePriceForDocsProperty = res.property == 1;
-        },
+        setHoldingDialogProperty(state, res) {
+            state.holdingDialogProperty = res.property == 1;
+        }, 
+        setCheckHoldingEnableProperty(state, res) {
+            state.checkHoldingEnableProperty = res.property == 1;
+        }, 
         setPeriod(state, res) {
             state.period = res;
         }
@@ -62,6 +70,14 @@ export const SettingStore = {
         async getIngredientDirIdProperty({commit, rootState}) {
             const response = await get('/api/v1/setting/ingredient/dir', rootState);
 			commit('setIngredientDirIdProperty', response);
+        },
+        async getHoldingDialogProperty({commit, rootState}) {
+            const response = await get('/api/v1/setting/hold/dialog/enable', rootState);
+			commit('setHoldingDialogProperty', response);
+        },
+        async getCheckHoldingEnableProperty({commit, rootState}) {
+            const response = await get('/api/v1/setting/check/holding/enable', rootState);
+			commit('setCheckHoldingEnableProperty', response);
         },
         async setProperty ({rootState}, [user, type, value]) {
 			let request = {'user': user, 'type': type, 'property': value};
@@ -109,6 +125,22 @@ export const SettingStore = {
 			const response = await post('/api/v1/setting/ingredient/dir', headers, request, rootState);
             if(response == "ok") {
                 this.dispatch("getIngredientDirIdProperty");
+            }
+        },
+        async setHoldingDialogEnableProperty({rootState}, value) {
+			let request = {'type': Property.HOLDING_DIALOG_ENABLE, 'property': value};
+			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
+			const response = await post('/api/v1/setting/hold/dialog/enable', headers, request, rootState);
+            if(response == "ok") {
+                this.dispatch("getHoldingDialogProperty");
+            }
+        },
+        async setCheckHoldingEnableProperty({rootState}, value) {
+			let request = {'type': Property.CHECK_HOLDING_ENABLE, 'property': value};
+			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
+			const response = await post('/api/v1/setting/check/holding/enable', headers, request, rootState);
+            if(response == "ok") {
+                this.dispatch("getCheckHoldingEnableProperty");
             }
         },
         async getPeriod({commit, rootState}) {

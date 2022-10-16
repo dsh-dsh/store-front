@@ -27,7 +27,6 @@ export default {
   methods: {
     getLabel() {
       if(this.user.first_name.length > 0) {
-        console.log("-" + this.user.first_name + "-")
         return this.user.first_name.substring(0, 1);
       } else {
         return this.user.last_name.substring(0, 1);
