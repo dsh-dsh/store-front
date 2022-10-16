@@ -87,7 +87,8 @@
       :type="type" :docType="docType"/>
     </div>
     <div v-else>
-      <Document :docId="docId" @copy-to-request-doc="openRequestDocRedactor" @open-update-doc="openUpdateDocumentRedactor" @open-copy-doc="openCopyDocumentRedactor" />
+      <Document :docId="docId" @copy-to-request-doc="openRequestDocRedactor" @open-base-doc="openBaseDoc"
+                @open-update-doc="openUpdateDocumentRedactor" @open-copy-doc="openCopyDocumentRedactor" />
     </div>
     <template #footer>
       <Button label="Закрыть" icon="pi pi-times" @click="closeDocument" class="p-button-sm p-button-secondary p-button-text"/>
@@ -427,6 +428,12 @@ export default {
 			this.docId = value.data.id;
 			this.displayDocument = true;
 		},
+    openBaseDoc(value) {
+      console.log(value);
+      this.docRedactor = false;
+			this.docId = value;
+			// this.displayDocument = true;
+    },
     openNewDocument(value) {
       this.docRedactor = true;
 			this.docType = value;

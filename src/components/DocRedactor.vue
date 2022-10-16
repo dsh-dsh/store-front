@@ -173,12 +173,18 @@
             <Button icon="pi pi-check" class="p-button-warning" @click="onItemClick(data)"/>
           </template>
         </Column>
-        <Column field="quantity" header="Кол-во" key="quantity" style="width:7rem">
+        <Column v-if="!isMovement" field="quantity" header="Кол-во" key="quantity" style="width:7rem">
           <template #editor="{ data, field }">
             <InputNumber @change="disableHoldButton" v-model="data[field]" :minFractionDigits="3" :maxFractionDigits="3" autofocus />
           </template>
         </Column>
-        <Column v-if="isInventory" field="quantity_fact" header="Кол-во факт." key="quantity_fact" style="width:7rem">
+        <Column v-if="isInventory" field="quantity_fact" header="Кол-во" key="quantity_fact" style="width:7rem">
+          <template #editor="{ data, field }">
+            <InputNumber @change="disableHoldButton" v-model="data[field]" :minFractionDigits="3" :maxFractionDigits="3" autofocus />
+          </template>
+        </Column>
+        <Column v-if="isMovement" field="quantity_fact" header="Заявка" key="quantity_fact" style="width:7rem"></Column>
+        <Column v-if="isMovement" field="quantity" header="Кол-во" key="quantity" style="width:7rem">
           <template #editor="{ data, field }">
             <InputNumber @change="disableHoldButton" v-model="data[field]" :minFractionDigits="3" :maxFractionDigits="3" autofocus />
           </template>
@@ -204,8 +210,8 @@
         <ColumnGroup type="footer">
           <Row>
             <Column footer="сумма:" :colspan="colSpan" footerStyle="text-align:right" />
-            <Column :footer="totalAmount" :colspan="colSpan2" />
-            <Column v-if="isInventory" :footer="totalAmountFact" :colspan="2" />
+            <Column v-if="!isMovement" :footer="totalAmount" :colspan="colSpan2" />
+            <Column v-if="isInventory || isMovement" :footer="totalAmountFact" :colspan="2" />
           </Row>
         </ColumnGroup>
       </DataTable> 
@@ -322,14 +328,15 @@ export default {
         orderDoc: false,
         isInventory: false,
         isCheck: false,
+        isMovement: false,
         colSpan: 3,  
         colSpan2: 2,              
         DocumentType: DocumentType,
         paymentTypes:[],
         displayItems: 1,
         multiplySelectItems: false,
-        currentItem: undefined
-
+        currentItem: undefined,
+        baseDocId: 0
       };
     },
     computed: {
@@ -338,7 +345,13 @@ export default {
           if(this.type === "copyToRequestDoc") {
             doc.id = 0;
             doc.doc_type = DocumentType.MOVEMENT_DOC;
+            doc.base_document_id = this.docId;
             doc.time = new Date();
+            doc.doc_items.forEach(doc_item => {
+                doc_item.quantity_fact = doc_item.quantity;
+                doc_item.quantity = 0;
+                doc_item.amount = 0;
+              });
           }
           if(this.type === "copy") {
             this.disableSaveButton();
@@ -392,7 +405,10 @@ export default {
       this.setPaymentTypes();
     },
     watch: {
-      doc(value) {       
+      doc(value) { 
+        if(this.doc.base_document_id != 0) {
+            this.baseDocId = this.doc.base_document_id;
+        }      
         if(value.doc_type == DocumentType.WITHDRAW_ORDER_DOC 
                     || value.doc_type == DocumentType.CREDIT_ORDER_DOC) {
           this.orderDoc = true;
@@ -439,6 +455,11 @@ export default {
           this.isInventory = true;
           this.colSpan++;
           this.colSpan2--;
+        }
+        if(value.doc_type == DocumentType.MOVEMENT_DOC && this.baseDocId) {
+            this.isMovement = true;
+            this.colSpan++;
+            this.colSpan2--;
         }
         this.selectedProject = value.project
         this.dateInput = value.date_time;

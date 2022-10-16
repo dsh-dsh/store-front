@@ -3,6 +3,7 @@
     <div class="formgrid grid">
         <div class="col-12 md:col-7 center">
             <h4>{{ header }}</h4>
+            <Button v-if="baseDocId" label="документ основание" class="p-button-sm p-button-text ml-2" @click="openBaseDoc"/>
         </div>
         <div class="col-12 md:col-5 center">
             <div class="center right">
@@ -150,17 +151,18 @@
     <div v-if="doc.doc_items">
       <DataTable :value="doc.doc_items" editMode="cell" class="p-datatable-sm" responsiveLayout="scroll">
         <Column field="item_name" header="Наименование" key="item_name"></Column>
-        <Column field="quantity" header="Кол-во" key="quantity" style="width:7rem"></Column>
-        <Column v-if="isInventory" field="quantity_fact" header="Кол-во факт." key="quantity_fact" style="width:7rem"></Column>
+        <Column v-if="!isMovement" field="quantity" header="Кол-во" key="quantity" style="width:7rem"></Column>
+        <Column v-if="isInventory || isMovement" field="quantity_fact" :header="quantityColumnName" key="quantity_fact" style="width:7rem"></Column>
+        <Column v-if="isMovement" field="quantity" header="Кол-во" key="quantity" style="width:7rem"></Column>
         <Column field="price" header="Цена" key="price" style="width:7rem"></Column>
-        <Column field="amount" header="Сумма" key="price" style="width:7rem"></Column>
+        <Column field="amount" header="Сумма" key="amount" style="width:7rem"></Column>
         <Column v-if="isInventory" field="amount_fact" header="Сумма факт." key="amount_fact" style="width:7rem"></Column>
         <Column v-if="isCheck" field="discount" header="Скидка" key="discount" style="width:7rem"></Column>
         <ColumnGroup type="footer">
           <Row>
             <Column footer="сумма:" :colspan="colSpan" footerStyle="text-align:right" />
-            <Column :footer="totalAmount" />
-            <Column v-if="isInventory" :footer="totalAmountFact" />
+            <Column v-if="!isMovement" :footer="totalAmount" />
+            <Column v-if="isInventory || isMovement" :footer="totalAmountFact" />
           </Row>
         </ColumnGroup>
       </DataTable> 
@@ -191,11 +193,14 @@ export default {
             header: '',
             checkDate: '',
             isInventory: false,
+            isMovement: false,
             isCheck: false,
             isPosting: false,
             colSpan: 3,
             DocumentType: DocumentType,
-            disableRedactoring: false
+            disableRedactoring: false,
+            baseDocId: 0,
+            quantityColumnName: 'Кол-во факт.'
         };
     },
     props: {
@@ -204,7 +209,8 @@ export default {
     emits: {
         openUpdateDoc: null,
         openCopyDoc: null,
-        copyToRequestDoc: null
+        copyToRequestDoc: null,
+        openBaseDoc: null
     },
     computed: {
         doc() {
@@ -243,6 +249,9 @@ export default {
         onCopyClick() {
             this.$emit('openCopyDoc', this.doc);
         },
+        openBaseDoc() {
+            this.$emit('openBaseDoc', this.baseDocId);
+        },
         setEnableRedactoring(user, value) {
             this.disableRedactoring = (user.id != value.author.id && user.role != 'ADMIN');
         }
@@ -261,6 +270,9 @@ export default {
             } else {
                 header += " (не проведен)";
             }
+            if(this.doc.base_document_id != 0) {
+                this.baseDocId = this.doc.base_document_id;
+            }
             this.header = header;
             if(value.check_info) {
                 this.checkDate = formatDate(value.check_info.date_time, true);
@@ -268,6 +280,11 @@ export default {
             if(value.doc_type == DocumentType.CHECK_DOC) {
                 this.isCheck = true;
                 this.colSpan++;
+            }
+            if(value.doc_type == DocumentType.MOVEMENT_DOC && this.baseDocId) {
+                this.isMovement = true;
+                this.colSpan++;
+                this.quantityColumnName = 'Заявка';
             }
             if(value.doc_type == DocumentType.INVENTORY_DOC) {
                 this.isInventory = true;
@@ -325,6 +342,9 @@ function formatDate(date, withTime) {
   }
   .ml-2 {
     margin-left: 10 px;
+  }
+  .ml-4 {
+    margin-left: 50 px;
   }
   .mr-2 {
     margin-right: 10 px;
