@@ -635,40 +635,6 @@ export default {
           this.currentData = data;
         }
       },
-      // onItemSelect(event) {
-      //   this.displayItems = false;
-      //   if(this.itemSelectType == 'update') {
-      //     this.updateItem(event.data.id, event.data.name, event.data.price, event.data.is_composite);
-      //   } else {
-      //     this.addItem(event.data.id, event.data.name, event.data.price, event.data.is_composite);
-      //   }
-      //   this.$emit('disableHoldButton');
-      // },
-      // updateItem(item_id, item_name, item_price, is_composite){
-      //   this.currentData['item_id'] = item_id;
-      //   this.currentData['item_name'] = item_name;
-      //   this.currentData['price'] = item_price;
-      //   this.currentData['is_composite'] = is_composite;
-      //   if(this.doc.doc_type == DocumentType.POSTING_DOC || this.doc.doc_type == DocumentType.RECEIPT_DOC) {
-      //     if(is_composite == true) {
-      //       this.$emit('disableSaveButton', true);
-      //     } 
-      //     else {
-      //       if(!checkComposite(this.doc.doc_items)) {
-      //         this.$emit('disableSaveButton', false);
-      //       }
-      //     }
-      //   }
-      // },
-      // addItem(item_id, item_name, item_price, is_composite) {
-      //   if(is_composite == true 
-      //       && (this.doc.doc_type == DocumentType.POSTING_DOC || this.doc.doc_type == DocumentType.RECEIPT_DOC)) {
-      //     this.$emit('disableSaveButton', true);
-      //   }
-      //   if(this.doc.doc_items.filter(item => item.item_id === item_id).length == 0) {
-      //     this.doc.doc_items.push(new DocItem(item_id, item_name, 0.0, item_price, 0.0, this.doc.id, is_composite));
-      //   }
-      // },
       addItemsToDoc(newItemList) {
         if(newItemList.length == 0) return;
         if(this.multiplySelectItems) {

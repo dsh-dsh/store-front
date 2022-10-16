@@ -162,10 +162,10 @@ export default {
             let currentItem = this.chosenItems.filter(item => item.item_id == this.newItem.item_id).pop();
             if(currentItem != undefined) {
                 currentItem.quantity = this.newQuantity;
-                currentItem.amount = currentItem.quantity * currentItem.price;
+                currentItem.amount = this.formatPrice(currentItem.quantity * currentItem.price);
             } else {
                 this.newItem.quantity = this.newQuantity;
-                this.newItem.amount = this.newItem.quantity * this.newItem.price;
+                this.newItem.amount = this.formatPrice(this.newItem.quantity * this.newItem.price);
                 this.chosenItems.push(this.newItem);
             }
             this.displayQuantityDialog = false;
@@ -175,7 +175,10 @@ export default {
             this.$emit('newItemList', this.chosenItems);
             this.displayDialog = false;
             this.chosenItems = [];
-        }
+        },
+        formatPrice(value) {
+            return value.toFixed(2);
+        },
     }
 }
 
