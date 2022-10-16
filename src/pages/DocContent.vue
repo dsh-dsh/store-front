@@ -91,6 +91,7 @@
     </div>
     <template #footer>
       <Button label="Закрыть" icon="pi pi-times" @click="closeDocument" class="p-button-sm p-button-secondary p-button-text"/>
+      <!-- <Button v-if="docRedactor" label="Записать" icon="pi pi-check" @click="quickSaveDoc" class="p-button-sm p-button-rounded p-button-secondary" :disabled="disabledSaveButton"/> -->
       <Button v-if="docRedactor" label="Сохранить" icon="pi pi-check" @click="openSaveDocDialog" class="p-button-sm p-button-rounded p-button-secondary" autofocus :disabled="disabledSaveButton"/>
       <Button :label="holdLable" icon="pi pi-check" @click="holdDocument" class="p-button-sm p-button-rounded p-button-secondary" :disabled="disabledHoldButton" />
     </template>
@@ -112,13 +113,13 @@
     </template>
   </Dialog>
 
-  <Dialog header="Сохраение" class="border" v-model:visible="displaySaveDialog" :style="{width: '350px'}" :modal="true" :showHeader="false">
+  <Dialog header="Сохранение" class="border" v-model:visible="displaySaveDialog" :style="{width: '350px'}" :modal="true" :showHeader="false">
       <h3>Выберете время сохранения документа</h3>
       <div class="field-radiobutton">
         <RadioButton id="time1" name="choseTime" value="dayStart" v-model="salectedSaveTime" />
         <label for="time1">сохранить в начало дня</label>
       </div>
-      <div v-if="type == 'update' & disabledCurrentTime == false" class="field-radiobutton">
+      <div v-if="type == 'update' && disabledCurrentTime == false" class="field-radiobutton">
         <RadioButton id="time2" name="choseTime" value="currentTime" v-model="salectedSaveTime"  :disabled="disabledCurrentTime"/>
         <label for="time2">сохранить текущее время документа</label>
       </div>
@@ -196,6 +197,8 @@ export default {
         menuModel: [],
         salectedSaveTime: 'dayEnd',
         disabledCurrentTime: false,
+        closeDocAfterSave: true,
+        quickSave : false,
         items: [
         {
           label: "Документы",
@@ -244,7 +247,13 @@ export default {
       },
       period() {
         return this.$store.state.ss.period;
-      }
+      },
+      holdingDialogSetting() {
+        return this.$store.state.ss.holdingDialogProperty;
+      },
+      newDocId() {
+        return this.$store.state.ds.newDocId;
+      },
     },
     mounted() {
       this.firstDate = this.$store.state.ds.startDate;
@@ -315,6 +324,9 @@ export default {
         } else {
           this.salectedSaveTime = 'dayEnd';
         }
+      }, 
+      newDocId(val) {
+        this.document.id = val;
       }
     },
 	methods: {
@@ -454,14 +466,25 @@ export default {
       if(this.type == 'update') {
         this.$store.dispatch('updateDocument', [this.document, this.salectedSaveTime]);
       }	else {
-        this.document.id = 0;
-        this.$store.dispatch('addDocument', [this.document, this.salectedSaveTime]);
+        this.$store.dispatch('addDocument', [this.document, this.salectedSaveTime, this.quickSave]);
+        this.quickSave = false;
+        //this.type = 'update';
       }	
-      if(this.document.is_hold == false) {
+      if(this.document.is_hold == false && this.holdingDialogSetting == 1) {
         this.confirmationType = 'hold';
         this.displayConfirmation = true;
       } else {
-        this.displayDocument = false;
+        this.displayDocument = !this.closeDocAfterSave;
+        this.closeDocAfterSave = true;
+      }
+    },
+    quickSaveDoc() {
+      if(this.type == 'add') {
+        this.closeDocAfterSave = false;
+        this.quickSave = true;
+        this.displaySaveDialog = true;
+      } else {
+        this.$store.dispatch('updateDocument', [this.document, 'currentTime']);
       }
     },
     serialHoldDocument() {
@@ -521,6 +544,7 @@ export default {
     },
     closeSaveDocDialog() {
       this.displaySaveDialog = false;
+        this.quickSave = false;
     },
     resetDocuments() {
       this.$store.dispatch('getDocuments', this.filter);

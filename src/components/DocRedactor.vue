@@ -341,7 +341,6 @@ export default {
             doc.time = new Date();
           }
           if(this.type === "copy") {
-            doc.date_time = new Date();
             this.disableSaveButton();
           }
           return doc;
@@ -388,7 +387,7 @@ export default {
         this.initFilters();
     },
     mounted() {
-      this.$store.dispatch('getDocument', [this.docId, this.docType]);
+      this.$store.dispatch('getDocument', [this.docId, this.docType, this.type === "copy"]);
       this.user = JSON.parse(localStorage.getItem('user'));
       this.setPaymentTypes();
     },

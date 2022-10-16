@@ -31,7 +31,9 @@ export const DocStore = {
 			startDate: 0,
 			endDate: 0,
 			exsistNotHoldenDocs: 0,
-			unholdenCheckDate: ""
+			unholdenCheckDate: "",
+			newDocId: 0,
+			NewDocNumber: 0
         }
     },
     mutations: {
@@ -62,7 +64,13 @@ export const DocStore = {
 		},
 		setUnholdenCheckDate(state, res) {
 			state.unholdenCheckDate = res;
-		}
+		},
+		setNewDocId(state, res) {
+			state.newDocId = res;
+		},
+		setNewDocNumber(state, res) {
+			state.NewDocNumber = res;
+		},
     },
     actions: {
 		setDates({commit}) {
@@ -87,13 +95,17 @@ export const DocStore = {
 			}
 			commit('setDocuments', response);
         },
-		async getDocument({commit, rootState}, [id, docType]) {
+		async getNewDocNumber({commit, rootState}, docType) {
+			let docNumber = await get('/api/v1/docs/new/number?type=' + docType, rootState);
+			commit('setNewDocNumber', docNumber)
+		},
+		async getDocument({commit, rootState}, [id, docType, copy = false]) {
 			let document = null;
 			if(id == 0) {
 				let docNumber = await get('/api/v1/docs/new/number?type=' + docType, rootState)
 				document = new Document(docType, new Date(), docNumber);
-			} else {
-				document = await get('/api/v1/docs?id=' + id, rootState)
+			} else { 
+				document = await get('/api/v1/docs?id=' + id + '&copy=' + copy, rootState)
 				document.date_time = new Date(document.date_time);
 			}
 			if(document.check_info) {
@@ -111,7 +123,7 @@ export const DocStore = {
 			const response = await put('/api/v1/docs/' + saveTime, headers, request, rootState);
 			if(response == 'ok') { commit('setSuccess'); }
 		},
-		async addDocument({commit, rootState}, [doc, saveTime]) {
+		async addDocument({commit, rootState}, [doc, saveTime, quickSave = false]) {
 			doc.date_time = doc.date_time.getTime();
 			if(doc.check_info) {
 				doc.check_info.date_time = doc.check_info.date_time.getTime();
@@ -119,7 +131,12 @@ export const DocStore = {
 			let request = {'item_doc_dto': doc};
 			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
 			const response = await post('/api/v1/docs/' + saveTime, headers, request, rootState);
-			if(response == 'ok') { commit('setSuccess'); }
+			if(response != -1) { 
+				commit('setSuccess'); 
+				if(quickSave) {
+					commit('setNewDocId', response);
+				} 
+			}
 		},
 		createRelativeDocks({commit}, doc) {
 			let writeOffDocument = new Document(DocumentType.WRITE_OFF_DOC, doc.date_time, "");
