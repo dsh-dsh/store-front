@@ -173,32 +173,33 @@
             <Button icon="pi pi-check" class="p-button-warning" @click="onItemClick(data)"/>
           </template>
         </Column>
+         <!-- readonly style="cursor: pointer;" -->
         <Column v-if="!isMovement" field="quantity" header="Кол-во" key="quantity" style="width:5rem">
           <template #editor="{ data, field }">
-            <InputNumber @change="disableHoldButton" v-model="data[field]" :minFractionDigits="3" :maxFractionDigits="3" autofocus />
+            <InputNumber @change="disableHoldButton" v-model="data[field]" :minFractionDigits="3" :maxFractionDigits="3" inputtype="decimal" />
           </template>
         </Column>
         <Column v-if="isInventory" field="quantity_fact" header="Кол-во" key="quantity_fact" style="width:5rem">
           <template #editor="{ data, field }">
-            <InputNumber @change="disableHoldButton" v-model="data[field]" :minFractionDigits="3" :maxFractionDigits="3" autofocus />
+            <InputNumber @change="disableHoldButton" v-model="data[field]" :minFractionDigits="3" :maxFractionDigits="3" inputtype="decimal" />
           </template>
         </Column>
         <Column v-if="isMovement" field="quantity_fact" header="Заявка" key="quantity_fact" style="width:5rem"></Column>
         <Column v-if="isMovement" field="quantity" header="Кол-во" key="quantity" style="width:5rem">
           <template #editor="{ data, field }">
-            <InputNumber @change="disableHoldButton" v-model="data[field]" :minFractionDigits="3" :maxFractionDigits="3" autofocus />
+            <InputNumber @change="disableHoldButton" v-model="data[field]" :minFractionDigits="3" :maxFractionDigits="3" inputtype="decimal" />
           </template>
         </Column>
         <Column field="price" header="Цена" key="price" style="width:5rem">
           <template #editor="{ data, field }">
-            <InputNumber @change="disableHoldButton" v-model="data[field]" :minFractionDigits="2" :maxFractionDigits="2" autofocus />
+            <InputNumber @change="disableHoldButton" v-model="data[field]" :minFractionDigits="2" :maxFractionDigits="2" inputtype="decimal" />
           </template>
         </Column>
         <Column field="amount" header="Сумма" key="amount" style="width:5rem"></Column>
         <Column v-if="isInventory" field="amount_fact" header="Сумма факт." key="amount_fact" style="width:5rem"></Column>
         <Column v-if="isCheck" field="discount" header="Скидка" key="discount" style="width:5rem">
           <template #editor="{ data, field }">
-            <InputNumber @change="disableHoldButton" v-model="data[field]" :minFractionDigits="2" :maxFractionDigits="2" autofocus />
+            <InputNumber @change="disableHoldButton" v-model="data[field]" :minFractionDigits="2" :maxFractionDigits="2" inputtype="decimal" />
           </template>
         </Column>
         <Column style="width:1rem">
@@ -247,6 +248,9 @@
         :paginator="true" :rows="5" @rowSelect="onStorageSelect" responsiveLayout="scroll" >
         <Column field="name" header="Name" sortable />
     </DataTable>
+  </OverlayPanel>
+  <OverlayPanel ref="keyboard">
+    <p>keyboard</p>
   </OverlayPanel>
 
   <ItemChoose :displayItems="displayItems" :currentStorage="doc.storage_to"  :dateTime="doc.date_time" :multiplySelect="multiplySelectItems" @new-item-list="addItemsToDoc"/>
@@ -474,6 +478,11 @@ export default {
       }
     },
     methods: {
+      virtualKeyboard(event) {
+        console.log("virtualKeyboard", event)
+        blur();
+        this.$refs.keyboard.toggle(event);
+      },
       clearFilter() {
         this.initFilters();
       },

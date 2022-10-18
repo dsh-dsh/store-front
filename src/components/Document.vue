@@ -275,7 +275,7 @@ export default {
             }
             this.header = header;
             if(value.check_info) {
-                this.checkDate = formatDate(value.check_info.date_time, true);
+                this.checkDate = formatTime(value.check_info.date_time, true);
             }
             if(value.doc_type == DocumentType.CHECK_DOC) {
                 this.isCheck = true;
@@ -309,6 +309,15 @@ function formatDate(date, withTime) {
     return date.toLocaleString("ru-Ru", params);
 }
 
+function formatTime(date) {
+    let params = {
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric'
+    };
+    return date.toLocaleString("ru-Ru", params);
+}
+
 </script>
 
 <style scoped>
@@ -317,7 +326,7 @@ function formatDate(date, withTime) {
     display: inline-block;
   }
   .text_field {
-    width: 300px;
+    width: 220px;
     height: 35px;
     margin: 5px 0px;
     padding: 5px 10px;
@@ -325,7 +334,7 @@ function formatDate(date, withTime) {
     border-radius: 5px
   }
   .sm {
-    width: 180px;
+    width: 150px;
   }
   .lm {
     width: 500px;
