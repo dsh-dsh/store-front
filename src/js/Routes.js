@@ -8,7 +8,7 @@ import UserContent from "@/pages/UserContent.vue";
 import CompanyContent from "@/pages/CompanyContent.vue";
 
 const routes = [
-  { path: '/', redirect: '/documents/default' },
+  { path: '/', redirect: '/documents/posting' },
   { path: '/login', component: LoginPage },
   { path: '/documents/:filter?', component: DocContent, props: true },
   { path: '/items', component: ItemContent },

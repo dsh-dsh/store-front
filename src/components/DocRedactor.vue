@@ -166,7 +166,7 @@
       <Button icon="pi pi-plus" @click="onAddItemClick" class="p-button-text p-button-rounded" />
 
       <DataTable :value="doc.doc_items" :rowClass="rowClass" editMode="cell" @cell-edit-init="onCellEditInit"
-          @cell-edit-complete="onCellEditComplete" class="p-datatable-sm editable-cells-table"> 
+          @cell-edit-complete="onCellEditComplete" class="p-datatable-sm editable-cells-table" responsiveLayout="scroll"> 
         <Column field="item_name" header="Наименование" key="item_name">
           <template #editor="{ data, field }">
             <InputText @change="disableHoldButton" v-model="data[field]" autofocus/>
@@ -344,6 +344,7 @@ export default {
           let doc = this.$store.state.ds.document;
           if(this.type === "copyToRequestDoc") {
             doc.id = 0;
+            doc.number = this.newDocNumber;
             doc.doc_type = DocumentType.MOVEMENT_DOC;
             doc.base_document_id = this.docId;
             doc.time = new Date();
@@ -394,7 +395,11 @@ export default {
           return this.$store.state.ss.defaultProperties;
         },
         period() {
-          return this.$store.state.ss.period;        }
+          return this.$store.state.ss.period;        
+        },
+        newDocNumber() {
+          return this.$store.state.ds.newDocNumber;
+        }
     },
     created() {
         this.initFilters();
@@ -403,6 +408,9 @@ export default {
       this.$store.dispatch('getDocument', [this.docId, this.docType, this.type === "copy"]);
       this.user = JSON.parse(localStorage.getItem('user'));
       this.setPaymentTypes();
+      if(this.type === "copyToRequestDoc") {
+        this.$store.dispatch('getNewDocNumber', DocumentType.MOVEMENT_DOC);
+      }
     },
     watch: {
       doc(value) { 
@@ -765,13 +773,11 @@ export default {
   .ml-1 {
       margin-left: 10 px;
   }
-  /* .dialog {
-    width: 900px; 
-    height: 600px; 
-    background-color: white;
-  } */
   .p-dialog, :deep(.p-dialog) {
     height : 500px;
     width : 900px;
+  }
+  ::v-deep(.p-inputnumber-input) {
+    width: 80px;
   }
 </style>

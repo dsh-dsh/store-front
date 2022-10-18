@@ -23,7 +23,7 @@ export default {
         return {
             selectedFilter: this.$route.params.filter,
             filters: [
-                { name: "...",            path: 'default' },
+                // { name: "...",            path: 'default' },
                 { name: "Приходные",      path: 'posting' },
                 { name: "Складские",      path: 'store'   },
                 { name: "Заявки",         path: 'request' },

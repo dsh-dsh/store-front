@@ -33,7 +33,7 @@ export const DocStore = {
 			exsistNotHoldenDocs: 0,
 			unholdenCheckDate: "",
 			newDocId: 0,
-			NewDocNumber: 0
+			newDocNumber: 0
         }
     },
     mutations: {
@@ -69,7 +69,8 @@ export const DocStore = {
 			state.newDocId = res;
 		},
 		setNewDocNumber(state, res) {
-			state.NewDocNumber = res;
+			console.log(res)
+			state.newDocNumber = res;
 		},
     },
     actions: {
@@ -190,12 +191,7 @@ export const DocStore = {
 		async checkUnholden1CDocuments({commit, rootState}) {
 			const response = await get('/api/v1/1c/check', rootState);
 			commit('setUnholdenCheckDate', response)
-		},
-		async getAAA({commit, rootState}) {
-			let headers = {'Authorization': rootState.token };
-			const response = await post('/api/v1/1c/number/3', headers, null, rootState);
-			if(response.data == 'ok') { commit('setSuccess'); }
-		},
+		}
     }
 }
 

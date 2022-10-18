@@ -42,10 +42,10 @@
           <Column field="doc_type" header="Документ" sortable>
             <template #body="{data}"><div :class="disabledClass(data)">{{data.doc_type}}</div></template>
           </Column>
-          <!-- <Column field="project.name" header="Проект" sortable >
+          <!-- <Column v-if="isMobile" field="project.name" header="Проект" sortable >
             <template #body="{data}"><div :class="disabledClass(data)">{{data.project.name}}</div></template>
           </Column> -->
-          <Column field="date_time" header="Время" sortable dataType="date">
+          <Column field="date_time" header="Дата" sortable dataType="date">
             <template #body="{data}">
               <div :class="disabledClass(data)">
                 {{new Date(data.date_time).toLocaleDateString('ru-RU', {day: '2-digit', month: '2-digit', year: 'numeric'})}}
@@ -58,7 +58,7 @@
           <Column field="storage_to.name" header="на склад" sortable>
             <template #body="{data}"><div :class="disabledClass(data)">{{getName(data.storage_to)}}</div></template>
           </Column>
-          <Column field="amount" header="Сумма" sortable>
+          <Column v-if="!isMobile" field="amount" header="Сумма" sortable>
             <template #body="{data}"><div :class="disabledClass(data)">{{formatCurrency(data.amount)}}</div></template>
           </Column>
           <Column field="author.name" header="Автор" style="max-width:9rem" sortable >
@@ -200,6 +200,7 @@ export default {
         disabledCurrentTime: false,
         closeDocAfterSave: true,
         quickSave : false,
+        isMobile: Boolean,
         items: [
         {
           label: "Документы",
@@ -265,6 +266,7 @@ export default {
         this.startPeriod = new Date(this.period.start_date);
       }
       this.salectedSaveTime = 'dayEnd';
+      this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     },
     watch: {
       period(val) {

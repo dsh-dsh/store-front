@@ -33,4 +33,3 @@ export const PaymentType = {
     SALE_CASH_PAYMENT: 'Выручка наличными',
     SALE_CARD_PAYMENT: 'Выручка по картам'
 };
-
