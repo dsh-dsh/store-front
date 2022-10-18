@@ -209,7 +209,7 @@ export default {
     emits: {
         openUpdateDoc: null,
         openCopyDoc: null,
-        copyToRequestDoc: null,
+        copyFromRequestDoc: null,
         openBaseDoc: null
     },
     computed: {
@@ -241,7 +241,7 @@ export default {
             return value.toLocaleString('re-RU', {style: 'currency', currency: 'RUB'});
         },
         onRequestClick() {
-            this.$emit('copyToRequestDoc', this.doc);
+            this.$emit('copyFromRequestDoc', this.doc);
         },
         onUpdateClick() {
             this.$emit('openUpdateDoc', this.doc);

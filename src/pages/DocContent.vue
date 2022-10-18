@@ -7,7 +7,7 @@
     </div>
     <div>
       <div class="border">
-        <DataTable :value="documents" @row-click="openDocument" class="p-datatable-sm" stripedRows :paginator="true" :rows="10"
+        <DataTable :value="documents" @row-click="openDocument" class="p-datatable-sm" stripedRows :paginator="true" :rows="20"
           v-model:selection="selectedProduct" selectionMode="single" sortField="date_time" :sortOrder="-1"
           paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
           :rowsPerPageOptions="[10,20,50]" responsiveLayout="scroll"
@@ -87,7 +87,7 @@
       :type="type" :docType="docType"/>
     </div>
     <div v-else>
-      <Document :docId="docId" @copy-to-request-doc="openRequestDocRedactor" @open-base-doc="openBaseDoc"
+      <Document :docId="docId" @copy-from-request-doc="openRequestDocRedactor" @open-base-doc="openBaseDoc"
                 @open-update-doc="openUpdateDocumentRedactor" @open-copy-doc="openCopyDocumentRedactor" />
     </div>
     <template #footer>
@@ -447,7 +447,7 @@ export default {
       this.docRedactor = true;
 			this.docType = this.DocumentType.REQUEST_DOC;
 			this.docId = value.id;
-      this.type = 'copyToRequestDoc';
+      this.type = 'copyFromRequestDoc';
 			this.displayDocument = true;
     },
 		openUpdateDocumentRedactor(value) {

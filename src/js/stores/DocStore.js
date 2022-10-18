@@ -100,6 +100,11 @@ export const DocStore = {
 			let docNumber = await get('/api/v1/docs/new/number?type=' + docType, rootState);
 			commit('setNewDocNumber', docNumber)
 		},
+		async getMovDocFromRequest({commit, rootState}, id) {
+			let document = await get('/api/v1/docs/move/from/request?id=' + id, rootState);
+			document.date_time = new Date(document.date_time);
+			commit('setDocument', document)
+		},
 		async getDocument({commit, rootState}, [id, docType, copy = false]) {
 			let document = null;
 			if(id == 0) {
