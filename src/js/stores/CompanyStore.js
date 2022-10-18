@@ -39,7 +39,7 @@ export const CompanyStore = {
 			} else {
 				response = await put('/api/v1/companies', headers, company, rootState);
 			}
-			if(response == 'ok') { 
+			if(response.data == 'ok') { 
 				commit('setSuccess'); 
 				this.dispatch('getCompanyTree');
 			}

@@ -131,10 +131,10 @@ export const DocStore = {
 			let request = {'item_doc_dto': doc};
 			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
 			const response = await post('/api/v1/docs/' + saveTime, headers, request, rootState);
-			if(response != -1) { 
+			if(response.data != -1) { 
 				commit('setSuccess'); 
 				if(quickSave) {
-					commit('setNewDocId', response);
+					commit('setNewDocId', response.data);
 				} 
 			}
 		},
@@ -165,12 +165,12 @@ export const DocStore = {
 			if(response.type == 1) {
 				commit('setExsistNotHoldenDocs');
 			}
-			if(response == 'ok') { commit('setSuccess'); }
+			if(response.data == 'ok') { commit('setSuccess'); }
 		},
 		async serialHoldDocument({commit, rootState}, docId) {
 			let headers = {'Authorization': rootState.token };
 			const response = await post('/api/v1/docs/hold/serial/' + docId, headers, null, rootState);
-			if(response == 'ok') { commit('setSuccess'); }
+			if(response.data == 'ok') { commit('setSuccess'); }
 		},
 		async getRestOnDateAndStorage({commit, rootState}, [docId, docTime, storageId]) {
 			let url = '/api/v1/rest/inventory?docId=' + docId + '&time=' + docTime.getTime() + "&storageId=" + storageId;
@@ -185,7 +185,7 @@ export const DocStore = {
 		async hold1CDocuments({commit, rootState}) {
 			let headers = {'Authorization': rootState.token };
 			const response = await post('/api/v1/1c/hold', headers, null, rootState);
-			if(response == 'ok') { commit('setSuccess'); }
+			if(response.data == 'ok') { commit('setSuccess'); }
 		},
 		async checkUnholden1CDocuments({commit, rootState}) {
 			const response = await get('/api/v1/1c/check', rootState);
@@ -194,7 +194,7 @@ export const DocStore = {
 		async getAAA({commit, rootState}) {
 			let headers = {'Authorization': rootState.token };
 			const response = await post('/api/v1/1c/number/3', headers, null, rootState);
-			if(response == 'ok') { commit('setSuccess'); }
+			if(response.data == 'ok') { commit('setSuccess'); }
 		},
     }
 }

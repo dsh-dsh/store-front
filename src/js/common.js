@@ -17,8 +17,8 @@ export async function post(url, headers, body, state) {
 		body: JSON.stringify(body)
     })
     .then(res => res.json())
-	.then(res => handleResponce(res, state))
-    .then(res => res.data);
+	.then(res => handleResponce(res, state));
+    // .then(res => res.data);
 }
 
 export async function put(url, headers, body, state) {
@@ -51,3 +51,42 @@ function handleResponce(data, state) {
 	}
 	return data;
 }
+
+/*
+{ <script>
+    var myMobile = {
+        Android: function() {
+            return navigator.userAgent.match(/Android/i);
+        },
+        BlackBerry: function() {
+            return navigator.userAgent.match(/BlackBerry/i);
+        },
+        iOS: function() {
+            return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+        },
+        Opera: function() {
+            return navigator.userAgent.match(/Opera Mini/i);
+        },
+        Windows: function() {
+            return navigator.userAgent.match(/IEMobile/i);
+        },
+        any: function() {
+            return (myMobile.Android() || 
+                    myMobile.BlackBerry() || 
+                    myMobile.iOS() || 
+                    myMobile.Opera() || 
+                    myMobile.Windows());
+        }
+    };
+
+    if( myMobile.any() ) {
+      // это мобильник - делаем что-то
+    }
+</script>
+
+if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+    // код для мобильных устройств
+  } else {
+    // код для обычных устройств
+} 
+}*/

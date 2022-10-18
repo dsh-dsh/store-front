@@ -430,8 +430,8 @@ export default {
 		},
     openBaseDoc(value) {
       console.log(value);
-      this.docRedactor = false;
-			this.docId = value;
+      // this.docRedactor = false;
+			// this.docId = value;
 			// this.displayDocument = true;
     },
     openNewDocument(value) {

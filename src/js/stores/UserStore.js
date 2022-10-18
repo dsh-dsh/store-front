@@ -42,7 +42,7 @@ export const UserStore = {
 			} else {
 				response = await put('/api/v1/users/', headers, dtoPerson, rootState);
 			}
-			if(response == 'ok') { 
+			if(response.data == 'ok') { 
 				commit('setSuccess'); 
 				this.dispatch('getUserTree');
 			}

@@ -3,7 +3,7 @@
     <div class="formgrid grid">
         <div class="col-12 md:col-7 center">
             <h4>{{ header }}</h4>
-            <Button v-if="baseDocId" label="документ основание" class="p-button-sm p-button-text ml-2" @click="openBaseDoc"/>
+            <!-- <Button v-if="baseDocId" label="документ основание" class="p-button-sm p-button-text ml-2" @click="openBaseDoc"/> -->
         </div>
         <div class="col-12 md:col-5 center">
             <div class="center right">

@@ -92,7 +92,7 @@ export const ItemStore = {
 			} else {
 				response = await put('/api/v1/items/' + date.getTime(), headers, item, rootState);
 			}
-			if(response == 'ok') { 
+			if(response.data == 'ok') { 
 				commit('setSuccess'); 
 			}
 			commit('setItem', new Item());

@@ -58,7 +58,7 @@ const store = createStore({
 		async login(context, body) {
 			let headers = {'Content-Type': 'application/json' }
 			const response = await post('/api/v1/auth/login', headers, body, context.state)
-			context.commit('setUser', response)
+			context.commit('setUser', response.data)
 			this.dispatch('getInitialData')
 		},
 		async logout(context) {
