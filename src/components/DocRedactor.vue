@@ -58,6 +58,8 @@
           <div v-if="doc.supplier">
             <label for="supplier" class="label">Поставщик</label><br>
             <div class="p-inputgroup">
+              <!-- v-model="doc.supplier.name" -->
+              <!-- <AutoComplete id="supplier" v-model="selectedSupplier" :suggestions="filteredSuppliers" @complete="searchSupplier($event)"  :disabled="disabledSupplier" /> -->
               <InputText id="supplier" type="text" class="p-inputtext-sm" v-model="doc.supplier.name" :disabled="disabledSupplier" />
               <Button icon="pi pi-check" class="p-button-warning" @click="onSupplierClick"/>
             </div>
@@ -165,7 +167,7 @@
       
       <Button icon="pi pi-plus" @click="onAddItemClick" class="p-button-text p-button-rounded" />
 
-      <DataTable :value="doc.doc_items" :rowClass="rowClass" editMode="cell" @cell-edit-init="onCellEditInit"
+      <DataTable :value="doc.doc_items" :rowClass="rowClass" editMode="cell" @cell-edit-init="onCellEditInit" 
           @cell-edit-complete="onCellEditComplete" class="p-datatable-sm editable-cells-table" responsiveLayout="scroll"> 
         <Column field="item_name" header="Наименование" key="item_name">
           <template #editor="{ data, field }">
@@ -176,30 +178,30 @@
          <!-- readonly style="cursor: pointer;" -->
         <Column v-if="!isMovement" field="quantity" header="Кол-во" key="quantity" style="width:5rem">
           <template #editor="{ data, field }">
-            <InputNumber @change="disableHoldButton" v-model="data[field]" :minFractionDigits="3" :maxFractionDigits="3" inputtype="decimal" />
+            <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="3" :maxFractionDigits="3" />
           </template>
         </Column>
         <Column v-if="isInventory" field="quantity_fact" header="Кол-во" key="quantity_fact" style="width:5rem">
           <template #editor="{ data, field }">
-            <InputNumber @change="disableHoldButton" v-model="data[field]" :minFractionDigits="3" :maxFractionDigits="3" inputtype="decimal" />
+            <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="3" :maxFractionDigits="3" />
           </template>
         </Column>
         <Column v-if="isMovement" field="quantity_fact" header="Заявка" key="quantity_fact" style="width:5rem"></Column>
         <Column v-if="isMovement" field="quantity" header="Кол-во" key="quantity" style="width:5rem">
           <template #editor="{ data, field }">
-            <InputNumber @change="disableHoldButton" v-model="data[field]" :minFractionDigits="3" :maxFractionDigits="3" inputtype="decimal" />
+            <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="3" :maxFractionDigits="3" />
           </template>
         </Column>
         <Column field="price" header="Цена" key="price" style="width:5rem">
           <template #editor="{ data, field }">
-            <InputNumber @change="disableHoldButton" v-model="data[field]" :minFractionDigits="2" :maxFractionDigits="2" inputtype="decimal" />
+            <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="2" :maxFractionDigits="2" />
           </template>
         </Column>
         <Column field="amount" header="Сумма" key="amount" style="width:5rem"></Column>
         <Column v-if="isInventory" field="amount_fact" header="Сумма факт." key="amount_fact" style="width:5rem"></Column>
         <Column v-if="isCheck" field="discount" header="Скидка" key="discount" style="width:5rem">
           <template #editor="{ data, field }">
-            <InputNumber @change="disableHoldButton" v-model="data[field]" :minFractionDigits="2" :maxFractionDigits="2" inputtype="decimal" />
+            <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="2" :maxFractionDigits="2" />
           </template>
         </Column>
         <Column style="width:1rem">
@@ -226,34 +228,91 @@
   <OverlayPanel ref="opProjects">
     <DataTable :value="projects" v-model:selection="selectedProject" selectionMode="single" 
         :paginator="true" :rows="5" @rowSelect="onProjectSelect" responsiveLayout="scroll" >
-        <Column field="name" header="Name" sortable />
+        <Column field="name" header="Проект" sortable />
     </DataTable>
   </OverlayPanel>
   <OverlayPanel ref="opUsers">
     <DataTable :value="users" v-model:selection="selectedUsers" selectionMode="single" 
         :paginator="true" :rows="5" @rowSelect="onUserSelect" responsiveLayout="scroll" >
-        <Column field="name" header="Name" sortable style="width: 60%"/>
-        <Column field="email" header="email" sortable style="width: 40%"></Column>
+        <Column field="name" header="ФИО" sortable style="width: 60%"/>
+        <Column field="email" header="имаил" sortable style="width: 40%"></Column>
     </DataTable>
   </OverlayPanel>
   <OverlayPanel ref="opCompanies">
     <DataTable :value="companies" v-model:selection="selectedCompany" selectionMode="single" 
-        :paginator="true" :rows="5" @rowSelect="onCompanySelect" responsiveLayout="scroll" >
-        <Column field="name" header="Name" sortable style="width: 60%"/>
-        <Column field="inn" header="email" sortable style="width: 40%"></Column>
+        sortField="name" :sortOrder="1"
+        :paginator="true" :rows="10" @rowSelect="onCompanySelect" responsiveLayout="scroll" >
+        <Column field="name" header="Наименование" sortable style="width:20rem"/>
+        <Column field="inn" header="ИНН" sortable style="width: 40%"></Column>
     </DataTable>
   </OverlayPanel>
   <OverlayPanel ref="opStorage">
     <DataTable :value="storages" v-model:selection="selectedStorage" selectionMode="single" 
         :paginator="true" :rows="5" @rowSelect="onStorageSelect" responsiveLayout="scroll" >
-        <Column field="name" header="Name" sortable />
+        <Column field="name" header="Наименование" sortable />
     </DataTable>
   </OverlayPanel>
   <OverlayPanel ref="keyboard">
     <p>keyboard</p>
   </OverlayPanel>
 
-  <ItemChoose :displayItems="displayItems" :currentStorage="doc.storage_to"  :dateTime="doc.date_time" :multiplySelect="multiplySelectItems" @new-item-list="addItemsToDoc"/>
+  <ItemChoose :displayItems="displayItems" :currentStorage="doc.storage_to"  :dateTime="doc.date_time" 
+        :multiplySelect="multiplySelectItems" @new-item-list="addItemsToDoc"/>
+
+  <div id="numPad" class="num-pad" @click="outsideCloseNumPad($event)">
+    <div class="modal-content border shadow"  @keyup="onKeyUp">
+      <div class="formgrid grid" style="margin: 10px;">
+          <div class="field col-12 md:col-12">
+            <InputText id="inputDigit" v-model="digitValue" style="width: 100%;" readonly autofocus />
+          </div>
+          <div class="field col-12 md:col-3">
+            <Button label="1" class="p-button-lg p-button-outlined p-button-secondary" @click="addDigit(1)" />
+          </div>
+          <div class="field col-12 md:col-3">
+            <Button label="2" class="p-button-lg p-button-outlined p-button-secondary" @click="addDigit(2)" />
+          </div>
+          <div class="field col-12 md:col-3">
+            <Button label="3" class="p-button-lg p-button-outlined p-button-secondary" @click="addDigit(3)" />
+          </div>
+          <div class="field col-12 md:col-3">
+            <Button icon="pi pi-angle-left" class="p-button-lg p-button-outlined p-button-secondary p-button-text" @click="delDigit()" />
+          </div>
+          <div class="field col-12 md:col-3">
+            <Button label="4" class="p-button-lg p-button-outlined p-button-secondary" @click="addDigit(4)" />
+          </div>
+          <div class="field col-12 md:col-3">
+            <Button label="5" class="p-button-lg p-button-outlined p-button-secondary" @click="addDigit(5)" />
+          </div>
+          <div class="field col-12 md:col-3">
+            <Button label="6" class="p-button-lg p-button-outlined p-button-secondary" @click="addDigit(6)" />
+          </div>
+          <div class="field col-12 md:col-3">
+          </div>
+          <div class="field col-12 md:col-3">
+            <Button label="7" class="p-button-lg p-button-outlined p-button-secondary" @click="addDigit(7)" />
+          </div>
+          <div class="field col-12 md:col-3">
+            <Button label="8" class="p-button-lg p-button-outlined p-button-secondary" @click="addDigit(8)" />
+          </div>
+          <div class="field col-12 md:col-3">
+            <Button label="9" class="p-button-lg p-button-outlined p-button-secondary" @click="addDigit(9)" />
+          </div>
+          <div class="field col-12 md:col-3">
+            <Button icon="pi pi-times" class="p-button-lg p-button-outlined p-button-warning" @click="closeNumPad()" />
+          </div>
+          <div class="field col-12 md:col-3"></div>
+          <div class="field col-12 md:col-3">
+            <Button label="0" class="p-button-lg p-button-outlined p-button-secondary" @click="addDigit(0)" />
+          </div>
+          <div class="field col-12 md:col-3">
+            <Button label=" ." class="p-button-lg p-button-outlined p-button-secondary" @click="addDigit('.')" />
+          </div>
+          <div class="field col-12 md:col-3">
+            <Button icon="pi pi-check" class="p-button-lg p-button-outlined p-button-success" @click="inserValue()" />
+          </div>
+      </div>
+    </div>
+  </div>
 
 </template>
 
@@ -272,6 +331,8 @@ import {FilterMatchMode, FilterOperator} from 'primevue/api';
 import {Property, DocumentType, PaymentType} from '@/js/Constants';
 import ItemChoose from '@/components/ItemChoose.vue';
 import InputNumber from 'primevue/inputnumber';
+// import AutoComplete from 'primevue/autocomplete';
+
 
 export default {
     name: 'DocContent',
@@ -287,7 +348,8 @@ export default {
         OverlayPanel,
         Divider,
         ItemChoose,
-        InputNumber
+        InputNumber,
+        // AutoComplete
     },
     props: {
         docId: Number,
@@ -339,7 +401,14 @@ export default {
         displayItems: 1,
         multiplySelectItems: false,
         currentItem: undefined,
-        baseDocId: 0
+        baseDocId: 0,
+        filteredSuppliers: null,
+        companyNames: null,
+        digitValue: 0,
+        isMobile: Boolean,
+        documentItem: null,
+        documentField: null,
+        modalDiv: null
       };
     },
     computed: {
@@ -386,6 +455,9 @@ export default {
         },
         newDocNumber() {
           return this.$store.state.ds.newDocNumber;
+        },
+        ourCompanyIdSetting() {
+          return this.$store.state.ss.ourCompanyIdProperty;
         }
     },
     created() {
@@ -402,6 +474,8 @@ export default {
       }
       this.user = JSON.parse(localStorage.getItem('user'));
       this.setPaymentTypes();
+      this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      this.modalDiv = document.getElementById("numPad");
     },
     watch: {
       doc(value) { 
@@ -427,13 +501,16 @@ export default {
           if(this.defaultProperties.length > 0) {
             let projectId = this.defaultProperties.filter(prop => prop.type == Property.PROJECT).pop().property;
             value.project = this.getProjectById(projectId);
-            if(!this.disabledStorageTo) {
+            if(!this.disabledStorageTo && value.storage_to.id == 0) {
               let storageToId = this.defaultProperties.filter(prop => prop.type == Property.STORAGE_TO).pop().property;
               value.storage_to = this.getStorageById(storageToId);
             }
-            if(!this.disabledStorageFrom) {
+            if(!this.disabledStorageFrom && value.storage_from.id == 0) {
               let storageFromId = this.defaultProperties.filter(prop => prop.type == Property.STORAGE_FROM).pop().property;
               value.storage_from = this.getStorageById(storageFromId);
+            }
+            if(this.ourCompanyIdSetting != 0) {
+              value.recipient = this.getRecipientById(this.ourCompanyIdSetting);
             }
           }
         }
@@ -475,9 +552,79 @@ export default {
       },
       items() {
         this.loading = false;
+      },
+      companies(value) {
+        this.companyNames = value.map(function(company){return company.name})
       }
     },
     methods: {
+      addDigit(digit) {
+        if(this.digitValue == '0') this.digitValue = '';
+        this.digitValue += "" + digit;
+        document.getElementById('inputDigit').focus();
+      },
+      delDigit() {
+        if(this.digitValue.length == 1) {
+          this.digitValue = '0';
+          document.getElementById('inputDigit').focus();
+          return;
+        }
+        this.digitValue = this.digitValue.substring(0, this.digitValue.length-1);
+        document.getElementById('inputDigit').focus();
+      },
+      inserValue() {
+        this.documentItem[this.documentField] = Number(this.digitValue);
+        this.setFields(this.documentItem, this.documentField);
+        document.getElementById('numPad').style.display='none';
+        this.documentItem = null;
+        this.documentField = null;
+      },
+      openNumPud(data, field) {
+        this.documentItem = data;
+        this.documentField = field;
+        this.digitValue = 0;
+        document.getElementById('numPad').style.display='block';
+        document.getElementById('inputDigit').focus();
+        
+      },
+      outsideCloseNumPad(event) {
+        console.log(event.target)
+        if(event.target == this.modalDiv) {
+          this.closeNumPad();
+        }
+      },
+      closeNumPad() {
+        this.modalDiv.style.display='none';
+        this.documentItem = null;
+        this.documentField = null;
+      },
+      onKeyUp(event) {
+        let key = event.key;
+        if(key > -1 && key < 10) {
+          this.addDigit(key);
+        }
+        if(key == ',' || key == '.') {
+          if(!this.digitValue.includes('.')) {
+            this.addDigit('.');
+          }
+        }
+        if(key == 'Backspace' || key == 'Delete' || key == ' ') {
+          this.delDigit();
+        }
+      },
+      searchSupplier(event) {
+        console.log(event)
+        setTimeout(() => {
+          if (!event.query.trim().length) {
+            this.filteredSuppliers = [...this.companyNames];
+          }
+          else {
+            this.filteredSuppliers = this.companyNames.filter((company) => {
+              return company.name.toLowerCase().includes(event.query.toLowerCase());
+            });
+          }
+        }, 250);
+      },
       virtualKeyboard(event) {
         console.log("virtualKeyboard", event)
         blur();
@@ -524,10 +671,13 @@ export default {
         this.$emit('disableSaveButton');
       },
       getProjectById(id) {
-        return this.projects.filter(project => project.id == id).pop();
+        return this.projects.find(project => project.id == id);
       },
       getStorageById(id) {
-        return this.storages.filter(storage => storage.id == id).pop();
+        return this.storages.find(storage => storage.id == id);
+      },
+      getRecipientById(id) {
+        return this.companies.find(company => company.id == id);
       },
       getItemRestOnStorage(item, storage) {
         for(let rest of item.rest_list) {
@@ -563,8 +713,12 @@ export default {
       onCellEditComplete(event) {
         let { data, newValue, field } = event;
         if(field != 'item_name') {
+          if(newValue == null) newValue = 0;
           data[field] = newValue;
         }
+        this.setFields(data, field);  
+      },
+      setFields(data, field) {
         if(field === 'quantity' || field === 'quantity_fact' || field === 'price' || field === 'discount') {
           data['amount'] = this.formatPrice((data['price'] * data['quantity']) - data['discount']);
           if(this.doc.doc_type == this.DocumentType.INVENTORY_DOC) {
@@ -658,6 +812,10 @@ export default {
         if(field == "item_name") {
           this.currentField = field;
           this.currentData = data;
+        } else {
+          if(this.isMobile) {
+            this.openNumPud(data, field);
+          }
         }
       },
       addItemsToDoc(newItemList) {
@@ -696,6 +854,39 @@ export default {
 </script>
 
 <style scoped>
+  .num-pad {
+    /* background-color: white;
+    width: 300px; 
+    height: 320px;
+    position: fixed;
+    z-index: 100;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none; */
+
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 100; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  }
+  .shadow {
+    box-shadow: 5px 5px 5px rgba(0,0,0,0.3); /* Параметры тени */
+    padding: 10px;
+  }
+  .modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    width: 300px; 
+    height: 320px;
+  }
   ::v-deep(.row-composite) {
       background-color: rgba(255, 0, 0, 0.15) !important;
   }
@@ -703,13 +894,6 @@ export default {
     display: flex;
     margin: 8px;
   }
-  /* .column {
-    display: flex;
-    flex-direction: column;
-  } */
-  /* .row {
-    display: flex;
-  } */
   .border {
     border: 1px solid #dee2e6;
     border-radius: 3px;

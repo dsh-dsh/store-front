@@ -78,8 +78,8 @@ export const DocStore = {
 			let now = new Date();
 			let year = now.getFullYear();
 			let month = now.getMonth();
-			let day = now.getDate();
-			commit('setDates', [new Date(year, month, 1), new Date(year, month, day + 1)]);
+			let day = 31;
+			commit('setDates', [new Date(year, month, 1), new Date(year, month, day)]);
 		},
 		setStartDate({commit}, date) {
 			commit('setStartDate', date);

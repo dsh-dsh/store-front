@@ -52,6 +52,9 @@
               </div>
             </template>
           </Column>
+          <Column v-if="!isMobile" field="supplier.name" header="поставщик" sortable>
+            <template #body="{data}"><div :class="disabledClass(data)">{{getName(data.supplier)}}</div></template>
+          </Column>
           <Column field="storage_from.name" header="со склада" sortable>
             <template #body="{data}"><div :class="disabledClass(data)">{{getName(data.storage_from)}}</div></template>
           </Column>
