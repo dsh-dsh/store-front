@@ -150,6 +150,11 @@
 
     <div v-if="doc.doc_items">
       <DataTable :value="doc.doc_items" editMode="cell" class="p-datatable-sm" responsiveLayout="scroll">
+        <Column header="#" style="width:1rem">
+            <template #body="slotProps">
+                {{slotProps.index + 1}}
+            </template>
+        </Column>
         <Column field="item_name" header="Наименование" key="item_name"></Column>
         <Column v-if="!isMovement" field="quantity" header="Кол-во" key="quantity" style="width:7rem"></Column>
         <Column v-if="isInventory || isMovement" field="quantity_fact" :header="quantityColumnName" key="quantity_fact" style="width:7rem"></Column>
@@ -196,7 +201,7 @@ export default {
             isMovement: false,
             isCheck: false,
             isPosting: false,
-            colSpan: 3,
+            colSpan: 4,
             DocumentType: DocumentType,
             disableRedactoring: false,
             baseDocId: 0,

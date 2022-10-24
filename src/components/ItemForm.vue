@@ -102,7 +102,6 @@
                 </div>
 
                 <div class="field col-12 md:col-12">
-                    <!-- <IngredientTable :ingrObject="item.ingredients" /> -->
                     <IngredientTable />
                 </div>
 

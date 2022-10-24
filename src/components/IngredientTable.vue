@@ -6,7 +6,7 @@
   <div>
      <!-- @cell-edit-init="onCellEditInit" -->
     <DataTable :value="this.ingredients" editMode="cell" @cell-edit-complete="onCellEditComplete"
-      class="p-datatable-sm editable-cells-table"  responsiveLayout="scroll">
+      class="p-datatable-sm editable-cells-table"  responsiveLayout="stack" breakpoint="640px">
       <Column style="width: 2.2rem">
         <template #body="{data}">
           <img @click="onIngredientClick(data)" src="../../src/assets/img/ii.png" />

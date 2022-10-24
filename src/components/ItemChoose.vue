@@ -1,6 +1,6 @@
 <template>
     <Dialog header="Подбор номенклатуры" class="border" v-model:visible="displayDialog" :modal="true" :closable="false"
-      :contentStyle="{height: '100%'}" :style="{width: '90%', height: '900px'}"> 
+      :contentStyle="{height: '100%'}" :style="{width: '90%', height: '900px'}" @keyup.enter="addItemsToDoc"> 
         <template #header>
 
         </template>
@@ -32,7 +32,7 @@
             
             <div class="formgrid grid form" :style="{height: '200px'}">
                 <div class="col-12 md:col-3">
-                    <InputText class="p-inputtext-sm mr-2" v-model="filters['global'].value" placeholder="поиск" autofocus />
+                    <InputText id="filterInput" class="p-inputtext-sm mr-2" v-model="filters['global'].value" placeholder="поиск" autofocus />
                     <Button icon="pi pi-times" class="p-button-rounded p-button-text p-button-plain p-button-sm" @click="clearFilter"/>
                 </div>
                 <div class="col-12 md:col-9">
@@ -93,7 +93,8 @@ export default {
             chosenItems: [],
             displayQuantityDialog: false,
             newItem: DocItem,
-            newQuantity: 0
+            newQuantity: 0,
+            filterInput: null
         }
     }, 
     props: {
@@ -171,9 +172,16 @@ export default {
             }
             this.displayQuantityDialog = false;
             this.newQuantity = 0;
+            this.focusOnOkButton();
+        },
+        focusOnOkButton() {
+            const filterInput = document.getElementById("filterInput")
+            filterInput.focus();
         },
         addItemsToDoc() {
-            this.$emit('newItemList', this.chosenItems);
+            if(this.chosenItems.length > 0) {
+                this.$emit('newItemList', this.chosenItems);
+            }
             this.displayDialog = false;
             this.chosenItems = [];
         },

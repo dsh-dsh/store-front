@@ -8,10 +8,11 @@
     <div>
       <div class="border">
         <DataTable :value="documents" @row-click="openDocument" class="p-datatable-sm" stripedRows :paginator="true" :rows="20"
-          v-model:selection="selectedProduct" selectionMode="single" sortField="date_time" :sortOrder="-1"
+          v-model:selection="selectedProduct" selectionMode="single" sortField="date_time" :sortOrder="-1" 
           paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
-          :rowsPerPageOptions="[10,20,50]" responsiveLayout="scroll"
-          currentPageReportTemplate="Showing {first} to {last} of {totalRecords}">
+          :rowsPerPageOptions="[10,20,50]" responsiveLayout="scroll" :rowHover="true"
+          currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+          filterDisplay="row" :globalFilterFields="['author.name']">
           <template #header>
             <div class="flex justify-content-end">
               <div class="horizontal">
@@ -19,7 +20,7 @@
               <Calendar id="buttonbar" v-model="firstDate" @date-select="setStartDate" dateFormat="dd.mm.yy" :showButtonBar="true" />
               <span class="mlr-1">до</span>
               <Calendar id="buttonbar" v-model="lastDate" @date-select="setEndDate" dateFormat="dd.mm.yy" :showButtonBar="true" />
-              <Button icon="pi pi-angle-right" @click="resetDocuments" class="p-button-sm p-button-rounded p-button-secondary p-button-text mlr-1" />
+              <!-- <Button icon="pi pi-angle-right" @click="resetDocuments" class="p-button-sm p-button-rounded p-button-secondary p-button-text mlr-1" /> -->
               </div>
             </div>
           </template>
@@ -36,6 +37,13 @@
           <Column field="is_hold" header="" dataType="boolean">
             <template #body="{data}"><i class="pi" :class="iconClass(data)" v-tooltip="getToolTipText(data)"></i></template>
           </Column>
+          <Column field="date_time" header="Дата" sortable dataType="date">
+            <template #body="{data}">
+              <div :class="disabledClass(data)">
+                {{new Date(data.date_time).toLocaleDateString('ru-RU', {day: '2-digit', month: '2-digit', year: 'numeric'})}}
+              </div>
+            </template>
+          </Column>
           <Column field="number" header="№" sortable style="max-width:7rem">
             <template #body="{data}"><div :class="disabledClass(data)">{{data.number}}</div></template>
           </Column>
@@ -45,13 +53,6 @@
           <!-- <Column v-if="isMobile" field="project.name" header="Проект" sortable >
             <template #body="{data}"><div :class="disabledClass(data)">{{data.project.name}}</div></template>
           </Column> -->
-          <Column field="date_time" header="Дата" sortable dataType="date">
-            <template #body="{data}">
-              <div :class="disabledClass(data)">
-                {{new Date(data.date_time).toLocaleDateString('ru-RU', {day: '2-digit', month: '2-digit', year: 'numeric'})}}
-              </div>
-            </template>
-          </Column>
           <Column v-if="!isMobile" field="supplier.name" header="поставщик" sortable>
             <template #body="{data}"><div :class="disabledClass(data)">{{getName(data.supplier)}}</div></template>
           </Column>
@@ -64,8 +65,12 @@
           <Column v-if="!isMobile" field="amount" header="Сумма" sortable>
             <template #body="{data}"><div :class="disabledClass(data)">{{formatCurrency(data.amount)}}</div></template>
           </Column>
-          <Column field="author.name" header="Автор" style="max-width:9rem" sortable >
+          <Column  filterField="author.name" header="Автор" style="max-width:9rem" sortable >
             <template #body="{data}"><div :class="disabledClass(data)">{{getName(data.author)}}</div></template>
+            <!-- <template #filter="{filterModel,filterCallback}">
+                <InputText type="text" v-model="filterModel.value" @keydown.enter="filterCallback()" 
+                    class="p-column-filter" :placeholder="`Search by name - `" v-tooltip.top.focus="'Hit enter key to filter'"/>
+            </template> -->
           </Column>
           <Column style="max-width:3rem">
             <template #body="{data}"> 
@@ -107,7 +112,7 @@
     </div>
   </OverlayPanel>
 
-  <Menu ref="menu" :model="menuModel" :popup="true" />
+  <Menu ref="menu" :model="menuModel" :popup="true" style="width: 230px;"/>
 
   <Dialog header="Подтверждение" class="border" v-model:visible="displayConfirmation" :style="{width: '300px'}" :modal="true" :showHeader="false">
       <h3>{{confirmationMessage}}</h3>
@@ -153,6 +158,7 @@ import Menu from 'primevue/menu';
 import Calendar from 'primevue/calendar';
 import {DocumentType} from '@/js/Constants';
 import RadioButton from 'primevue/radiobutton';
+// import InputText from 'primevue/inputtext';
 
 export default {
     name: 'DocContent',
@@ -168,7 +174,8 @@ export default {
       OverlayPanel,
       Menu,
       Calendar,
-      RadioButton
+      RadioButton,
+      // InputText
     },
     props: {
         filter: String,
@@ -204,6 +211,7 @@ export default {
         closeDocAfterSave: true,
         quickSave : false,
         isMobile: Boolean,
+        holdDoc: false,
         items: [
         {
           label: "Документы",
@@ -232,7 +240,7 @@ export default {
       documents() {
         return this.$store.state.ds.documents
       },
-      document() {
+      currentDocument() {
         return this.$store.state.ds.document
       },
       success() {
@@ -281,7 +289,7 @@ export default {
       success() {
         this.$store.dispatch('getDocuments', this.filter);
       },
-      document(val) {
+      currentDocument(val) {
         this.holdLable = val.is_hold? 'Отменить проведение' : (val.doc_type == this.DocumentType.MOVEMENT_DOC? 'Подтвердить получение' : 'Провести');
         if(val.date_time < this.startPeriod) {
           this.disabledHoldButton = true;
@@ -289,6 +297,10 @@ export default {
         } else {
           this.disabledHoldButton = false;
           this.disabledSaveButton = false;
+        }
+        if(this.holdDoc == true) {
+          this.holdDocument();
+          this.holdDoc = false;
         }
       },
       confirmationType(val) {
@@ -305,7 +317,7 @@ export default {
           this.buttonNoEnabled = false;
           this.confirmationMessage = 'Для проведения заполните все цены в документе';
         } else if(val == 'serialHold') {
-          if(this.document.is_hold == true) {
+          if(this.currentDocument.is_hold == true) {
             this.confirmationMessage = 'После этого документа есть другие проведенные документы. Отменить их проведение?';
           } else {
             this.confirmationMessage = 'Есть более ранние не проведенные документы. Провести их?';
@@ -332,7 +344,7 @@ export default {
         }
       }, 
       newDocId(val) {
-        this.document.id = val;
+        this.currentDocument.id = val;
       }
     },
 	methods: {
@@ -375,9 +387,11 @@ export default {
     },
     setStartDate(date) {
       this.$store.dispatch('setStartDate', date)
+      this.$store.dispatch('getDocuments', this.filter);
     },
     setEndDate(date) {
       this.$store.dispatch('setEndDate', date)
+      this.$store.dispatch('getDocuments', this.filter);
     },
     getToolTipText(doc) {
       if(doc.is_hold) {
@@ -391,12 +405,17 @@ export default {
     toggleModalMenu(event, data) {
       this.data = data;
       this.menuModel = [];
-
       let item = {
         label: 'Копировать', icon: 'pi pi-copy',
         command: () => {this.openCopyDocumentRedactor(this.data);}
       };
       this.menuModel.push(item);
+      let holdItem = {
+        label: this.data.is_hold? "Отменить проведение" : "Провести", 
+        icon: 'pi pi-check-circle',
+        command: () => {this.holdDocumentFromModalMenu(this.data);}
+      }
+      this.menuModel.push(holdItem);
       if(this.user.role == 'ADMIN' || data.author.id == this.user.id) {
         if(data.date_time >= this.startPeriod ) {
           let item = {
@@ -417,7 +436,7 @@ export default {
             command: () => this.openConfirmation(data)
           };
           this.menuModel.push(delItem);
-          }
+        }
       }
       this.$refs.menu.toggle(event);
     },
@@ -434,7 +453,7 @@ export default {
 			this.displayDocument = true;
 		},
     openBaseDoc(value) {
-      console.log(value);
+      console.log("openBaseDoc", value);
       // this.docRedactor = false;
 			// this.docId = value;
 			// this.displayDocument = true;
@@ -476,13 +495,13 @@ export default {
 		saveDocument() {
       this.displaySaveDialog = false;
       if(this.type == 'update') {
-        this.$store.dispatch('updateDocument', [this.document, this.salectedSaveTime]);
+        this.$store.dispatch('updateDocument', [this.currentDocument, this.salectedSaveTime]);
       }	else {
-        this.$store.dispatch('addDocument', [this.document, this.salectedSaveTime, this.quickSave]);
+        this.$store.dispatch('addDocument', [this.currentDocument, this.salectedSaveTime, this.quickSave]);
         this.quickSave = false;
         //this.type = 'update';
       }	
-      if(this.document.is_hold == false && this.holdingDialogSetting == 1) {
+      if(this.currentDocument.is_hold == false && this.holdingDialogSetting == 1) {
         this.confirmationType = 'hold';
         this.displayConfirmation = true;
       } else {
@@ -496,26 +515,50 @@ export default {
         this.quickSave = true;
         this.displaySaveDialog = true;
       } else {
-        this.$store.dispatch('updateDocument', [this.document, 'currentTime']);
+        this.$store.dispatch('updateDocument', [this.currentDocument, 'currentTime']);
       }
     },
     serialHoldDocument() {
-      this.$store.dispatch('serialHoldDocument', this.document.id);
+      this.$store.dispatch('serialHoldDocument', this.currentDocument.id);
       this.displayConfirmation = false;
     },
     holdDocument() {
       this.displayConfirmation = false;
+      if(!this.checkQuantity()) {
+        return;
+      }
       if(this.checkPrices()) {
-        this.$store.dispatch('holdDocument', [this.document.id, this.document.is_hold]);
+        this.$store.dispatch('holdDocument', [this.currentDocument.id, this.currentDocument.is_hold]);
         this.displayDocument = false;
       } else {
         this.confirmationType = 'price';
         this.displayConfirmation = true;
       }
     },
+    holdDocumentFromModalMenu(data) {
+      this.holdDoc = true;
+      this.$store.dispatch('getDocument', [data.id, null, false]);
+    },
+    checkQuantity() {
+      if(this.currentDocument.doc_type == DocumentType.POSTING_DOC 
+          || this.currentDocument.doc_type == DocumentType.RECEIPT_DOC 
+          || this.currentDocument.doc_type == DocumentType.MOVEMENT_DOC
+          || this.currentDocument.doc_type == DocumentType.WRITE_OFF_DOC) {
+        let nullItems = this.currentDocument.doc_items
+              .filter(item => item.quantity == 0)
+              .map(item => item.item_name)
+              .join(", ");
+        if(nullItems.length > 0) {
+          const subject = "Документ " + this.currentDocument.doc_type + " нельзя проводить с нулевыми количествами"
+          this.$toast.add({severity:'warn', summary: subject, detail: nullItems, life: 5000});
+          return false;
+        }
+      }
+      return true;
+    },
     checkPrices() {
-      if(this.document.doc_type == this.DocumentType.INVENTORY_DOC) {
-        for(let docItem of this.document.doc_items) {
+      if(this.currentDocument.doc_type == this.DocumentType.INVENTORY_DOC) {
+        for(let docItem of this.currentDocument.doc_items) {
           if(docItem.price == 0) {
             return false;
           }

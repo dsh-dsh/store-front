@@ -169,6 +169,11 @@
 
       <DataTable :value="doc.doc_items" :rowClass="rowClass" editMode="cell" @cell-edit-init="onCellEditInit" 
           @cell-edit-complete="onCellEditComplete" class="p-datatable-sm editable-cells-table" responsiveLayout="scroll"> 
+        <Column header="#" style="width:1rem">
+          <template #body="slotProps">
+            {{slotProps.index + 1}}
+          </template>
+        </Column>
         <Column field="item_name" header="Наименование" key="item_name">
           <template #editor="{ data, field }">
             <InputText @change="disableHoldButton" v-model="data[field]" autofocus/>
@@ -181,7 +186,7 @@
             <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="3" :maxFractionDigits="3" />
           </template>
         </Column>
-        <Column v-if="isInventory" field="quantity_fact" header="Кол-во" key="quantity_fact" style="width:5rem">
+        <Column v-if="isInventory" field="quantity_fact" header="Кол-во факт" key="quantity_fact" style="width:5rem">
           <template #editor="{ data, field }">
             <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="3" :maxFractionDigits="3" />
           </template>
@@ -197,7 +202,11 @@
             <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="2" :maxFractionDigits="2" />
           </template>
         </Column>
-        <Column field="amount" header="Сумма" key="amount" style="width:5rem"></Column>
+        <Column field="amount" header="Сумма" key="amount" style="width:5rem">
+          <template #editor="{ data, field }">
+            <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="2" :maxFractionDigits="2" />
+          </template>
+        </Column>
         <Column v-if="isInventory" field="amount_fact" header="Сумма факт." key="amount_fact" style="width:5rem"></Column>
         <Column v-if="isCheck" field="discount" header="Скидка" key="discount" style="width:5rem">
           <template #editor="{ data, field }">
@@ -394,7 +403,7 @@ export default {
         isInventory: false,
         isCheck: false,
         isMovement: false,
-        colSpan: 3,  
+        colSpan: 4,  
         colSpan2: 2,              
         DocumentType: DocumentType,
         paymentTypes:[],
@@ -407,8 +416,7 @@ export default {
         digitValue: 0,
         isMobile: Boolean,
         documentItem: null,
-        documentField: null,
-        modalDiv: null
+        documentField: null
       };
     },
     computed: {
@@ -588,7 +596,6 @@ export default {
         
       },
       outsideCloseNumPad(event) {
-        console.log(event.target)
         if(event.target == this.modalDiv) {
           this.closeNumPad();
         }
@@ -613,7 +620,6 @@ export default {
         }
       },
       searchSupplier(event) {
-        console.log(event)
         setTimeout(() => {
           if (!event.query.trim().length) {
             this.filteredSuppliers = [...this.companyNames];
@@ -625,8 +631,7 @@ export default {
           }
         }, 250);
       },
-      virtualKeyboard(event) {
-        console.log("virtualKeyboard", event)
+      virtualKeyboard() {
         blur();
         this.$refs.keyboard.toggle(event);
       },
@@ -724,13 +729,17 @@ export default {
           if(this.doc.doc_type == this.DocumentType.INVENTORY_DOC) {
             data['amount_fact'] = this.formatPrice(data['price'] * data['quantity_fact']);
           }
+        } else if (field === 'amount') {
+          if(data['quantity'] > 0) {
+            data['price'] = this.formatPrice(data['amount'] / data['quantity']);
+            if(this.doc.doc_type == this.DocumentType.INVENTORY_DOC) {
+              data['amount_fact'] = this.formatPrice(data['price'] * data['quantity_fact']);
+            }
+          }
         }
       },
       formatPrice(value) {
-        return value.toFixed(2);
-      },
-      formatQuantity(value) {
-        return value.toFixed(3);
+        return Number(value.toFixed(2));
       },
       formatCurrency(value) {
         return value.toLocaleString('re-RU', {style: 'currency', currency: 'RUB'});
