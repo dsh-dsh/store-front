@@ -168,7 +168,9 @@
       <Button icon="pi pi-plus" @click="onAddItemClick" class="p-button-text p-button-rounded" />
 
       <DataTable :value="doc.doc_items" :rowClass="rowClass" editMode="cell" 
-          class="p-datatable-sm editable-cells-table" @cell-edit-init="onCellEditInit" @cell-edit-complete="onCellEditComplete"
+          class="p-datatable-sm editable-cells-table" 
+          filterDisplay="row" v-model:filters="filters"
+          @cell-edit-init="onCellEditInit" @cell-edit-complete="onCellEditComplete"
           :rowHover="true" responsiveLayout="scroll"> 
         <Column header="#" style="width:1rem">
           <template #body="{index}">
@@ -176,6 +178,9 @@
           </template>
         </Column>
         <Column field="item_name" header="Наименование" key="item_name">
+          <!-- <template #filter="{filterModel,filterCallback}">
+            <InputText type="text" v-model="filterModel.value" @keydown.enter="filterCallback()" class="p-column-filter" v-tooltip.top.focus="'Hit enter key to filter'"/>
+          </template> -->
           <template #editor="{ data, field }">
             <InputText @change="disableHoldButton" v-model="data[field]" autofocus/>
             <Button icon="pi pi-check" class="p-button-warning" @click="onItemClick(data)"/>
@@ -479,9 +484,9 @@ export default {
         }
     },
     created() {
-        this.initFilters();
     },
     mounted() {
+      this.initFilters();
       if(this.type === "copyFromRequestDoc") {
         this.$store.dispatch('getMovDocFromRequest', this.docId);
       } else {
@@ -656,8 +661,8 @@ export default {
       },
       initFilters() {
         this.filters = {
-          'global': {value: null, matchMode: FilterMatchMode.CONTAINS},
-          'name': {operator: FilterOperator.AND, constraints: [{value: null, matchMode: FilterMatchMode.STARTS_WITH}]}
+          // 'global': {value: null, matchMode: FilterMatchMode.CONTAINS},
+          'item_name': {operator: FilterOperator.AND, constraints: [{value: null, matchMode: FilterMatchMode.STARTS_WITH}]}
         }
       },
       setPaymentTypes() {

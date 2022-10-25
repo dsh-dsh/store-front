@@ -52,9 +52,20 @@ export default {
           label: "Настройки",
           icon: "pi pi-fw pi-cog",
           to: "/settings"
-        },
+        }
       ],
+      user: null,
     };
+  },
+  mounted() {
+    this.user = JSON.parse(localStorage.getItem('user'));
+    if(this.user.role == 'ADMIN') {
+      this.items.push({
+          label: "aaaaaaaaaa",
+          icon: "pi pi-fw pi-cog",
+          to: "/filter/table"
+        });
+      }
   },
   methods: {
     logout() {
