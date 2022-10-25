@@ -11,10 +11,10 @@
                     <Button label="Перемещение" class="p-button-rounded p-button-secondary p-button-outlined" @click="onRequestClick"/>
                 </div>
                 <div class="mr-2">
-                    <Button label="Изменить" class="p-button-sm p-button-rounded p-button-secondary" @click="onUpdateClick" :disabled="disableRedactoring" />
+                    <Button label="Изменить" class="p-button-rounded p-button-secondary" @click="onUpdateClick" :disabled="disableRedactoring" />
                 </div>
                 <div>
-                    <Button label="Копировать" class="p-button-sm p-button-rounded p-button-secondary" @click="onCopyClick"/>
+                    <Button label="Копировать" class="p-button-rounded p-button-secondary" @click="onCopyClick"/>
                 </div>
             </div>
         </div>
@@ -149,10 +149,10 @@
     <br>
 
     <div v-if="doc.doc_items">
-      <DataTable :value="doc.doc_items" editMode="cell" class="p-datatable-sm" responsiveLayout="scroll">
+      <DataTable :value="doc.doc_items" editMode="cell" class="p-datatable-sm" responsiveLayout="scroll" :rowHover="true">
         <Column header="#" style="width:1rem">
-            <template #body="slotProps">
-                {{slotProps.index + 1}}
+            <template #body="{index}">
+                {{index + 1}}
             </template>
         </Column>
         <Column field="item_name" header="Наименование" key="item_name"></Column>

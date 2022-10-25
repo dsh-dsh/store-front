@@ -1,10 +1,12 @@
 <template>
-  <MainMenu />
-  <div class="content">
+  <div>
+    <MainMenu />
     <div class="flex justify-content-between mb-2">
       <DocTabs :filter="filter" />
       <Button icon="pi pi-plus" @click="chooseDocType" class="p-button-rounded p-button-secondary p-button-outlined mr-2" />
     </div>
+  </div>
+  <div class="content">
     <div>
       <div class="border">
         <DataTable :value="documents" @row-click="openDocument" class="p-datatable-sm" stripedRows :paginator="true" :rows="20"
@@ -20,7 +22,6 @@
               <Calendar id="buttonbar" v-model="firstDate" @date-select="setStartDate" dateFormat="dd.mm.yy" :showButtonBar="true" />
               <span class="mlr-1">до</span>
               <Calendar id="buttonbar" v-model="lastDate" @date-select="setEndDate" dateFormat="dd.mm.yy" :showButtonBar="true" />
-              <!-- <Button icon="pi pi-angle-right" @click="resetDocuments" class="p-button-sm p-button-rounded p-button-secondary p-button-text mlr-1" /> -->
               </div>
             </div>
           </template>
@@ -99,10 +100,10 @@
                 @open-update-doc="openUpdateDocumentRedactor" @open-copy-doc="openCopyDocumentRedactor" />
     </div>
     <template #footer>
-      <Button label="Закрыть" icon="pi pi-times" @click="closeDocument" class="p-button-sm p-button-secondary p-button-text"/>
-      <!-- <Button v-if="docRedactor" label="Записать" icon="pi pi-check" @click="quickSaveDoc" class="p-button-sm p-button-rounded p-button-secondary" :disabled="disabledSaveButton"/> -->
-      <Button v-if="docRedactor" label="Сохранить" icon="pi pi-check" @click="openSaveDocDialog" class="p-button-sm p-button-rounded p-button-secondary" autofocus :disabled="disabledSaveButton"/>
-      <Button :label="holdLable" icon="pi pi-check" @click="holdDocument" class="p-button-sm p-button-rounded p-button-secondary" :disabled="disabledHoldButton" />
+      <Button label="Закрыть" icon="pi pi-times" @click="closeDocument" class="p-button-secondary p-button-text"/>
+      <!-- <Button v-if="docRedactor" label="Записать" icon="pi pi-check" @click="quickSaveDoc" class="p-button-rounded p-button-secondary" :disabled="disabledSaveButton"/> -->
+      <Button v-if="docRedactor" label="Сохранить" icon="pi pi-check" @click="openSaveDocDialog" class="p-button-rounded p-button-secondary" autofocus :disabled="disabledSaveButton"/>
+      <Button :label="holdLable" icon="pi pi-check" @click="holdDocument" class="p-button-rounded p-button-secondary" :disabled="disabledHoldButton" />
     </template>
   </Dialog>
 
@@ -609,10 +610,20 @@ export default {
 
 </script>
 <style scoped>
+  .fixed-header {
+    background-color: white;
+    z-index: 100;
+    position: fixed;
+    top: 0;
+    width: 100%;
+  }
   .content {
     display: flex;
     flex-direction: column;
     flex: 0 0 100%;
+  }
+  .mt-200 {
+    margin-top: 130px;
   }
   .border {
     border: 1px solid #dee2e6;

@@ -7,7 +7,7 @@
         <div class="container">
             <DataTable :value="items" class="p-datatable-sm" v-model:selection="selectedItem" selectionMode="single" 
                         v-model:filters="filters" filterDisplay="menu" :globalFilterFields="['name']"
-                        @rowSelect="onItemSelect" :scrollable="true" scrollHeight="420px"> 
+                        @rowSelect="onItemSelect" :scrollable="true" scrollHeight="420px" :rowHover="true"> 
                         <!-- responsiveLayout="scroll"> -->
                 <template #loading>
                 <div class="flex justify-content-center">

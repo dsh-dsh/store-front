@@ -28,7 +28,7 @@
         <div class="field col-12 md:col-4">
           <label for="project" class="label">Проект</label><br>
             <div class="p-inputgroup">
-              <InputText id="project" type="text" class="p-inputtext-sm" v-model="doc.project.name" />
+              <InputText id="project" type="text" class="p-inputtext" v-model="doc.project.name" />
               <Button icon="pi pi-check" class="p-button-warning" @click="onProjectClick" />
             </div>
         </div>
@@ -38,7 +38,7 @@
           <div v-if="doc.storage_from">
             <label for="storageFrom" class="label">со склада</label><br>
             <div class="p-inputgroup">
-              <InputText id="storageFrom" type="text" class="p-inputtext-sm" v-model="doc.storage_from.name" :disabled="disabledStorageFrom" />
+              <InputText id="storageFrom" type="text" class="p-inputtext" v-model="doc.storage_from.name" :disabled="disabledStorageFrom" />
               <Button icon="pi pi-check" class="p-button-warning" @click="onStorageFromClick" :disabled="disabledStorageFrom" />
             </div>
           </div>
@@ -47,7 +47,7 @@
           <div v-if="doc.storage_to">
           <label for="storageTo" class="label">на склад</label><br>
             <div class="p-inputgroup">
-              <InputText id="storageTo" type="text" class="p-inputtext-sm" v-model="doc.storage_to.name" :disabled="disabledStorageTo" />
+              <InputText id="storageTo" type="text" class="p-inputtext" v-model="doc.storage_to.name" :disabled="disabledStorageTo" />
               <Button icon="pi pi-check" class="p-button-warning" @click="onStorageToClick" :disabled="disabledStorageTo"/>
             </div>
           </div>
@@ -60,7 +60,7 @@
             <div class="p-inputgroup">
               <!-- v-model="doc.supplier.name" -->
               <!-- <AutoComplete id="supplier" v-model="selectedSupplier" :suggestions="filteredSuppliers" @complete="searchSupplier($event)"  :disabled="disabledSupplier" /> -->
-              <InputText id="supplier" type="text" class="p-inputtext-sm" v-model="doc.supplier.name" :disabled="disabledSupplier" />
+              <InputText id="supplier" type="text" class="p-inputtext" v-model="doc.supplier.name" :disabled="disabledSupplier" />
               <Button icon="pi pi-check" class="p-button-warning" @click="onSupplierClick"/>
             </div>
           </div>
@@ -69,7 +69,7 @@
           <div v-if="doc.recipient">
             <label for="recipient" class="label">Получатель</label><br>
             <div class="p-inputgroup">
-              <InputText id="recipient" type="text" class="p-inputtext-sm" v-model="doc.recipient.name" />
+              <InputText id="recipient" type="text" class="p-inputtext" v-model="doc.recipient.name" />
               <Button icon="pi pi-check" class="p-button-warning" @click="onRecipientClick"/>
             </div>
           </div>
@@ -79,14 +79,14 @@
         <div v-if="orderDoc" class="field col-12 md:col-4">
             <label for="individual" class="label">Физ лицо</label><br>
             <div class="p-inputgroup">
-              <InputText id="individual" type="text" class="p-inputtext-sm" v-model="doc.individual.name" />
+              <InputText id="individual" type="text" class="p-inputtext" v-model="doc.individual.name" />
               <Button icon="pi pi-check" class="p-button-warning" @click="onIndividualClick"/>
             </div>
         </div>
         <div v-if="orderDoc" class="field col-12 md:col-4">
             <label for="payment_type" class="label">Физ лицо</label><br>
             <div class="p-inputgroup">
-              <InputText id="payment_type" type="text" class="p-inputtext-sm" v-model="doc.payment_type" />
+              <InputText id="payment_type" type="text" class="p-inputtext" v-model="doc.payment_type" />
               <Button icon="pi pi-check" class="p-button-warning" @click="onPaymentTypeClick"/>
             </div>
         </div>
@@ -94,11 +94,11 @@
 
         <div v-if="orderDoc" class="field col-12 md:col-4">
           <label for="amount" class="label">сумма</label><br>
-          <InputText id="amount" @change="disableHoldButton" type="text" class="p-inputtext-sm mr-1" v-model="doc.amount" />
+          <InputText id="amount" @change="disableHoldButton" type="text" class="p-inputtext mr-1" v-model="doc.amount" />
         </div>
         <div v-if="orderDoc" class="field col-12 md:col-8">
           <label for="tax" class="label">сумма</label><br>
-          <InputText id="tax" @change="disableHoldButton" type="text" class="p-inputtext-sm mr-1" v-model="doc.tax" />
+          <InputText id="tax" @change="disableHoldButton" type="text" class="p-inputtext mr-1" v-model="doc.tax" />
         </div>
       </div>
     </div>
@@ -113,27 +113,27 @@
       <div class="formgrid grid">
         <div class="field col-12 md:col-3">
           <label for="waiter" class="label">официант</label><br>
-          <InputText id="waiter" @change="disableHoldButton" type="text" class="p-inputtext-sm mr-1" v-model="doc.check_info.waiter" />
+          <InputText id="waiter" @change="disableHoldButton" type="text" class="p-inputtext mr-1" v-model="doc.check_info.waiter" />
         </div>
         <div class="field col-12 md:col-3">
           <label for="check_number" class="label">номер чека</label><br>
-          <InputText id="check_number" @change="disableHoldButton" type="text" class="p-inputtext-sm mr-1" v-model="doc.check_info.check_number" />
+          <InputText id="check_number" @change="disableHoldButton" type="text" class="p-inputtext mr-1" v-model="doc.check_info.check_number" />
         </div>
         <div class="field col-12 md:col-3">
           <label for="cash_register_number" class="label">номер кассы</label><br>
-          <InputText id="cash_register_number" @change="disableHoldButton" type="text" class="p-inputtext-sm mr-1" v-model="doc.check_info.cash_register_number" />
+          <InputText id="cash_register_number" @change="disableHoldButton" type="text" class="p-inputtext mr-1" v-model="doc.check_info.cash_register_number" />
         </div>
         <div class="field col-12 md:col-3">
           <label for="amount_received" class="label">получено</label><br>
-          <InputText id="amount_received" @change="disableHoldButton" type="text" class="p-inputtext-sm mr-1" v-model="doc.check_info.amount_received" />
+          <InputText id="amount_received" @change="disableHoldButton" type="text" class="p-inputtext mr-1" v-model="doc.check_info.amount_received" />
         </div>
         <div class="field col-12 md:col-3">
           <label for="table_number" class="label">стол</label><br>
-          <InputText id="table_number" @change="disableHoldButton" type="text" class="p-inputtext-sm mr-1" v-model="doc.check_info.table_number" />
+          <InputText id="table_number" @change="disableHoldButton" type="text" class="p-inputtext mr-1" v-model="doc.check_info.table_number" />
         </div>
         <div class="field col-12 md:col-3">
           <label for="guest_number" class="label">гость</label><br>
-          <InputText id="guest_number" @change="disableHoldButton" type="text" class="p-inputtext-sm mr-1" v-model="doc.check_info.guest_number" />
+          <InputText id="guest_number" @change="disableHoldButton" type="text" class="p-inputtext mr-1" v-model="doc.check_info.guest_number" />
         </div>
         <div class="field col-12 md:col-3">
           <label for="kkm_check_time" class="label">время</label><br>
@@ -167,11 +167,12 @@
       
       <Button icon="pi pi-plus" @click="onAddItemClick" class="p-button-text p-button-rounded" />
 
-      <DataTable :value="doc.doc_items" :rowClass="rowClass" editMode="cell" @cell-edit-init="onCellEditInit" 
-          @cell-edit-complete="onCellEditComplete" class="p-datatable-sm editable-cells-table" responsiveLayout="scroll"> 
+      <DataTable :value="doc.doc_items" :rowClass="rowClass" editMode="cell" 
+          class="p-datatable-sm editable-cells-table" @cell-edit-init="onCellEditInit" @cell-edit-complete="onCellEditComplete"
+          :rowHover="true" responsiveLayout="scroll"> 
         <Column header="#" style="width:1rem">
-          <template #body="slotProps">
-            {{slotProps.index + 1}}
+          <template #body="{index}">
+            {{index + 1}}
           </template>
         </Column>
         <Column field="item_name" header="Наименование" key="item_name">
@@ -181,33 +182,33 @@
           </template>
         </Column>
          <!-- readonly style="cursor: pointer;" -->
-        <Column v-if="!isMovement" field="quantity" header="Кол-во" key="quantity" style="width:5rem">
+        <Column v-if="!isMovement" field="quantity" header="Кол-во" key="quantity" style="width:8rem">
           <template #editor="{ data, field }">
             <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="3" :maxFractionDigits="3" />
           </template>
         </Column>
-        <Column v-if="isInventory" field="quantity_fact" header="Кол-во факт" key="quantity_fact" style="width:5rem">
+        <Column v-if="isInventory" field="quantity_fact" header="Кол-во факт" key="quantity_fact" style="width:8rem">
           <template #editor="{ data, field }">
             <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="3" :maxFractionDigits="3" />
           </template>
         </Column>
-        <Column v-if="isMovement" field="quantity_fact" header="Заявка" key="quantity_fact" style="width:5rem"></Column>
-        <Column v-if="isMovement" field="quantity" header="Кол-во" key="quantity" style="width:5rem">
+        <Column v-if="isMovement" field="quantity_fact" header="Заявка" key="quantity_fact" style="width:8rem"></Column>
+        <Column v-if="isMovement" field="quantity" header="Кол-во" key="quantity" style="width:8rem">
           <template #editor="{ data, field }">
             <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="3" :maxFractionDigits="3" />
           </template>
         </Column>
-        <Column field="price" header="Цена" key="price" style="width:5rem">
+        <Column field="price" header="Цена" key="price" style="width:8rem">
           <template #editor="{ data, field }">
             <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="2" :maxFractionDigits="2" />
           </template>
         </Column>
-        <Column field="amount" header="Сумма" key="amount" style="width:5rem">
+        <Column field="amount" header="Сумма" key="amount" style="width:8rem">
           <template #editor="{ data, field }">
             <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="2" :maxFractionDigits="2" />
           </template>
         </Column>
-        <Column v-if="isInventory" field="amount_fact" header="Сумма факт." key="amount_fact" style="width:5rem"></Column>
+        <Column v-if="isInventory" field="amount_fact" header="Сумма факт." key="amount_fact" style="width:7rem"></Column>
         <Column v-if="isCheck" field="discount" header="Скидка" key="discount" style="width:5rem">
           <template #editor="{ data, field }">
             <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="2" :maxFractionDigits="2" />
@@ -218,11 +219,19 @@
             <Button icon="pi pi-minus" class="p-button-rounded p-button-secondary p-button-text" @click="deleteRow(data)" />
           </template>
         </Column>
+        <Column style="width:1rem">
+          <template #body="{index, data}">
+            <div class="up-down-buttons">
+              <i class="pi pi-angle-up arrow-button" @click="rowUp(index, data)" />
+              <i class="pi pi-angle-down arrow-button" @click="rowDown(index, data)" />
+            </div>
+          </template>
+        </Column>
         <ColumnGroup type="footer">
           <Row>
             <Column footer="сумма:" :colspan="colSpan" footerStyle="text-align:right" />
             <Column :footer="totalAmount" :colspan="colSpan2" />
-            <Column v-if="isInventory" :footer="totalAmountFact" :colspan="2" />
+            <Column v-if="isInventory" :footer="totalAmountFact" :colspan="3" />
           </Row>
         </ColumnGroup>
       </DataTable> 
@@ -416,7 +425,8 @@ export default {
         digitValue: 0,
         isMobile: Boolean,
         documentItem: null,
-        documentField: null
+        documentField: null,
+        // inputNullValueProperty: false
       };
     },
     computed: {
@@ -484,6 +494,7 @@ export default {
       this.setPaymentTypes();
       this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
       this.modalDiv = document.getElementById("numPad");
+      // this.getinputNullValueProperty();
     },
     watch: {
       doc(value) { 
@@ -542,9 +553,7 @@ export default {
         }
         if(value.doc_type == DocumentType.MOVEMENT_DOC && this.baseDocId) {
             this.isMovement = true;
-            this.colSpan++;
-            // this.colSpan2;
-        }
+            this.colSpan++;     }
         this.selectedProject = value.project
         this.dateInput = value.date_time;
         if(value.check_info) {
@@ -566,6 +575,13 @@ export default {
       }
     },
     methods: {
+      // getinputNullValueProperty() {
+      //   let property = this.defaultProperties.find(prop => prop.type == Property.INPUT_NULL_VALUE);
+      //   if(property) this.inputNullValueProperty = property.property == 1;
+      // },
+      onRowReorder() {
+        console.log(this.doc)
+      },
       addDigit(digit) {
         if(this.digitValue == '0') this.digitValue = '';
         this.digitValue += "" + digit;
@@ -695,6 +711,20 @@ export default {
         this.doc.doc_items = this.doc.doc_items.filter( currentValue => currentValue != value );
         this.$emit('disableHoldButton');
       },
+      rowUp(index, data) {
+        if(index > 0) {
+          let currentData = this.doc.doc_items[index - 1];
+          this.doc.doc_items[index - 1] = data;
+          this.doc.doc_items[index] = currentData;
+        }
+      },
+      rowDown(index, data) {
+        if(index < this.doc.doc_items.length - 1) {
+          let currentData = this.doc.doc_items[index + 1];
+          this.doc.doc_items[index + 1] = data;
+          this.doc.doc_items[index] = currentData;
+        }
+      },
       onPaymentTypeClick(event) {
         this.$refs.opPaymentTypes.toggle(event);
       },
@@ -822,6 +852,10 @@ export default {
           this.currentField = field;
           this.currentData = data;
         } else {
+          // if(this.inputNullValueProperty) {
+          //   console.log(data, field)
+          //   data[field] = 0;
+          // }
           if(this.isMobile) {
             this.openNumPud(data, field);
           }
@@ -863,31 +897,33 @@ export default {
 </script>
 
 <style scoped>
+  .up-down-buttons {
+    cursor: pointer;
+    margin: 0px;
+    padding: 0px;
+  }
+  .arrow-button {
+    margin: 0px;
+    padding: 0px;
+  }
+  .arrow-button:hover {
+    background-color: #ffffff;
+  }
   .num-pad {
-    /* background-color: white;
-    width: 300px; 
-    height: 320px;
+    display: none;
     position: fixed;
     z-index: 100;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: none; */
-
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 100; /* Sit on top */
-    padding-top: 100px; /* Location of the box */
+    padding-top: 100px;
     left: 0;
     top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgb(0,0,0); /* Fallback color */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
   }
   .shadow {
-    box-shadow: 5px 5px 5px rgba(0,0,0,0.3); /* Параметры тени */
+    box-shadow: 5px 5px 5px rgba(0,0,0,0.3);
     padding: 10px;
   }
   .modal-content {
@@ -967,6 +1003,6 @@ export default {
     width : 900px;
   }
   ::v-deep(.p-inputnumber-input) {
-    width: 70px;
+    width: 100px;
   }
 </style>

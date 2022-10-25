@@ -3,7 +3,7 @@
     <div>
         <div class="itemform">
             <div class="header">
-                <Button label="Новая номенклатура" @click="addNewItem" class="p-button-rounded p-button-secondary p-button-sm" />
+                <Button label="Новая номенклатура" @click="addNewItem" class="p-button-rounded p-button-secondary" />
             </div>
             <Breadcrumb :home="homeCrumb" :model="crumbs">
                 <template #item="{item}">
@@ -113,8 +113,8 @@
                 </div>
 
                 <div class="col-12 md:col-12" style="text-align: end">
-                    <Button label="Калькуляция" @click="getCalculation" class="p-button-rounded p-button-sm" style="margin-top: 15px" />
-                    <Button label="Сохранить" @click="onSave" class="p-button-rounded p-button-sm" style="margin-top: 15px" />
+                    <Button label="Калькуляция" @click="getCalculation" class="p-button-rounded" style="margin-top: 15px" />
+                    <Button label="Сохранить" @click="onSave" class="p-button-rounded" style="margin-top: 15px" />
                 </div>
             </div>
         </div>

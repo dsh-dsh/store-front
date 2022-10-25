@@ -127,7 +127,7 @@
       </div>
     </AccordionTab>
 
-    <AccordionTab v-if="isAdmin" header="Настройки интерфеса">
+    <AccordionTab v-if="isAdmin" header="Настройки интерфеса (админ)">
       <div class="formgrid grid leftAlignment">
         <div class="col-12 md:col-4">
           <span>Запрашивать проведение при сохранении документа </span>
@@ -136,6 +136,28 @@
           <InputSwitch v-model="holdingDialog" @click="setHoldingDialogProperty" />
         </div>
         <div class="col-12 md:col-4"></div>
+      </div>
+    </AccordionTab>
+
+    <AccordionTab header="Настройки интерфеса">
+      <div class="formgrid grid leftAlignment">
+        <div class="col-12 md:col-4">
+          <span>размер шрифта {{fontSize/20}}</span>
+        </div>
+        <div class="col-12 md:col-4">
+          <Slider class="mt-3" v-model="fontSize" :step="20" @change="setExampleFontSize"/>
+        </div>
+        <div class="col-12 md:col-4"></div>
+
+        <!-- <div class="col-12 md:col-12"><br></div>
+
+        <div class="col-12 md:col-4">
+          <span>удвлять значение из полей при начале редактирования</span>
+        </div>
+        <div class="col-12 md:col-4">
+          <InputSwitch v-model="inputNullValue" @click="setInputNullValue" />
+        </div>
+        <div class="col-12 md:col-4"></div> -->
       </div>
     </AccordionTab>
 
@@ -179,6 +201,7 @@ import Column from 'primevue/column';
 import InputText from 'primevue/inputtext';
 import InputSwitch from 'primevue/inputswitch';
 import {Property} from '@/js/Constants';
+import Slider from 'primevue/slider';
 
 export default {
   name: 'Settings',
@@ -191,7 +214,8 @@ export default {
     DataTable,
     Column,
     OverlayPanel,
-    InputSwitch
+    InputSwitch,
+    Slider
   },
   data() {
     return {
@@ -216,7 +240,10 @@ export default {
       ingredientDirName: "",
       holdingDialog: Boolean,
       checkHoldingEnable: Boolean,
-      selectedItemDir: null
+      selectedItemDir: null,
+      fontSize: 0,
+      currentFontSize: 0,
+      // inputNullValue: 0,
     };
   },
   computed: {
@@ -278,7 +305,6 @@ export default {
   },
   mounted() {
     this.user = JSON.parse(localStorage.getItem('user'));
-    this.$store.dispatch('getDefaultProperties');
     this.$store.dispatch('getAddShortageForHold');
     this.$store.dispatch('getAveragePriceForPeriodCloseProperty');
     this.$store.dispatch('getAveragePriceForDocsProperty');
@@ -290,19 +316,34 @@ export default {
     this.$store.dispatch('getCheckHoldingEnableProperty');
   },
   methods: {
+    // setInputNullValue() {
+    //   console.log("setInputNullValue", this.inputNullValue)
+    //   this.setProperty(this.user, Property.INPUT_NULL_VALUE, this.inputNullValue == false ? 1 : 0);
+    // },
+    setExampleFontSize(event) {
+      if(event != this.currentFontSize) {
+        let root= document.documentElement;
+        root.style.setProperty('--app-font-size', 1 + (event / 200) + 'rem');
+        if(this.currentFontSize != 0) {
+          this.setProperty(this.user, Property.FONT_SIZE, event);
+        }
+        this.currentFontSize = event;
+        this.fontSize = event;
+      }
+    },
     closePeriod() {
       this.$store.dispatch('closePeriod');
     },
     setDefaultProperties() {
       if(this.activeIndex == 0) {
         if(this.defaultProperties.length > 0) {
-          let project = this.defaultProperties.filter(prop => prop.type == Property.PROJECT).pop();
+          let project = this.defaultProperties.find(prop => prop.type == Property.PROJECT);
           if(project) this.defaultProject = this.getProjectById(project.property);
 
-          let storageTo = this.defaultProperties.filter(prop => prop.type == Property.STORAGE_TO).pop();
+          let storageTo = this.defaultProperties.find(prop => prop.type == Property.STORAGE_TO);
           if(storageTo) this.defaultStorageTo = this.getStorageById(storageTo.property);
 
-          let storageFrom = this.defaultProperties.filter(prop => prop.type == Property.STORAGE_FROM).pop();
+          let storageFrom = this.defaultProperties.find(prop => prop.type == Property.STORAGE_FROM);
           if(storageFrom) this.defaultStorageFrom = this.getStorageById(storageFrom.property);
         }
       } else if(this.activeIndex == 2) {
@@ -314,11 +355,22 @@ export default {
         this.disabledHoldChecksButton = this.unholdenCheckDate == "";
       } else if(this.activeIndex == 4) {
         this.companyId = this.ourCompanyIdSetting;
-        this.companyName = this.companies.filter(c => c.id == this.ourCompanyIdSetting).pop().name;
+        this.companyName = this.companies.find(c => c.id == this.ourCompanyIdSetting).name;
         this.ingredientDirId = this.ingredientDirIdSetting;
-        this.ingredientDirName  = this.itemDirList.filter(i => i.id == this.ingredientDirIdSetting).pop().name;
+        this.ingredientDirName  = this.itemDirList.find(i => i.id == this.ingredientDirIdSetting).name;
       } else if(this.activeIndex == 5) {
         this.holdingDialog = this.holdingDialogSetting;
+      } else if(this.activeIndex == 6) {
+        let fontSizeProperty = this.defaultProperties.find(prop => prop.type == Property.FONT_SIZE);
+        if(fontSizeProperty) {
+          this.currentFontSize = 0;
+          this.setExampleFontSize(fontSizeProperty.property);
+        }
+        // let inputNullValueProperty = this.defaultProperties.find(prop => prop.type == Property.INPUT_NULL_VALUE);
+        // if(inputNullValueProperty) {
+        //   this.inputNullValue = inputNullValueProperty.property == 1;
+        //   console.log(this.inputNullValue)
+        // }
       }
     },
     logout() {
@@ -429,7 +481,10 @@ function formatDate(date, withTime) {
     width: 200 px;
   }
   .ml-5 {
-    margin: 0px 0px 0px 50px;
+    margin-left: 50px;
+  }
+  .mt-3 {
+    margin-top: 30px;
   }
   .label {
     margin: 0px 0px 5px 0px;
