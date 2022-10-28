@@ -14,7 +14,7 @@
           paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
           :rowsPerPageOptions="[10,20,50]" responsiveLayout="scroll" :rowHover="true"
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
-          filterDisplay="row" :globalFilterFields="['author.name']">
+          filterDisplay="menu" v-model:filters="filters">
           <template #header>
             <div class="flex justify-content-end">
               <div class="horizontal">
@@ -48,30 +48,49 @@
           <Column field="number" header="№" sortable style="max-width:7rem">
             <template #body="{data}"><div :class="disabledClass(data)">{{data.number}}</div></template>
           </Column>
-          <Column field="doc_type" header="Документ" sortable>
+          <Column filterField="doc_type" header="Документ" :showFilterMatchModes="false" :showApplyButton="false" sortable style="max-width:12rem">
+            <template #filter="{filterModel, filterCallback}">
+              <div class="mb-3 font-bold">тип документа</div>
+              <MultiSelect v-model="filterModel.value" @change="filterCallback()" :options="docTypeFilters">
+                <template #option="slotProps">
+                  <div class="p-multiselect-representative-option">
+                    <span class="image-text">{{slotProps.option}}</span>
+                  </div>
+                </template>
+              </MultiSelect>
+            </template>
             <template #body="{data}"><div :class="disabledClass(data)">{{data.doc_type}}</div></template>
           </Column>
-          <!-- <Column v-if="isMobile" field="project.name" header="Проект" sortable >
-            <template #body="{data}"><div :class="disabledClass(data)">{{data.project.name}}</div></template>
-          </Column> -->
-          <Column v-if="!isMobile" field="supplier.name" header="поставщик" sortable>
+          <Column v-if="!isMobile" field="supplier.name" header="поставщик" :showFilterMatchModes="false" :showClearButton="false" :showApplyButton="false" sortable style="max-width:12rem">
+            <template #filter="{filterModel, filterCallback}">
+              <div class="mb-3 font-bold">поставщик</div>
+              <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" v-tooltip.top.focus="toltip"/>
+            </template>
             <template #body="{data}"><div :class="disabledClass(data)">{{getName(data.supplier)}}</div></template>
           </Column>
-          <Column field="storage_from.name" header="со склада" sortable>
+          <Column field="storage_from.name" header="со склада" :showFilterMatchModes="false" :showClearButton="false" :showApplyButton="false" sortable style="max-width:12rem">
+            <template #filter="{filterModel, filterCallback}">
+              <div class="mb-3 font-bold">со склада</div>
+              <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" v-tooltip.top.focus="toltip"/>
+            </template>
             <template #body="{data}"><div :class="disabledClass(data)">{{getName(data.storage_from)}}</div></template>
           </Column>
-          <Column field="storage_to.name" header="на склад" sortable>
+          <Column field="storage_to.name" header="на склад" :showFilterMatchModes="false" :showClearButton="false" :showApplyButton="false" sortable style="max-width:12rem">
+            <template #filter="{filterModel, filterCallback}">
+              <div class="mb-3 font-bold">на склад</div>
+              <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" v-tooltip.top.focus="toltip"/>
+            </template>
             <template #body="{data}"><div :class="disabledClass(data)">{{getName(data.storage_to)}}</div></template>
           </Column>
-          <Column v-if="!isMobile" field="amount" header="Сумма" sortable>
+          <Column v-if="!isMobile" field="amount" header="Сумма" sortable style="max-width:12rem">
             <template #body="{data}"><div :class="disabledClass(data)">{{formatCurrency(data.amount)}}</div></template>
           </Column>
-          <Column  filterField="author.name" header="Автор" style="max-width:9rem" sortable >
+          <Column  filterField="author.name" header="Автор" :showFilterMatchModes="false" :showClearButton="false" :showApplyButton="false" style="max-width:9rem"> 
+            <template #filter="{filterModel, filterCallback}">
+              <div class="mb-3 font-bold">автор</div>
+              <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" v-tooltip.top.focus="toltip"/>
+            </template>
             <template #body="{data}"><div :class="disabledClass(data)">{{getName(data.author)}}</div></template>
-            <!-- <template #filter="{filterModel,filterCallback}">
-                <InputText type="text" v-model="filterModel.value" @keydown.enter="filterCallback()" 
-                    class="p-column-filter" :placeholder="`Search by name - `" v-tooltip.top.focus="'Hit enter key to filter'"/>
-            </template> -->
           </Column>
           <Column style="max-width:3rem">
             <template #body="{data}"> 
@@ -159,7 +178,9 @@ import Menu from 'primevue/menu';
 import Calendar from 'primevue/calendar';
 import {DocumentType} from '@/js/Constants';
 import RadioButton from 'primevue/radiobutton';
-// import InputText from 'primevue/inputtext';
+import {FilterMatchMode} from 'primevue/api';
+import InputText from 'primevue/inputtext';
+import MultiSelect from 'primevue/multiselect';
 
 export default {
     name: 'DocContent',
@@ -176,7 +197,8 @@ export default {
       Menu,
       Calendar,
       RadioButton,
-      // InputText
+      InputText,
+      MultiSelect
     },
     props: {
         filter: String,
@@ -213,6 +235,14 @@ export default {
         quickSave : false,
         isMobile: Boolean,
         holdDoc: false,
+        toltip: 'Начните набирать текст для поиска',
+        filters: {
+          'doc_type': {value: null, matchMode: FilterMatchMode.IN},
+          'supplier.name': {value: null, matchMode: FilterMatchMode.CONTAINS},
+          'storage_from.name': {value: null, matchMode: FilterMatchMode.CONTAINS},
+          'storage_to.name': {value: null, matchMode: FilterMatchMode.CONTAINS},
+          'author.name': {value: null, matchMode: FilterMatchMode.STARTS_WITH}
+        },
         items: [
         {
           label: "Документы",
@@ -249,6 +279,9 @@ export default {
       },
       docTypes() {
         return this.$store.state.cs.docTypes
+      },
+      docTypeFilters() {
+        return this.$store.state.cs.docTypeFilters
       },
       startDate() {
         return this.$store.state.ds.startDate;
@@ -610,6 +643,9 @@ export default {
 
 </script>
 <style scoped>
+  /* .p-column-filter {
+    width: 200px;
+  } */
   .fixed-header {
     background-color: white;
     z-index: 100;

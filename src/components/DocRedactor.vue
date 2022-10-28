@@ -11,7 +11,7 @@
         <div class="field col-12 md:col-5 flex justify-content-between numberdatecard">
           <div class="mt-3 mb-3">
             <label for="number" class="label">Номер</label><br>
-            <InputText id="number" @change="disableHoldButton" type="text" class="p-inputtext smallinput" v-model="doc.number" />
+            <InputText id="number" @change="disableHoldButton" type="text" class="p-inputtext input" v-model="doc.number" />
           </div>
           <div class="mt-3 mb-3">
             <label for="time" class="label">Дата</label><br>
@@ -169,7 +169,6 @@
 
       <DataTable :value="doc.doc_items" :rowClass="rowClass" editMode="cell" 
           class="p-datatable-sm editable-cells-table" 
-          filterDisplay="row" v-model:filters="filters"
           @cell-edit-init="onCellEditInit" @cell-edit-complete="onCellEditComplete"
           :rowHover="true" responsiveLayout="scroll"> 
         <Column header="#" style="width:1rem">
@@ -177,10 +176,7 @@
             {{index + 1}}
           </template>
         </Column>
-        <Column field="item_name" header="Наименование" key="item_name">
-          <!-- <template #filter="{filterModel,filterCallback}">
-            <InputText type="text" v-model="filterModel.value" @keydown.enter="filterCallback()" class="p-column-filter" v-tooltip.top.focus="'Hit enter key to filter'"/>
-          </template> -->
+        <Column field="item_name" header="Наименование" key="item_name" filter>
           <template #editor="{ data, field }">
             <InputText @change="disableHoldButton" v-model="data[field]" autofocus/>
             <Button icon="pi pi-check" class="p-button-warning" @click="onItemClick(data)"/>
@@ -189,34 +185,34 @@
          <!-- readonly style="cursor: pointer;" -->
         <Column v-if="!isMovement" field="quantity" header="Кол-во" key="quantity" style="width:8rem">
           <template #editor="{ data, field }">
-            <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="3" :maxFractionDigits="3" />
+            <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="3" :maxFractionDigits="3" :useGrouping="false" />
           </template>
         </Column>
         <Column v-if="isInventory" field="quantity_fact" header="Кол-во факт" key="quantity_fact" style="width:8rem">
           <template #editor="{ data, field }">
-            <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="3" :maxFractionDigits="3" />
+            <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="3" :maxFractionDigits="3" :useGrouping="false" />
           </template>
         </Column>
         <Column v-if="isMovement" field="quantity_fact" header="Заявка" key="quantity_fact" style="width:8rem"></Column>
         <Column v-if="isMovement" field="quantity" header="Кол-во" key="quantity" style="width:8rem">
           <template #editor="{ data, field }">
-            <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="3" :maxFractionDigits="3" />
+            <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="3" :maxFractionDigits="3" :useGrouping="false" />
           </template>
         </Column>
         <Column field="price" header="Цена" key="price" style="width:8rem">
           <template #editor="{ data, field }">
-            <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="2" :maxFractionDigits="2" />
+            <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="2" :maxFractionDigits="2" :useGrouping="false" />
           </template>
         </Column>
         <Column field="amount" header="Сумма" key="amount" style="width:8rem">
           <template #editor="{ data, field }">
-            <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="2" :maxFractionDigits="2" />
+            <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="2" :maxFractionDigits="2" :useGrouping="false" />
           </template>
         </Column>
         <Column v-if="isInventory" field="amount_fact" header="Сумма факт." key="amount_fact" style="width:7rem"></Column>
         <Column v-if="isCheck" field="discount" header="Скидка" key="discount" style="width:5rem">
           <template #editor="{ data, field }">
-            <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="2" :maxFractionDigits="2" />
+            <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="2" :maxFractionDigits="2" :useGrouping="false" />
           </template>
         </Column>
         <Column style="width:1rem">
@@ -274,9 +270,6 @@
         :paginator="true" :rows="5" @rowSelect="onStorageSelect" responsiveLayout="scroll" >
         <Column field="name" header="Наименование" sortable />
     </DataTable>
-  </OverlayPanel>
-  <OverlayPanel ref="keyboard">
-    <p>keyboard</p>
   </OverlayPanel>
 
   <ItemChoose :displayItems="displayItems" :currentStorage="doc.storage_to"  :dateTime="doc.date_time" 
@@ -350,7 +343,6 @@ import Row from 'primevue/row';
 import Button from 'primevue/button';
 import OverlayPanel from 'primevue/overlaypanel';
 import Divider from 'primevue/divider';
-import {FilterMatchMode, FilterOperator} from 'primevue/api';
 import {Property, DocumentType, PaymentType} from '@/js/Constants';
 import ItemChoose from '@/components/ItemChoose.vue';
 import InputNumber from 'primevue/inputnumber';
@@ -386,7 +378,7 @@ export default {
     },
     data() {
       return {
-        filters: null,
+        // filters: null,
         loading: false,
         user: null,
         selectedPaymentType: null,
@@ -486,7 +478,7 @@ export default {
     created() {
     },
     mounted() {
-      this.initFilters();
+      // this.initFilters();
       if(this.type === "copyFromRequestDoc") {
         this.$store.dispatch('getMovDocFromRequest', this.docId);
       } else {
@@ -655,15 +647,6 @@ export default {
       virtualKeyboard() {
         blur();
         this.$refs.keyboard.toggle(event);
-      },
-      clearFilter() {
-        this.initFilters();
-      },
-      initFilters() {
-        this.filters = {
-          // 'global': {value: null, matchMode: FilterMatchMode.CONTAINS},
-          'item_name': {operator: FilterOperator.AND, constraints: [{value: null, matchMode: FilterMatchMode.STARTS_WITH}]}
-        }
       },
       setPaymentTypes() {
         this.paymentTypes = [];

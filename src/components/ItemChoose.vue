@@ -54,7 +54,7 @@
     <Dialog header="Ввод колличества" v-model:visible="displayQuantityDialog" :modal="true" :closable="false" 
             :style="{width: '350px', height: '208px'}"> 
         <InputNumber inputId="minmaxfraction" v-model="newQuantity" mode="decimal" @keyup.enter="addItemAndQuantity"
-                :minFractionDigits="3" :maxFractionDigits="3" autofocus />
+                :minFractionDigits="3" :maxFractionDigits="3" :useGrouping="false" autofocus />
         <template #footer>
         <Button label="закрыть" icon="pi pi-times" @click="closeQuantityDialog" class="p-button-text p-button-sm" />
         <Button label="ОК" @click="addItemAndQuantity" class="p-button-secondary p-button-rounded p-button-sm" />

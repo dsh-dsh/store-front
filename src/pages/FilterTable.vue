@@ -4,25 +4,25 @@
             @cell-edit-complete="onCellEditComplete" class="editable-cells-table"
             filterDisplay="row" v-model:filters="filters"  
             responsiveLayout="scroll">
-        <Column field="code" header="code" key="code" style="width:25%" sortable filter>
-            <template #filter="{filterModel,filterCallback}">
-                <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" v-tooltip.top.focus="'Hit enter key to filter'"/>
-            </template>
+        <Column field="code" header="code" key="code" style="width:25%" sortable>
+            <!-- <template #filter="{filterModel,filterCallback}">
+                <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" v-tooltip.top.focus="toltip"/>
+            </template> -->
             <template #editor="{ data, field }">
                 <InputText v-model="data[field]" autofocus />
             </template>
         </Column>
-        <Column field="name" header="name" key="name" style="width:25%" :showFilterMenu="false" sortable filter>
+        <Column field="name" header="name" key="name" style="width:25%" sortable filter>
             <template #filter="{filterModel, filterCallback}">
-                <!-- <InputText type="text" v-model="filterModel.value" @keydown="filterCallback()" class="p-column-filter" v-tooltip.top.focus="'Hit enter key to filter'"/> -->
-            <MultiSelect v-model="filterModel.value" :options="names" optionLabel="name" @change="filterCallback()" placeholder="Any" class="p-column-filter">
+                <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" v-tooltip.top.focus="toltip"/>
+            <!-- <MultiSelect v-model="filterModel.value" :options="names" optionLabel="name" @change="filterCallback()" placeholder="Any" class="p-column-filter">
                 <template #option="slotProps">
                     <div class="p-multiselect-representative-option">
-                        <!-- <img :alt="slotProps.option.name" width="15" style="vertical-align: middle" /> -->
+                        <img :alt="slotProps.option.name" width="15" style="vertical-align: middle" />
                         <span class="image-text">{{slotProps.option.name}}</span>
                     </div>
                 </template>
-            </MultiSelect>
+            </MultiSelect> -->
             </template>
             <!-- <template #editor="{ data, field }">
                 <InputText v-model="data[field]" autofocus />
@@ -30,7 +30,7 @@
         </Column>
         <Column field="quantity" header="quantity" key="quantity" style="width:25%" sortable filter>
             <template #filter="{filterModel,filterCallback}">
-                <InputText type="text" v-model="filterModel.value" @keydown="filterCallback()" class="p-column-filter" v-tooltip.top.focus="'Hit enter key to filter'"/>
+                <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" v-tooltip.top.focus="toltip"/>
             </template>
             <template #editor="{ data, field }">
                 <InputText v-model="data[field]" autofocus />
@@ -38,7 +38,7 @@
         </Column>
         <Column field="price" header="price" key="price" style="width:25%" sortable filter>
             <template #filter="{filterModel,filterCallback}">
-                <InputText type="text" v-model="filterModel.value" @keydown="filterCallback()" class="p-column-filter" v-tooltip.top.focus="'Hit enter key to filter'"/>
+                <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" v-tooltip.top.focus="toltip"/>
             </template>
             <template #editor="{ data, field }">
                 <InputText v-model="data[field]" autofocus />
@@ -52,7 +52,7 @@ import MainMenu from '@/components/MainMenu.vue'
 import InputText from 'primevue/inputtext';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import MultiSelect from 'primevue/multiselect';
+// import MultiSelect from 'primevue/multiselect';
 import {FilterMatchMode} from 'primevue/api';
 export default {
     name: 'App',
@@ -61,16 +61,17 @@ export default {
         InputText,
         DataTable,
         Column,
-        MultiSelect
+        // MultiSelect
     },
     data() {
         return {
+            toltip: 'Начните набирать текст для поиска',
             products: null,
             columns: [],
             names: null,
             filters: {
                 'code': {value: null, matchMode: FilterMatchMode.STARTS_WITH},
-                'name': {value: null, matchMode: FilterMatchMode.IN},
+                'name': {value: null, matchMode: FilterMatchMode.STARTS_WITH},
                 'quantity': {value: null, matchMode: FilterMatchMode.STARTS_WITH},
                 'price': {value: null, matchMode: FilterMatchMode.STARTS_WITH}
             }

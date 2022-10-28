@@ -5,6 +5,7 @@ export const CatalogStore = {
         return {
 			companies: [],
             docTypes: [],
+            docTypeFilters: [],
             workshops: [],
             units: [],
             projects: [],
@@ -17,6 +18,7 @@ export const CatalogStore = {
     mutations: {
 		setDocTypes (state, res) {
 			state.docTypes = res;
+			state.docTypeFilters = state.docTypes.map(type => type.name);
 		},
 		setWorkShops (state, res) {
 			state.workshops = res;
