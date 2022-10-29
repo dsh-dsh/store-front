@@ -15,6 +15,10 @@ import ToastService from 'primevue/toastservice';
 const app = createApp(App)
 
 
+// app.use(PrimeVue, {
+//     locale: {
+//         clear: 'очистить',
+//     }});
 app.use(PrimeVue)
 app.use(store)
 app.use(router)

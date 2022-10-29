@@ -148,14 +148,17 @@
 
     <br>
 
+    <!-- <div v-if="doc.doc_items" style="height: calc(100vh - 29.5rem)"> -->
     <div v-if="doc.doc_items">
-      <DataTable :value="doc.doc_items" editMode="cell" class="p-datatable-sm" responsiveLayout="scroll" :rowHover="true">
-        <Column header="#" style="width:1rem">
+      <DataTable :value="doc.doc_items" editMode="cell" class="p-datatable-sm" 
+        responsiveLayout="scroll" :rowHover="true"> 
+        <!-- :scrollable="true" scrollHeight="flex"> -->
+        <Column header="#" style="width: 2rem">
             <template #body="{index}">
                 {{index + 1}}
             </template>
         </Column>
-        <Column field="item_name" header="Наименование" key="item_name"></Column>
+        <Column field="item_name" header="Наименование" key="item_name" style="min-width:12rem"></Column>
         <Column v-if="!isMovement" field="quantity" header="Кол-во" key="quantity" style="width:7rem"></Column>
         <Column v-if="isInventory || isMovement" field="quantity_fact" :header="quantityColumnName" key="quantity_fact" style="width:7rem"></Column>
         <Column v-if="isMovement" field="quantity" header="Кол-во" key="quantity" style="width:7rem"></Column>
@@ -326,6 +329,10 @@ function formatTime(date) {
 </script>
 
 <style scoped>
+  .border {
+    border: 1px solid #dee2e6;
+    border-radius: 3px;
+  }
   .label {
     margin: 0px;
     display: inline-block;

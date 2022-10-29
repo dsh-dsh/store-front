@@ -1,242 +1,236 @@
 <template> 
-    <br><br>
-    <div v-if="doc.author && doc.project">
-
-      <div class="formgrid grid">
-
-        <div class="field col-12 md:col-12">
-          <p class="mb-2"><b>Документ  {{ doc.doc_type }}</b> (автор {{ doc.author.name }})</p>
+  <br><br>
+  <div v-if="doc.author && doc.project">
+    <div class="formgrid grid">
+      <div class="field col-12 md:col-12">
+        <p class="mb-2"><b>Документ  {{ doc.doc_type }}</b> (автор {{ doc.author.name }})</p>
+      </div>
+      <div class="field col-12 md:col-5 flex justify-content-between numberdatecard">
+        <div class="mt-3 mb-3">
+          <label for="number" class="label">Номер</label><br>
+          <InputText id="number" @change="disableHoldButton" type="text" class="p-inputtext input" v-model="doc.number" />
         </div>
-
-        <div class="field col-12 md:col-5 flex justify-content-between numberdatecard">
-          <div class="mt-3 mb-3">
-            <label for="number" class="label">Номер</label><br>
-            <InputText id="number" @change="disableHoldButton" type="text" class="p-inputtext input" v-model="doc.number" />
-          </div>
-          <div class="mt-3 mb-3">
-            <label for="time" class="label">Дата</label><br>
-            <Calendar id="time" @change="disableHoldButton('date')" @date-select="disableHoldButton('date')" v-model="dateInput" dateFormat="dd.mm.yy" :showIcon="true" />
-          </div>
-        </div>
-        <div class="field col-12 md:col-7 center right">
-          <div v-if="doc.doc_type === DocumentType.INVENTORY_DOC" class="mr-5">
-            <Button label="Заполнить" class="p-button-rounded p-button-secondary mr-1" @click="onFillRestClick" :disabled="disabledFillItemRest"/>
-            <Button label="Создать подчиненные документы" class="p-button-rounded p-button-secondary" @click="onCreateDockClick" :disabled="disabledFillItemRest"/>
-          </div>
-        </div>
-
-        <div class="field col-12 md:col-4">
-          <label for="project" class="label">Проект</label><br>
-            <div class="p-inputgroup">
-              <InputText id="project" type="text" class="p-inputtext" v-model="doc.project.name" />
-              <Button icon="pi pi-check" class="p-button-warning" @click="onProjectClick" />
-            </div>
-        </div>
-        <div class="field col-12 md:col-8"></div>
-
-        <div v-if="!orderDoc" class="field col-12 md:col-4">
-          <div v-if="doc.storage_from">
-            <label for="storageFrom" class="label">со склада</label><br>
-            <div class="p-inputgroup">
-              <InputText id="storageFrom" type="text" class="p-inputtext" v-model="doc.storage_from.name" :disabled="disabledStorageFrom" />
-              <Button icon="pi pi-check" class="p-button-warning" @click="onStorageFromClick" :disabled="disabledStorageFrom" />
-            </div>
-          </div>
-        </div>
-        <div v-if="!orderDoc" class="field col-12 md:col-4">
-          <div v-if="doc.storage_to">
-          <label for="storageTo" class="label">на склад</label><br>
-            <div class="p-inputgroup">
-              <InputText id="storageTo" type="text" class="p-inputtext" v-model="doc.storage_to.name" :disabled="disabledStorageTo" />
-              <Button icon="pi pi-check" class="p-button-warning" @click="onStorageToClick" :disabled="disabledStorageTo"/>
-            </div>
-          </div>
-        </div>
-        <div v-if="!orderDoc" class="field col-12 md:col-4"></div>
-
-        <div v-if="doc.doc_type == DocumentType.POSTING_DOC" class="field col-12 md:col-4">
-          <div v-if="doc.supplier">
-            <label for="supplier" class="label">Поставщик</label><br>
-            <div class="p-inputgroup">
-              <!-- v-model="doc.supplier.name" -->
-              <!-- <AutoComplete id="supplier" v-model="selectedSupplier" :suggestions="filteredSuppliers" @complete="searchSupplier($event)"  :disabled="disabledSupplier" /> -->
-              <InputText id="supplier" type="text" class="p-inputtext" v-model="doc.supplier.name" :disabled="disabledSupplier" />
-              <Button icon="pi pi-check" class="p-button-warning" @click="onSupplierClick"/>
-            </div>
-          </div>
-        </div>
-        <div v-if="doc.doc_type == DocumentType.POSTING_DOC" class="field col-12 md:col-4">
-          <div v-if="doc.recipient">
-            <label for="recipient" class="label">Получатель</label><br>
-            <div class="p-inputgroup">
-              <InputText id="recipient" type="text" class="p-inputtext" v-model="doc.recipient.name" />
-              <Button icon="pi pi-check" class="p-button-warning" @click="onRecipientClick"/>
-            </div>
-          </div>
-        </div>
-        <div v-if="doc.doc_type == DocumentType.POSTING_DOC" class="field col-12 md:col-4"></div>
-        
-        <div v-if="orderDoc" class="field col-12 md:col-4">
-            <label for="individual" class="label">Физ лицо</label><br>
-            <div class="p-inputgroup">
-              <InputText id="individual" type="text" class="p-inputtext" v-model="doc.individual.name" />
-              <Button icon="pi pi-check" class="p-button-warning" @click="onIndividualClick"/>
-            </div>
-        </div>
-        <div v-if="orderDoc" class="field col-12 md:col-4">
-            <label for="payment_type" class="label">Физ лицо</label><br>
-            <div class="p-inputgroup">
-              <InputText id="payment_type" type="text" class="p-inputtext" v-model="doc.payment_type" />
-              <Button icon="pi pi-check" class="p-button-warning" @click="onPaymentTypeClick"/>
-            </div>
-        </div>
-        <div v-if="orderDoc" class="field col-12 md:col-4"></div>
-
-        <div v-if="orderDoc" class="field col-12 md:col-4">
-          <label for="amount" class="label">сумма</label><br>
-          <InputText id="amount" @change="disableHoldButton" type="text" class="p-inputtext mr-1" v-model="doc.amount" />
-        </div>
-        <div v-if="orderDoc" class="field col-12 md:col-8">
-          <label for="tax" class="label">сумма</label><br>
-          <InputText id="tax" @change="disableHoldButton" type="text" class="p-inputtext mr-1" v-model="doc.tax" />
+        <div class="mt-3 mb-3">
+          <label for="time" class="label">Дата</label><br>
+          <Calendar id="time" @change="disableHoldButton('date')" @date-select="disableHoldButton('date')" v-model="dateInput" dateFormat="dd.mm.yy" :showIcon="true" />
         </div>
       </div>
-    </div>
-
-    <div v-if="doc.check_info">
-      <Divider align="left">
-        <div class="inline-flex align-items-center">
-          <i class="pi pi-paperclip mr-2"></i>
-          информация из чека ККМ
-        </div>
-      </Divider>
-      <div class="formgrid grid">
-        <div class="field col-12 md:col-3">
-          <label for="waiter" class="label">официант</label><br>
-          <InputText id="waiter" @change="disableHoldButton" type="text" class="p-inputtext mr-1" v-model="doc.check_info.waiter" />
-        </div>
-        <div class="field col-12 md:col-3">
-          <label for="check_number" class="label">номер чека</label><br>
-          <InputText id="check_number" @change="disableHoldButton" type="text" class="p-inputtext mr-1" v-model="doc.check_info.check_number" />
-        </div>
-        <div class="field col-12 md:col-3">
-          <label for="cash_register_number" class="label">номер кассы</label><br>
-          <InputText id="cash_register_number" @change="disableHoldButton" type="text" class="p-inputtext mr-1" v-model="doc.check_info.cash_register_number" />
-        </div>
-        <div class="field col-12 md:col-3">
-          <label for="amount_received" class="label">получено</label><br>
-          <InputText id="amount_received" @change="disableHoldButton" type="text" class="p-inputtext mr-1" v-model="doc.check_info.amount_received" />
-        </div>
-        <div class="field col-12 md:col-3">
-          <label for="table_number" class="label">стол</label><br>
-          <InputText id="table_number" @change="disableHoldButton" type="text" class="p-inputtext mr-1" v-model="doc.check_info.table_number" />
-        </div>
-        <div class="field col-12 md:col-3">
-          <label for="guest_number" class="label">гость</label><br>
-          <InputText id="guest_number" @change="disableHoldButton" type="text" class="p-inputtext mr-1" v-model="doc.check_info.guest_number" />
-        </div>
-        <div class="field col-12 md:col-3">
-          <label for="kkm_check_time" class="label">время</label><br>
-          <Calendar id="kkm_check_time" @change="disableHoldButton" v-model="checkDateInput" :showTime="true" :showSeconds="true" dateFormat="dd.mm.yy" disabled/>
-        </div>
-        <div class="field col-12 md:col-3">
-        </div>
-        <div class="field col-12 md:col-2">
-          <label for="isReturn" class="label">возврат</label>
-          <InputSwitch id="isReturn" @change="disableHoldButton" v-model="doc.check_info.is_return" /> 
-        </div>
-        <div class="field col-12 md:col-2">
-          <label for="isKKMChecked" class="label">пробит</label>
-          <InputSwitch id="isKKMChecked" @change="disableHoldButton" v-model="doc.check_info.is_KKM_checked" /> 
-        </div>
-        <div class="field col-12 md:col-2">
-          <label for="is_Paid" class="label">оплачен</label>
-          <InputSwitch id="is_Paid" @change="disableHoldButton" v-model="doc.check_info.is_payed" /> 
-        </div>
-        <div class="field col-12 md:col-2">
-          <label for="isPayedByCard" class="label">эквайринг</label>
-          <InputSwitch id="isPayedByCard" @change="disableHoldButton" v-model="doc.check_info.is_payed_by_card" /> 
-        </div>
-        <div class="field col-12 md:col-2">
-          <label for="isDelivery" class="label">доставка</label>
-          <InputSwitch id="isDelivery" @change="disableHoldButton" v-model="doc.check_info.is_delivery" /> 
+      <div class="field col-12 md:col-7 center right">
+        <div v-if="doc.doc_type === DocumentType.INVENTORY_DOC" class="mr-5">
+          <Button label="Заполнить" class="p-button-rounded p-button-secondary mr-1" @click="onFillRestClick" :disabled="disabledFillItemRest"/>
+          <Button label="Создать подчиненные документы" class="p-button-rounded p-button-secondary" @click="onCreateDockClick" :disabled="disabledFillItemRest"/>
         </div>
       </div>
-    </div>
-    <div v-if="doc.doc_items">
+      <div class="field col-12 md:col-4">
+        <label for="project" class="label">Проект</label><br>
+          <div class="p-inputgroup">
+            <InputText id="project" type="text" class="p-inputtext" v-model="doc.project.name" />
+            <Button icon="pi pi-check" class="p-button-warning" @click="onProjectClick" />
+          </div>
+      </div>
+      <div class="field col-12 md:col-8"></div>
+      <div v-if="!orderDoc" class="field col-12 md:col-4">
+        <div v-if="doc.storage_from">
+          <label for="storageFrom" class="label">со склада</label><br>
+          <div class="p-inputgroup">
+            <InputText id="storageFrom" type="text" class="p-inputtext" v-model="doc.storage_from.name" :disabled="disabledStorageFrom" />
+            <Button icon="pi pi-check" class="p-button-warning" @click="onStorageFromClick" :disabled="disabledStorageFrom" />
+          </div>
+        </div>
+      </div>
+      <div v-if="!orderDoc" class="field col-12 md:col-4">
+        <div v-if="doc.storage_to">
+        <label for="storageTo" class="label">на склад</label><br>
+          <div class="p-inputgroup">
+            <InputText id="storageTo" type="text" class="p-inputtext" v-model="doc.storage_to.name" :disabled="disabledStorageTo" />
+            <Button icon="pi pi-check" class="p-button-warning" @click="onStorageToClick" :disabled="disabledStorageTo"/>
+          </div>
+        </div>
+      </div>
+      <div v-if="!orderDoc" class="field col-12 md:col-4"></div>
+      <div v-if="doc.doc_type == DocumentType.POSTING_DOC" class="field col-12 md:col-4">
+        <div v-if="doc.supplier">
+          <label for="supplier" class="label">Поставщик</label><br>
+          <div class="p-inputgroup">
+            <!-- v-model="doc.supplier.name" -->
+            <!-- <AutoComplete id="supplier" v-model="selectedSupplier" :suggestions="filteredSuppliers" @complete="searchSupplier($event)"  :disabled="disabledSupplier" /> -->
+            <InputText id="supplier" type="text" class="p-inputtext" v-model="doc.supplier.name" :disabled="disabledSupplier" />
+            <Button icon="pi pi-check" class="p-button-warning" @click="onSupplierClick"/>
+          </div>
+        </div>
+      </div>
+      <div v-if="doc.doc_type == DocumentType.POSTING_DOC" class="field col-12 md:col-4">
+        <div v-if="doc.recipient">
+          <label for="recipient" class="label">Получатель</label><br>
+          <div class="p-inputgroup">
+            <InputText id="recipient" type="text" class="p-inputtext" v-model="doc.recipient.name" />
+            <Button icon="pi pi-check" class="p-button-warning" @click="onRecipientClick"/>
+          </div>
+        </div>
+      </div>
+      <div v-if="doc.doc_type == DocumentType.POSTING_DOC" class="field col-12 md:col-4"></div>
       
-      <Button icon="pi pi-plus" @click="onAddItemClick" class="p-button-text p-button-rounded" />
+      <div v-if="orderDoc" class="field col-12 md:col-4">
+          <label for="individual" class="label">Физ лицо</label><br>
+          <div class="p-inputgroup">
+            <InputText id="individual" type="text" class="p-inputtext" v-model="doc.individual.name" />
+            <Button icon="pi pi-check" class="p-button-warning" @click="onIndividualClick"/>
+          </div>
+      </div>
+      <div v-if="orderDoc" class="field col-12 md:col-4">
+          <label for="payment_type" class="label">Физ лицо</label><br>
+          <div class="p-inputgroup">
+            <InputText id="payment_type" type="text" class="p-inputtext" v-model="doc.payment_type" />
+            <Button icon="pi pi-check" class="p-button-warning" @click="onPaymentTypeClick"/>
+          </div>
+      </div>
+      <div v-if="orderDoc" class="field col-12 md:col-4"></div>
+      <div v-if="orderDoc" class="field col-12 md:col-4">
+        <label for="amount" class="label">сумма</label><br>
+        <InputText id="amount" @change="disableHoldButton" type="text" class="p-inputtext mr-1" v-model="doc.amount" />
+      </div>
+      <div v-if="orderDoc" class="field col-12 md:col-8">
+        <label for="tax" class="label">сумма</label><br>
+        <InputText id="tax" @change="disableHoldButton" type="text" class="p-inputtext mr-1" v-model="doc.tax" />
+      </div>
+    </div>
+  </div>
+  <div v-if="doc.check_info">
+    <Divider align="left">
+      <div class="inline-flex align-items-center">
+        <i class="pi pi-paperclip mr-2"></i>
+        информация из чека ККМ
+      </div>
+    </Divider>
+    <div class="formgrid grid">
+      <div class="field col-12 md:col-3">
+        <label for="waiter" class="label">официант</label><br>
+        <InputText id="waiter" @change="disableHoldButton" type="text" class="p-inputtext mr-1" v-model="doc.check_info.waiter" />
+      </div>
+      <div class="field col-12 md:col-3">
+        <label for="check_number" class="label">номер чека</label><br>
+        <InputText id="check_number" @change="disableHoldButton" type="text" class="p-inputtext mr-1" v-model="doc.check_info.check_number" />
+      </div>
+      <div class="field col-12 md:col-3">
+        <label for="cash_register_number" class="label">номер кассы</label><br>
+        <InputText id="cash_register_number" @change="disableHoldButton" type="text" class="p-inputtext mr-1" v-model="doc.check_info.cash_register_number" />
+      </div>
+      <div class="field col-12 md:col-3">
+        <label for="amount_received" class="label">получено</label><br>
+        <InputText id="amount_received" @change="disableHoldButton" type="text" class="p-inputtext mr-1" v-model="doc.check_info.amount_received" />
+      </div>
+      <div class="field col-12 md:col-3">
+        <label for="table_number" class="label">стол</label><br>
+        <InputText id="table_number" @change="disableHoldButton" type="text" class="p-inputtext mr-1" v-model="doc.check_info.table_number" />
+      </div>
+      <div class="field col-12 md:col-3">
+        <label for="guest_number" class="label">гость</label><br>
+        <InputText id="guest_number" @change="disableHoldButton" type="text" class="p-inputtext mr-1" v-model="doc.check_info.guest_number" />
+      </div>
+      <div class="field col-12 md:col-3">
+        <label for="kkm_check_time" class="label">время</label><br>
+        <Calendar id="kkm_check_time" @change="disableHoldButton" v-model="checkDateInput" :showTime="true" :showSeconds="true" dateFormat="dd.mm.yy" disabled/>
+      </div>
+      <div class="field col-12 md:col-3">
+      </div>
+      <div class="field col-12 md:col-2">
+        <label for="isReturn" class="label">возврат</label>
+        <InputSwitch id="isReturn" @change="disableHoldButton" v-model="doc.check_info.is_return" /> 
+      </div>
+      <div class="field col-12 md:col-2">
+        <label for="isKKMChecked" class="label">пробит</label>
+        <InputSwitch id="isKKMChecked" @change="disableHoldButton" v-model="doc.check_info.is_KKM_checked" /> 
+      </div>
+      <div class="field col-12 md:col-2">
+        <label for="is_Paid" class="label">оплачен</label>
+        <InputSwitch id="is_Paid" @change="disableHoldButton" v-model="doc.check_info.is_payed" /> 
+      </div>
+      <div class="field col-12 md:col-2">
+        <label for="isPayedByCard" class="label">эквайринг</label>
+        <InputSwitch id="isPayedByCard" @change="disableHoldButton" v-model="doc.check_info.is_payed_by_card" /> 
+      </div>
+      <div class="field col-12 md:col-2">
+        <label for="isDelivery" class="label">доставка</label>
+        <InputSwitch id="isDelivery" @change="disableHoldButton" v-model="doc.check_info.is_delivery" /> 
+      </div>
+    </div>
+  </div>
 
-      <DataTable :value="doc.doc_items" :rowClass="rowClass" editMode="cell" 
-          class="p-datatable-sm editable-cells-table" 
-          @cell-edit-init="onCellEditInit" @cell-edit-complete="onCellEditComplete"
-          :rowHover="true" responsiveLayout="scroll"> 
-        <Column header="#" style="width:1rem">
-          <template #body="{index}">
-            {{index + 1}}
-          </template>
-        </Column>
-        <Column field="item_name" header="Наименование" key="item_name" filter>
-          <template #editor="{ data, field }">
-            <InputText @change="disableHoldButton" v-model="data[field]" autofocus/>
-            <Button icon="pi pi-check" class="p-button-warning" @click="onItemClick(data)"/>
-          </template>
-        </Column>
-         <!-- readonly style="cursor: pointer;" -->
-        <Column v-if="!isMovement" field="quantity" header="Кол-во" key="quantity" style="width:8rem">
-          <template #editor="{ data, field }">
-            <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="3" :maxFractionDigits="3" :useGrouping="false" />
-          </template>
-        </Column>
-        <Column v-if="isInventory" field="quantity_fact" header="Кол-во факт" key="quantity_fact" style="width:8rem">
-          <template #editor="{ data, field }">
-            <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="3" :maxFractionDigits="3" :useGrouping="false" />
-          </template>
-        </Column>
-        <Column v-if="isMovement" field="quantity_fact" header="Заявка" key="quantity_fact" style="width:8rem"></Column>
-        <Column v-if="isMovement" field="quantity" header="Кол-во" key="quantity" style="width:8rem">
-          <template #editor="{ data, field }">
-            <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="3" :maxFractionDigits="3" :useGrouping="false" />
-          </template>
-        </Column>
-        <Column field="price" header="Цена" key="price" style="width:8rem">
-          <template #editor="{ data, field }">
-            <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="2" :maxFractionDigits="2" :useGrouping="false" />
-          </template>
-        </Column>
-        <Column field="amount" header="Сумма" key="amount" style="width:8rem">
-          <template #editor="{ data, field }">
-            <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="2" :maxFractionDigits="2" :useGrouping="false" />
-          </template>
-        </Column>
-        <Column v-if="isInventory" field="amount_fact" header="Сумма факт." key="amount_fact" style="width:7rem"></Column>
-        <Column v-if="isCheck" field="discount" header="Скидка" key="discount" style="width:5rem">
-          <template #editor="{ data, field }">
-            <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="2" :maxFractionDigits="2" :useGrouping="false" />
-          </template>
-        </Column>
-        <Column style="width:1rem">
-          <template #body="{data}">
-            <Button icon="pi pi-minus" class="p-button-rounded p-button-secondary p-button-text" @click="deleteRow(data)" />
-          </template>
-        </Column>
-        <Column style="width:1rem">
-          <template #body="{index, data}">
-            <div class="up-down-buttons">
-              <i class="pi pi-angle-up arrow-button" @click="rowUp(index, data)" />
-              <i class="pi pi-angle-down arrow-button" @click="rowDown(index, data)" />
-            </div>
-          </template>
-        </Column>
-        <ColumnGroup type="footer">
-          <Row>
-            <Column footer="сумма:" :colspan="colSpan" footerStyle="text-align:right" />
-            <Column :footer="totalAmount" :colspan="colSpan2" />
-            <Column v-if="isInventory" :footer="totalAmountFact" :colspan="3" />
-          </Row>
-        </ColumnGroup>
-      </DataTable> 
-    </div>  
+  <Button  v-if="doc.doc_items" icon="pi pi-plus" @click="onAddItemClick" class="p-button-text p-button-rounded" />
+  
+  <!-- <div v-if="doc.doc_items" style="height: calc(100vh - 30rem)"> -->
+  <div v-if="doc.doc_items">
+    <DataTable :value="doc.doc_items" :rowClass="rowClass" editMode="cell" 
+        class="p-datatable-sm editable-cells-table" 
+        @cell-edit-init="onCellEditInit" @cell-edit-complete="onCellEditComplete"
+        :rowHover="true" responsiveLayout="scroll">
+        <!-- :scrollable="true" scrollHeight="flex">  -->
+      <Column header="#" style="width:2rem">
+        <template #body="{index}">
+          {{index + 1}}
+        </template>
+      </Column>
+      <Column field="item_name" header="Наименование" key="item_name" filter style="min-width:12rem">
+        <template #editor="{ data, field }">
+          <InputText @change="disableHoldButton" v-model="data[field]" autofocus/>
+          <Button icon="pi pi-check" class="p-button-warning" @click="onItemClick(data)"/>
+        </template>
+      </Column>
+        <!-- readonly style="cursor: pointer;" -->
+      <Column v-if="!isMovement" field="quantity" header="Кол-во" key="quantity" style="width:8rem">
+        <template #editor="{ data, field }">
+          <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="3" :maxFractionDigits="3" :useGrouping="false" />
+        </template>
+      </Column>
+      <Column v-if="isInventory" field="quantity_fact" header="Кол-во факт" key="quantity_fact" style="width:8rem">
+        <template #editor="{ data, field }">
+          <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="3" :maxFractionDigits="3" :useGrouping="false" />
+        </template>
+      </Column>
+      <Column v-if="isMovement" field="quantity_fact" header="Заявка" key="quantity_fact" style="width:8rem"></Column>
+      <Column v-if="isMovement" field="quantity" header="Кол-во" key="quantity" style="width:8rem">
+        <template #editor="{ data, field }">
+          <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="3" :maxFractionDigits="3" :useGrouping="false" />
+        </template>
+      </Column>
+      <Column field="price" header="Цена" key="price" style="width:8rem">
+        <template #editor="{ data, field }">
+          <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="2" :maxFractionDigits="2" :useGrouping="false" />
+        </template>
+      </Column>
+      <Column field="amount" header="Сумма" key="amount" style="width:8rem">
+        <template #editor="{ data, field }">
+          <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="2" :maxFractionDigits="2" :useGrouping="false" />
+        </template>
+      </Column>
+      <Column v-if="isInventory" field="amount_fact" header="Сумма факт." key="amount_fact" style="width:7rem"></Column>
+      <Column v-if="isCheck" field="discount" header="Скидка" key="discount" style="width:5rem">
+        <template #editor="{ data, field }">
+          <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="2" :maxFractionDigits="2" :useGrouping="false" />
+        </template>
+      </Column>
+      <Column style="width:3rem">
+        <template #body="{data}">
+          <Button icon="pi pi-minus" class="p-button-rounded p-button-secondary p-button-text" @click="deleteRow(data)" />
+        </template>
+      </Column>
+      <Column style="width:2rem">
+        <template #body="{index, data}">
+          <div class="up-down-buttons">
+            <i class="pi pi-angle-up arrow-button" @click="rowUp(index, data)" />
+            <i class="pi pi-angle-down arrow-button" @click="rowDown(index, data)" />
+          </div>
+        </template>
+      </Column>
+      <ColumnGroup type="footer">
+        <Row>
+          <Column footer="сумма:" :colspan="colSpan" footerStyle="text-align:right" />
+          <Column :footer="totalAmount" :colspan="colSpan2" />
+          <Column v-if="isInventory" :footer="totalAmountFact" :colspan="3" />
+        </Row>
+      </ColumnGroup>
+    </DataTable> 
+  </div>  
 
   <OverlayPanel ref="opPaymentTypes">
     <DataTable :value="paymentTypes" v-model:selection="selectedPaymentType" selectionMode="single" 
@@ -275,7 +269,7 @@
   <ItemChoose :displayItems="displayItems" :currentStorage="doc.storage_to"  :dateTime="doc.date_time" 
         :multiplySelect="multiplySelectItems" @new-item-list="addItemsToDoc"/>
 
-  <div id="numPad" class="num-pad" @click="outsideCloseNumPad($event)">
+  <!-- <div id="numPad" class="num-pad" @click="outsideCloseNumPad($event)">
     <div class="modal-content border shadow"  @keyup="onKeyUp">
       <div class="formgrid grid" style="margin: 10px;">
           <div class="field col-12 md:col-12">
@@ -328,7 +322,7 @@
           </div>
       </div>
     </div>
-  </div>
+  </div> -->
 
 </template>
 
@@ -410,7 +404,7 @@ export default {
         isCheck: false,
         isMovement: false,
         colSpan: 4,  
-        colSpan2: 2,              
+        colSpan2: 3,              
         DocumentType: DocumentType,
         paymentTypes:[],
         displayItems: 1,
@@ -546,7 +540,7 @@ export default {
         if(value.doc_type == DocumentType.INVENTORY_DOC) {
           this.isInventory = true;
           this.colSpan++;
-          this.colSpan2--;
+          this.colSpan2 -= 2;
         }
         if(value.doc_type == DocumentType.MOVEMENT_DOC && this.baseDocId) {
             this.isMovement = true;

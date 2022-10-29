@@ -1,9 +1,10 @@
 <template>
-    <MainMenu />
+    <!-- <MainMenu /> -->
+    <div style="height: 100%">
     <DataTable :value="products" editMode="cell" 
             @cell-edit-complete="onCellEditComplete" class="editable-cells-table"
             filterDisplay="row" v-model:filters="filters"  
-            responsiveLayout="scroll">
+            :scrollable="true" scrollHeight="900px">
         <Column field="code" header="code" key="code" style="width:25%" sortable>
             <!-- <template #filter="{filterModel,filterCallback}">
                 <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" v-tooltip.top.focus="toltip"/>
@@ -45,10 +46,11 @@
             </template>
         </Column>
     </DataTable>
+    </div>
 </template>
 
 <script>
-import MainMenu from '@/components/MainMenu.vue'
+// import MainMenu from '@/components/MainMenu.vue'
 import InputText from 'primevue/inputtext';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
@@ -57,7 +59,7 @@ import {FilterMatchMode} from 'primevue/api';
 export default {
     name: 'App',
     components: {
-        MainMenu,
+        // MainMenu,
         InputText,
         DataTable,
         Column,
@@ -92,6 +94,21 @@ export default {
             {field: 'price', header: 'Price'}
         ];
         this.products = [
+            {code: 1, name: 'bbb', quantity: 1, price: 10},
+            {code: 5, name: 'ccc', quantity: 2, price: 20},
+            {code: 6, name: 'ccc', quantity: 3, price: 30},
+            {code: 7, name: 'bbb', quantity: 4, price: 40},
+            {code: 8, name: 'eee', quantity: 5, price: 50},
+            {code: 1, name: 'bbb', quantity: 1, price: 10},
+            {code: 5, name: 'ccc', quantity: 2, price: 20},
+            {code: 6, name: 'ccc', quantity: 3, price: 30},
+            {code: 7, name: 'bbb', quantity: 4, price: 40},
+            {code: 8, name: 'eee', quantity: 5, price: 50},
+            {code: 1, name: 'bbb', quantity: 1, price: 10},
+            {code: 5, name: 'ccc', quantity: 2, price: 20},
+            {code: 6, name: 'ccc', quantity: 3, price: 30},
+            {code: 7, name: 'bbb', quantity: 4, price: 40},
+            {code: 8, name: 'eee', quantity: 5, price: 50},
             {code: 1, name: 'bbb', quantity: 1, price: 10},
             {code: 5, name: 'ccc', quantity: 2, price: 20},
             {code: 6, name: 'ccc', quantity: 3, price: 30},

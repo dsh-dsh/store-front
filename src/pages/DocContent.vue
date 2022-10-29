@@ -6,111 +6,113 @@
       <Button icon="pi pi-plus" @click="chooseDocType" class="p-button-rounded p-button-secondary p-button-outlined mr-2" />
     </div>
   </div>
-  <div class="content">
-    <div>
-      <div class="border">
-        <DataTable :value="documents" @row-click="openDocument" class="p-datatable-sm" stripedRows :paginator="true" :rows="20"
-          v-model:selection="selectedProduct" selectionMode="single" sortField="date_time" :sortOrder="-1" 
-          paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
-          :rowsPerPageOptions="[10,20,50]" responsiveLayout="scroll" :rowHover="true"
-          currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
-          filterDisplay="menu" v-model:filters="filters">
-          <template #header>
-            <div class="flex justify-content-end">
-              <div class="horizontal">
-              <span class="mlr-1">с</span>
-              <Calendar id="buttonbar" v-model="firstDate" @date-select="setStartDate" dateFormat="dd.mm.yy" :showButtonBar="true" />
-              <span class="mlr-1">до</span>
-              <Calendar id="buttonbar" v-model="lastDate" @date-select="setEndDate" dateFormat="dd.mm.yy" :showButtonBar="true" />
-              </div>
-            </div>
-          </template>
-          <template #empty>
-            <div class="flex justify-content-center">
-              <p>Журнал пуст</p>
-            </div>
-          </template>
-          <template #loading>
-            <div class="flex justify-content-center">
-              <i class="pi pi-spin pi-spinner" style="font-size: 2rem">
-            </i></div>
-          </template>
-          <Column field="is_hold" header="" dataType="boolean">
-            <template #body="{data}"><i class="pi" :class="iconClass(data)" v-tooltip="getToolTipText(data)"></i></template>
-          </Column>
-          <Column field="date_time" header="Дата" sortable dataType="date">
-            <template #body="{data}">
-              <div :class="disabledClass(data)">
-                {{new Date(data.date_time).toLocaleDateString('ru-RU', {day: '2-digit', month: '2-digit', year: 'numeric'})}}
-              </div>
-            </template>
-          </Column>
-          <Column field="number" header="№" sortable style="max-width:7rem">
-            <template #body="{data}"><div :class="disabledClass(data)">{{data.number}}</div></template>
-          </Column>
-          <Column filterField="doc_type" header="Документ" :showFilterMatchModes="false" :showApplyButton="false" sortable style="max-width:12rem">
-            <template #filter="{filterModel, filterCallback}">
-              <div class="mb-3 font-bold">тип документа</div>
-              <MultiSelect v-model="filterModel.value" @change="filterCallback();onDocTypeFilterChange($event)" :options="docTypeFilters" />
-            </template>
-            <template #body="{data}"><div :class="disabledClass(data)">{{data.doc_type}}</div></template>
-          </Column>
-          <Column v-if="!isMobile" field="supplier.name" header="поставщик" :showFilterMatchModes="false" :showClearButton="false" :showApplyButton="false" sortable style="max-width:12rem">
-            <template #filter="{filterModel, filterCallback}">
-              <div class="mb-3 font-bold">поставщик</div>
-              <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" v-tooltip.top.focus="toltip"/>
-            </template>
-            <template #body="{data}"><div :class="disabledClass(data)">{{getName(data.supplier)}}</div></template>
-          </Column>
-          <Column field="storage_from.name" header="со склада" :showFilterMatchModes="false" :showClearButton="false" :showApplyButton="false" sortable style="max-width:12rem">
-            <template #filter="{filterModel, filterCallback}">
-              <div class="mb-3 font-bold">со склада</div>
-              <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" v-tooltip.top.focus="toltip"/>
-            </template>
-            <template #body="{data}"><div :class="disabledClass(data)">{{getName(data.storage_from)}}</div></template>
-          </Column>
-          <Column field="storage_to.name" header="на склад" :showFilterMatchModes="false" :showClearButton="false" :showApplyButton="false" sortable style="max-width:12rem">
-            <template #filter="{filterModel, filterCallback}">
-              <div class="mb-3 font-bold">на склад</div>
-              <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" v-tooltip.top.focus="toltip"/>
-            </template>
-            <template #body="{data}"><div :class="disabledClass(data)">{{getName(data.storage_to)}}</div></template>
-          </Column>
-          <Column v-if="!isMobile" field="amount" header="Сумма" sortable style="max-width:12rem">
-            <template #body="{data}"><div :class="disabledClass(data)">{{formatCurrency(data.amount)}}</div></template>
-          </Column>
-          <Column  filterField="author.name" header="Автор" :showFilterMatchModes="false" :showClearButton="false" :showApplyButton="false" style="max-width:9rem"> 
-            <template #filter="{filterModel, filterCallback}">
-              <div class="mb-3 font-bold">автор</div>
-              <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" v-tooltip.top.focus="toltip"/>
-            </template>
-            <template #body="{data}"><div :class="disabledClass(data)">{{getName(data.author)}}</div></template>
-          </Column>
-          <Column style="max-width:3rem">
-            <template #body="{data}"> 
-              <Button icon="pi pi-bars" class="p-button-rounded p-button-secondary p-button-text mr-2" @click="toggleModalMenu($event, data)" />
-            </template>
-          </Column>
-          <template #paginatorstart>
-              <Button type="button" icon="pi pi-refresh" class="p-button-text" />
-          </template>
-          <template #paginatorend>
-              <Button type="button" icon="pi pi-cloud" class="p-button-text" />
-          </template>
-        </DataTable> 
-      </div>  
-    </div>
-  </div>
+  <div class="border"  style="height: calc(100vh - 9.5rem)">
+    <DataTable :value="documents" @row-click="openDocument" class="p-datatable-sm" stripedRows :paginator="true" :rows="20"
+      v-model:selection="selectedProduct" selectionMode="single" sortField="date_time" :sortOrder="-1" 
+      paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
+      :rowsPerPageOptions="[10,20,50]" responsiveLayout="scroll" :rowHover="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+      filterDisplay="menu" v-model:filters="filters"
+      :scrollable="true" scrollHeight="flex">
+      <template #header>
+        <div class="flex justify-content-end">
+          <div class="horizontal">
+          <span class="mlr-1">с</span>
+          <Calendar id="buttonbar" v-model="firstDate" @date-select="setStartDate" dateFormat="dd.mm.yy" :showButtonBar="true" />
+          <span class="mlr-1">до</span>
+          <Calendar id="buttonbar" v-model="lastDate" @date-select="setEndDate" dateFormat="dd.mm.yy" :showButtonBar="true" />
+          </div>
+        </div>
+      </template>
+      <template #empty>
+        <div class="flex justify-content-center">
+          <p>Журнал пуст</p>
+        </div>
+      </template>
+      <template #loading>
+        <div class="flex justify-content-center">
+          <i class="pi pi-spin pi-spinner" style="font-size: 2rem">
+        </i></div>
+      </template>
+      <Column field="is_hold" header="" :showApplyButton="false" dataType="boolean" style="max-width:3rem">
+        <template #body="{data}"><i class="pi" :class="iconClass(data)" v-tooltip="getToolTipText(data)"></i></template>
+        <template #filter="{filterModel,filterCallback}">
+          <div class="mb-3 font-bold">проведен</div>
+          <TriStateCheckbox v-model="filterModel.value" @change="filterCallback()"/>
+        </template>
+      </Column>
+      <Column field="date_time" header="Дата" sortable dataType="date" style="max-width:7rem">
+        <template #body="{data}">
+          <div :class="disabledClass(data)">
+            {{new Date(data.date_time).toLocaleDateString('ru-RU', {day: '2-digit', month: '2-digit', year: 'numeric'})}}
+          </div>
+        </template>
+      </Column>
+      <Column field="number" header="№" sortable>
+        <template #body="{data}"><div :class="disabledClass(data)">{{data.number}}</div></template>
+      </Column>
+      <Column filterField="doc_type" header="Документ" :showFilterMatchModes="false" :showApplyButton="false" sortable>
+        <template #filter="{filterModel, filterCallback}">
+          <div class="mb-3 font-bold">тип документа</div>
+          <MultiSelect v-model="filterModel.value" @change="filterCallback();onDocTypeFilterChange($event)" :options="docTypeFilters" />
+        </template>
+        <template #body="{data}"><div :class="disabledClass(data)">{{data.doc_type}}</div></template>
+      </Column>
+      <Column v-if="!isMobile" field="supplier.name" header="поставщик" :showFilterMatchModes="false" :showApplyButton="false" sortable>
+        <template #filter="{filterModel, filterCallback}">
+          <div class="mb-3 font-bold">поставщик</div>
+          <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" v-tooltip.top.focus="toltip"/>
+        </template>
+        <template #body="{data}"><div :class="disabledClass(data)">{{getName(data.supplier)}}</div></template>
+      </Column>
+      <Column field="storage_from.name" header="со склада" :showFilterMatchModes="false" :showApplyButton="false" sortable>
+        <template #filter="{filterModel, filterCallback}">
+          <div class="mb-3 font-bold">со склада</div>
+          <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" v-tooltip.top.focus="toltip"/>
+        </template>
+        <template #body="{data}"><div :class="disabledClass(data)">{{getName(data.storage_from)}}</div></template>
+      </Column>
+      <Column field="storage_to.name" header="на склад" :showFilterMatchModes="false" :showApplyButton="false" sortable>
+        <template #filter="{filterModel, filterCallback}">
+          <div class="mb-3 font-bold">на склад</div>
+          <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" v-tooltip.top.focus="toltip"/>
+        </template>
+        <template #body="{data}"><div :class="disabledClass(data)">{{getName(data.storage_to)}}</div></template>
+      </Column>
+      <Column v-if="!isMobile" field="amount" header="Сумма" sortable>
+        <template #body="{data}"><div :class="disabledClass(data)">{{formatCurrency(data.amount)}}</div></template>
+      </Column>
+      <Column  filterField="author.name" header="Автор" :showFilterMatchModes="false" :showApplyButton="false"> 
+        <template #filter="{filterModel, filterCallback}">
+          <div class="mb-3 font-bold">автор</div>
+          <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" v-tooltip.top.focus="toltip"/>
+        </template>
+        <template #body="{data}"><div :class="disabledClass(data)">{{getName(data.author)}}</div></template>
+      </Column>
+      <Column style="max-width:4rem">
+        <template #body="{data}"> 
+          <Button icon="pi pi-bars" class="p-button-rounded p-button-secondary p-button-text mr-2" @click="toggleModalMenu($event, data)" />
+        </template>
+      </Column>
+      <template #paginatorstart>
+          <Button type="button" icon="pi pi-refresh" class="p-button-text" />
+      </template>
+      <template #paginatorend>
+          <Button type="button" icon="pi pi-cloud" class="p-button-text" />
+      </template>
+    </DataTable> 
+  </div>  
 
   <Dialog v-model:visible="displayDocument" :style="{width: '90%'}" :modal="true"  :showHeader="showDialogHeader">
     <div v-if="docRedactor">
-      <DocRedactor :docId="docId" 
-      @disable-hold-button="disableHoldButton" @disable-save-button="disableSaveButton" @disable-current-time="disableCurrentTime"
-      :type="type" :docType="docType"/>
+      <DocRedactor :docId="docId"
+      @disable-hold-button="disableHoldButton" @disable-save-button="disableSaveButton" 
+      @disable-current-time="disableCurrentTime" :type="type" :docType="docType"/>
     </div>
     <div v-else>
-      <Document :docId="docId" @copy-from-request-doc="openRequestDocRedactor" @open-base-doc="openBaseDoc"
-                @open-update-doc="openUpdateDocumentRedactor" @open-copy-doc="openCopyDocumentRedactor" />
+      <Document :docId="docId" 
+      @copy-from-request-doc="openRequestDocRedactor" @open-base-doc="openBaseDoc"
+      @open-update-doc="openUpdateDocumentRedactor" @open-copy-doc="openCopyDocumentRedactor" />
     </div>
     <template #footer>
       <Button label="Закрыть" icon="pi pi-times" @click="closeDocument" class="p-button-secondary p-button-text"/>
@@ -175,6 +177,7 @@ import RadioButton from 'primevue/radiobutton';
 import {FilterMatchMode} from 'primevue/api';
 import InputText from 'primevue/inputtext';
 import MultiSelect from 'primevue/multiselect';
+import TriStateCheckbox from 'primevue/tristatecheckbox';
 
 export default {
     name: 'DocContent',
@@ -192,7 +195,8 @@ export default {
       Calendar,
       RadioButton,
       InputText,
-      MultiSelect
+      MultiSelect,
+      TriStateCheckbox
     },
     props: {
         filter: String,
@@ -231,12 +235,14 @@ export default {
         holdDoc: false,
         toltip: 'Начните набирать текст для поиска',
         filters: {
+          'is_hold': {value: null, matchMode: FilterMatchMode.EQUALS},
           'doc_type': {value: null, matchMode: FilterMatchMode.IN},
           'supplier.name': {value: null, matchMode: FilterMatchMode.CONTAINS},
           'storage_from.name': {value: null, matchMode: FilterMatchMode.CONTAINS},
           'storage_to.name': {value: null, matchMode: FilterMatchMode.CONTAINS},
           'author.name': {value: null, matchMode: FilterMatchMode.STARTS_WITH}
-        }
+        }, 
+        tableScrollHeight: '600px'
       };
     },
     computed: {
@@ -636,9 +642,15 @@ export default {
 
 </script>
 <style scoped>
-  /* .p-column-filter {
-    width: 200px;
-  } */
+  .p-dialog {
+    max-width: 90%; 
+    height: 90%; 
+    background-color: rgb(255, 255, 255);
+  }
+  .scroll-table {
+    height: 85%;
+    height: calc(100% - 150px);
+  }
   .fixed-header {
     background-color: white;
     z-index: 100;
