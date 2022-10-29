@@ -13,12 +13,28 @@ export const SettingStore = {
             ingredientDirIdProperty: 0,
             holdingDialogProperty: Boolean,
             checkHoldingEnableProperty: Boolean,
-            period: null
+            period: null,
+            choosenDocFilters: [],
+            docFilterTypes: [
+                {type:'POSTING_DOC_TYPE_FILTER', name:'Поступление'},
+                {type:'CHECK_DOC_TYPE_FILTER', name:'Чек ККМ'},
+                {type:'RECEIPT_DOC_TYPE_FILTER', name:'Оприходование'},
+                {type:'MOVEMENT_DOC_TYPE_FILTER', name:'Перемещение'},
+                {type:'WRITE_OFF_DOC_TYPE_FILTER', name:'Списание'},
+                {type:'WITHDRAW_ORDER_DOC_TYPE_FILTER', name:'ПКО'},
+                {type:'CREDIT_ORDER_DOC_TYPE_FILTER', name:'РКО'},
+                {type:'REQUEST_DOC_TYPE_FILTER', name:'Заявка'},
+                {type:'INVENTORY_DOC_TYPE_FILTER', name:'Инвентаризация'},
+                {type:'PERIOD_REST_MOVE_DOC_TYPE_FILTER', name:'Перенос остатков'}
+            ]
         }
     },
     mutations: {
         setDefaultProperties(state, res) {
             state.defaultProperties = res;
+            state.choosenDocFilters = res
+                    .filter(setting => (setting.type.includes('DOC_TYPE_FILTER') && setting.property == 1))
+                    .map(setting => state.docFilterTypes.find(filter => filter.type == setting.type).name);
         },
         setAddShortageForHold(state, res) {
             state.addShortageForHold = res.property == 1;
@@ -79,13 +95,18 @@ export const SettingStore = {
             const response = await get('/api/v1/setting/check/holding/enable', rootState);
 			commit('setCheckHoldingEnableProperty', response);
         },
-        async setProperty ({rootState}, [user, type, value]) {
+        async setProperty({rootState}, [user, type, value]) {
 			let request = {'user': user, 'type': type, 'property': value};
 			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
 			const response = await post('/api/v1/setting/property', headers, request, rootState);
             if(response.data == "ok") {
                 this.dispatch("getDefaultProperties");
             }
+        },
+        async setDocTypeFilterProperties({rootState}, [user, settings]) {
+			let request = {'user': user, 'settings': settings};
+			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
+			await post('/api/v1/setting/doc/type/properties', headers, request, rootState);
         },
         async setAddShortageForHoldProperty({rootState}, value) {
 			let request = {'type': Property.ADD_REST_FOR_HOLD_1C_DOCS, 'property': value};

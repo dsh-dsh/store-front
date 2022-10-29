@@ -51,13 +51,7 @@
           <Column filterField="doc_type" header="Документ" :showFilterMatchModes="false" :showApplyButton="false" sortable style="max-width:12rem">
             <template #filter="{filterModel, filterCallback}">
               <div class="mb-3 font-bold">тип документа</div>
-              <MultiSelect v-model="filterModel.value" @change="filterCallback()" :options="docTypeFilters">
-                <template #option="slotProps">
-                  <div class="p-multiselect-representative-option">
-                    <span class="image-text">{{slotProps.option}}</span>
-                  </div>
-                </template>
-              </MultiSelect>
+              <MultiSelect v-model="filterModel.value" @change="filterCallback();onDocTypeFilterChange($event)" :options="docTypeFilters" />
             </template>
             <template #body="{data}"><div :class="disabledClass(data)">{{data.doc_type}}</div></template>
           </Column>
@@ -242,29 +236,7 @@ export default {
           'storage_from.name': {value: null, matchMode: FilterMatchMode.CONTAINS},
           'storage_to.name': {value: null, matchMode: FilterMatchMode.CONTAINS},
           'author.name': {value: null, matchMode: FilterMatchMode.STARTS_WITH}
-        },
-        items: [
-        {
-          label: "Документы",
-          icon: "pi pi-fw pi-file",
-          to: '/documents/default'
-        },
-        {
-          label: "Номенклатура",
-          icon: "pi pi-fw pi-shopping-bag",
-          to: "/items"
-        },
-        {
-          label: "Пользователи",
-          icon: "pi pi-fw pi-users",
-          to: "/users"
-        },
-        {
-          label: "Настройки",
-          icon: "pi pi-fw pi-cog",
-          to: "/settings"
-        },
-      ],
+        }
       };
     },
     computed: {
@@ -282,6 +254,12 @@ export default {
       },
       docTypeFilters() {
         return this.$store.state.cs.docTypeFilters
+      },
+      choosenDocFilters() {
+        return this.$store.state.ss.choosenDocFilters
+      },
+      docFilterTypes() {
+        return this.$store.state.ss.docFilterTypes
       },
       startDate() {
         return this.$store.state.ds.startDate;
@@ -314,11 +292,16 @@ export default {
       this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     },
     watch: {
+      choosenDocFilters(val) {
+        this.filters.doc_type.value = (this.filter == '' && val.length > 0) ? val : null;
+      },
       period(val) {
         this.startPeriod = new Date(val.start_date);
       },
       filter(val) {
         this.$store.dispatch('getDocuments', val);
+        this.filters.doc_type.value = (this.filter == '' && this.choosenDocFilters.length > 0) ? this.choosenDocFilters : null;
+
       },
       success() {
         this.$store.dispatch('getDocuments', this.filter);
@@ -382,6 +365,16 @@ export default {
       }
     },
 	methods: {
+    onDocTypeFilterChange(event) {
+      let choosenTypes = event.value;
+      let settings = this.docFilterTypes
+          .filter(setting => choosenTypes.includes(setting.name))
+          .map(setting => {
+            let value = {'type': setting.type, 'property': 1};
+            return value;
+          })
+      this.$store.dispatch('setDocTypeFilterProperties', [this.user, settings]);
+    },
     getName(value) {
       if(value) {
         return value.name;
