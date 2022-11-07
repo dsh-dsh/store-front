@@ -1,7 +1,7 @@
 <template>
 <div>
     <router-view></router-view>
-    <Toast position="top-right" />
+    <Toast position="top-right" /> 
 </div>
 </template>
 
@@ -62,5 +62,13 @@ export default {
   }
   .p-component {
     font-size: var(--app-font-size);
+  }
+  .p-toast-top-right {
+    top: 20px;
+    right: 50px;
+  }
+  .p-toast {
+    position: fixed;
+    width: 28rem;
   }
 </style>

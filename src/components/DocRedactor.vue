@@ -269,7 +269,7 @@
   <ItemChoose :displayItems="displayItems" :currentStorage="doc.storage_to"  :dateTime="doc.date_time" 
         :multiplySelect="multiplySelectItems" @new-item-list="addItemsToDoc"/>
 
-  <!-- <div id="numPad" class="num-pad" @click="outsideCloseNumPad($event)">
+  <div id="numPad" class="num-pad" @click="outsideCloseNumPad($event)">
     <div class="modal-content border shadow"  @keyup="onKeyUp">
       <div class="formgrid grid" style="margin: 10px;">
           <div class="field col-12 md:col-12">
@@ -322,7 +322,7 @@
           </div>
       </div>
     </div>
-  </div> -->
+  </div>
 
 </template>
 

@@ -13,7 +13,7 @@
             </div>
           </div>
           <div class="col-12 md:col-12">
-            <Password v-model="password" toggleMask></Password>
+            <Password v-model="password" :feedback="false" toggleMask></Password>
           </div>
           <div class="col-12 md:col-12">
             <Button label="OK" @click.prevent="onSubmit" />

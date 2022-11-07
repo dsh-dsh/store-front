@@ -72,6 +72,9 @@ export const DocStore = {
 			console.log(res)
 			state.newDocNumber = res;
 		},
+		resetCurrentDocument(state) {
+			state.document = new Document(null, new Date(), 0);
+		}
     },
     actions: {
 		setDates({commit}) {
@@ -129,7 +132,10 @@ export const DocStore = {
 			let request = {'item_doc_dto': doc};
 			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
 			const response = await put('/api/v1/docs/' + saveTime, headers, request, rootState);
-			if(response == 'ok') { commit('setSuccess'); }
+			if(response == 'ok') { 
+				commit('setSuccess'); 
+				commit('resetCurrentDocument');
+			}
 		},
 		async addDocument({commit, rootState}, [doc, saveTime, quickSave = false]) {
 			doc.date_time = doc.date_time.getTime();
@@ -144,6 +150,7 @@ export const DocStore = {
 				if(quickSave) {
 					commit('setNewDocId', response.data);
 				} 
+				commit('resetCurrentDocument');
 			}
 		},
 		createRelativeDocks({commit}, doc) {
@@ -173,7 +180,10 @@ export const DocStore = {
 			if(response.type == 1) {
 				commit('setExsistNotHoldenDocs');
 			}
-			if(response.data == 'ok') { commit('setSuccess'); }
+			if(response.data == 'ok') { 
+				commit('setSuccess'); 
+				commit('resetCurrentDocument');
+			}
 		},
 		async serialHoldDocument({commit, rootState}, docId) {
 			let headers = {'Authorization': rootState.token };
@@ -198,6 +208,9 @@ export const DocStore = {
 		async checkUnholden1CDocuments({commit, rootState}) {
 			const response = await get('/api/v1/1c/check', rootState);
 			commit('setUnholdenCheckDate', response)
+		},
+		async setCurrentDocumentNull({commit}) {
+			commit('resetCurrentDocument');
 		}
     }
 }

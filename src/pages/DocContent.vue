@@ -65,6 +65,13 @@
         </template>
         <template #body="{data}"><div :class="disabledClass(data)">{{getName(data.supplier)}}</div></template>
       </Column>
+      <Column v-if="!isMobile" field="project.name" header="проект" :showFilterMatchModes="false" :showApplyButton="false" sortable>
+        <template #filter="{filterModel, filterCallback}">
+          <div class="mb-3 font-bold">со склада</div>
+          <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" v-tooltip.top.focus="toltip"/>
+        </template>
+        <template #body="{data}"><div :class="disabledClass(data)">{{getName(data.storage_from)}}</div></template>
+      </Column>
       <Column field="storage_from.name" header="со склада" :showFilterMatchModes="false" :showApplyButton="false" sortable>
         <template #filter="{filterModel, filterCallback}">
           <div class="mb-3 font-bold">со склада</div>
@@ -519,6 +526,7 @@ export default {
 		},
 		closeDocument() {
 			this.displayDocument = false;
+      this.$store.dispatch('setCurrentDocumentNull');
 		},
     choseSavingTime() {
         this.confirmationType = 'choseTime';
