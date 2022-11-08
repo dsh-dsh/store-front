@@ -20,7 +20,7 @@
         </div>
     </div>
 
-    <div v-if="doc.author" class="formgrid grid">
+    <!-- <div v-if="doc.author" class="formgrid grid" style="max-width: 750px">
         <div class="col-12 md:col-4">
             <label for="author" class="label">автор</label>
             <p id="author" class="text_field">{{ doc.author.name }}</p>
@@ -29,7 +29,12 @@
             <label for="project" class="label">проект</label>
             <p id="project" class="text_field">{{ doc.project.name }}</p>
         </div>
-        <div class="col-12 md:col-4"></div>
+        <div class="col-12 md:col-4">
+            <div v-if="doc.doc_info">
+                <label for="supplier_doc_number" class="label">номер приходной накладной</label>
+                <p id="supplier_doc_number" class="text_field">{{ doc.doc_info.supplier_doc_number }}</p>
+            </div>
+        </div>
 
         <div v-if="doc.doc_items" class="col-12 md:col-4">
             <label for="storageFrom" class="label">со склада</label>
@@ -50,6 +55,48 @@
             <p id="recipient" class="text_field">{{ (doc.recipient? doc.recipient.name:'') }}</p>
         </div>
         <div v-if="doc.doc_type == DocumentType.POSTING_DOC" class="field col-12 md:col-4"></div>
+    </div> -->
+
+    <div v-if="doc.author" class="grid" style="max-width: 750px">
+        <div class="col-4">
+            <label for="author" class="label">автор</label>
+            <p id="author" class="text_field">{{ doc.author.name }}</p></div>
+        <div class="col-4">
+            <label for="project" class="label">проект</label>
+            <p id="project" class="text_field">{{ doc.project.name }}</p></div>
+        <div class="col-4">
+            <div v-if="doc.doc_info && doc.doc_info.supplier_doc_number">
+                <label for="supplier_doc_number" class="label">номер приходной накладной</label>
+                <p id="supplier_doc_number" class="text_field">{{ doc.doc_info.supplier_doc_number }}</p>
+            </div></div>
+        <div v-if="doc.doc_items" class="col-8">
+            <div class="grid">
+                <div class="col-6">
+                    <label for="storageFrom" class="label">со склада</label>
+                    <p id="storageFrom" class="text_field">{{ (doc.storage_from? doc.storage_from.name:'') }}</p>
+                </div>
+                <div class="col-6">
+                    <label for="storageTo" class="label">на склад</label>
+                    <p id="storageTo" class="text_field">{{ (doc.storage_to? doc.storage_to.name:'') }}</p>
+                </div>
+            </div>
+            <div v-if="doc.doc_type == DocumentType.POSTING_DOC" class="grid">
+                <div class="col-6">
+                    <label for="supplier" class="label">отправитель</label>
+                    <p id="supplier" class="text_field">{{ (doc.supplier? doc.supplier.name:'') }}</p>
+                </div>
+                <div class="col-6">
+                    <label for="recipient" class="label">получатель</label>
+                    <p id="recipient" class="text_field">{{ (doc.recipient? doc.recipient.name:'') }}</p>
+                </div>
+            </div>
+        </div>
+        <div v-if="doc.doc_items" class="col-4">
+            <div v-if="doc.doc_info && doc.doc_info.comment">
+                <label for="comment" class="label">комментарий</label>
+                <p id="comment" class="text_field for-comment overflow-hidden text-overflow-ellipsis">{{ doc.doc_info.comment }}</p>
+            </div>
+        </div>
     </div>
     
     <div v-if="doc.check_info">
@@ -118,37 +165,41 @@
         </div>
     </div>
 
-    <div v-if="!doc.doc_items">
-        <div class="formgrid grid">
-            <div class="col-12 md:col-4">
-                <label for="individual" class="label">
-                    {{ (doc.doc_type == DocumentType.WITHDRAW_ORDER_DOC? 'получатель' : 'плательщик') }}
-                </label><br>
-                <p id="individual" class="text_field">{{ getName(doc.individual) }}</p>
-            </div>
-            <div class="col-12 md:col-8"></div>
-
-            <div class="field col-12 md:col-8">
-                <label for="payment_type" class="label">назначение платежа</label><br>
-                <p id="payment_type" class="text_field lm">{{ doc.payment_type }}</p>
-            </div>
-            <div class="field col-12 md:col-4"></div>
-
-            <div class="field col-12 md:col-4">
-                <label for="amount" class="label">сумма</label><br>
-                <p id="amount" class="text_field">{{ doc.amount }}</p>
-            </div>
-            <div class="field col-12 md:col-4">
-                <label for="tax" class="label">оплата налога</label><br>
-                <p id="tax" class="text_field">{{ doc.tax }}</p>
-            </div>
-            <div class="field col-12 md:col-4"></div>
+    <div v-if="!doc.doc_items" class="formgrid grid" style="max-width: 750px">
+        <div class="col-12 md:col-4">
+            <label for="individual" class="label">
+                {{ (doc.doc_type == DocumentType.WITHDRAW_ORDER_DOC? 'получатель' : 'плательщик') }}
+            </label><br>
+            <p id="individual" class="text_field">{{ getName(doc.individual) }}</p>
         </div>
-    </div>
+        <div class="col-12 md:col-8"></div>
 
+        <div class="field col-12 md:col-8">
+            <label for="payment_type" class="label">назначение платежа</label><br>
+            <p id="payment_type" class="text_field lm">{{ doc.payment_type }}</p>
+        </div>
+        <div class="field col-12 md:col-4"></div>
+
+        <div class="field col-12 md:col-4">
+            <label for="amount" class="label">сумма</label><br>
+            <p id="amount" class="text_field">{{ doc.amount }}</p>
+        </div>
+        <div class="field col-12 md:col-4">
+            <label for="tax" class="label">оплата налога</label><br>
+            <p id="tax" class="text_field">{{ doc.tax }}</p>
+        </div>
+        <div class="field col-12 md:col-4"></div>
+
+        <div class="field col-12 md:col-8">
+            <div v-if="doc.doc_info && doc.doc_info.comment">
+                <label for="comment" class="label">комментарий</label>
+                <p id="comment" class="text_field for-comment overflow-hidden text-overflow-ellipsis">{{ doc.doc_info.comment }}</p>
+            </div>
+        </div>
+        <div class="field col-12 md:col-4"></div>
+    </div>
     <br>
 
-    <!-- <div v-if="doc.doc_items" style="height: calc(100vh - 29.5rem)"> -->
     <div v-if="doc.doc_items">
       <DataTable :value="doc.doc_items" editMode="cell" class="p-datatable-sm" 
         responsiveLayout="scroll" :rowHover="true"> 
@@ -185,7 +236,6 @@ import Row from 'primevue/row';
 import Button from 'primevue/button';
 import Divider from 'primevue/divider';
 import {DocumentType} from '@/js/Constants';
-
 export default {
     name: 'Document',
     components: {
@@ -344,6 +394,10 @@ function formatTime(date) {
     padding: 5px 10px;
     background-color: rgb(247, 243, 238);
     border-radius: 5px
+  }
+  .for-comment{
+    width: 350px;
+    height: 110px;
   }
   .sm {
     width: 150px;

@@ -5,17 +5,17 @@
       <div class="field col-12 md:col-12">
         <p class="mb-2"><b>Документ  {{ doc.doc_type }}</b> (автор {{ doc.author.name }})</p>
       </div>
-      <div class="field col-12 md:col-5 flex justify-content-between numberdatecard">
+      <div class="field col-12 md:col-7 flex justify-content-between numberdatecard">
         <div class="mt-3 mb-3">
           <label for="number" class="label">Номер</label><br>
-          <InputText id="number" @change="disableHoldButton" type="text" class="p-inputtext input" v-model="doc.number" />
+          <InputText id="number" @change="disableHoldButton" type="text" class="p-inputtext medium-inpyt" v-model="doc.number" />
         </div>
         <div class="mt-3 mb-3">
           <label for="time" class="label">Дата</label><br>
           <Calendar id="time" @change="disableHoldButton('date')" @date-select="disableHoldButton('date')" v-model="dateInput" dateFormat="dd.mm.yy" :showIcon="true" />
         </div>
       </div>
-      <div class="field col-12 md:col-7 center right">
+      <div class="field col-12 md:col-5 center right">
         <div v-if="doc.doc_type === DocumentType.INVENTORY_DOC" class="mr-5">
           <Button label="Заполнить" class="p-button-rounded p-button-secondary mr-1" @click="onFillRestClick" :disabled="disabledFillItemRest"/>
           <Button label="Создать подчиненные документы" class="p-button-rounded p-button-secondary" @click="onCreateDockClick" :disabled="disabledFillItemRest"/>
@@ -23,52 +23,66 @@
       </div>
       <div class="field col-12 md:col-4">
         <label for="project" class="label">Проект</label><br>
-          <div class="p-inputgroup">
-            <InputText id="project" type="text" class="p-inputtext" v-model="doc.project.name" />
-            <Button icon="pi pi-check" class="p-button-warning" @click="onProjectClick" />
-          </div>
+        <div class="p-inputgroup">
+          <InputText id="project" type="text" class="p-inputtext" v-model="doc.project.name" />
+          <Button icon="pi pi-check" class="p-button-warning" @click="onProjectClick" />
+        </div>
       </div>
-      <div class="field col-12 md:col-8"></div>
-      <div v-if="!orderDoc" class="field col-12 md:col-4">
-        <div v-if="doc.storage_from">
-          <label for="storageFrom" class="label">со склада</label><br>
-          <div class="p-inputgroup">
-            <InputText id="storageFrom" type="text" class="p-inputtext" v-model="doc.storage_from.name" :disabled="disabledStorageFrom" />
-            <Button icon="pi pi-check" class="p-button-warning" @click="onStorageFromClick" :disabled="disabledStorageFrom" />
+      <div class="field col-12 md:col-4">
+        <label for="supplier_doc_number" class="label">Номер входящего документа</label><br>
+        <!-- <InputText id="supplier_doc_number" @change="disableHoldButton(), onDocInfoChange()" type="text" class="p-inputtext flex-inpyt" v-model="supplierDocNumber" /> -->
+        <InputText id="supplier_doc_number" @change="onDocInfoChange" type="text" class="p-inputtext flex-inpyt" v-model="supplierDocNumber" />
+      </div>
+      <div class="field col-12 md:col-4"></div>
+
+      <div v-if="!orderDoc" class="field col-12 md:col-8">
+        <div class="formgrid grid">
+          
+          <div v-if="!orderDoc" class="field col-12 md:col-6">
+            <div v-if="doc.storage_from">
+              <label for="storageFrom" class="label">со склада</label><br>
+              <div class="p-inputgroup">
+                <InputText id="storageFrom" type="text" class="p-inputtext" v-model="doc.storage_from.name" :disabled="disabledStorageFrom" />
+                <Button icon="pi pi-check" class="p-button-warning" @click="onStorageFromClick" :disabled="disabledStorageFrom" />
+              </div>
+            </div>
           </div>
+          <div v-if="!orderDoc" class="field col-12 md:col-6">
+            <div v-if="doc.storage_to">
+            <label for="storageTo" class="label">на склад</label><br>
+              <div class="p-inputgroup">
+                <InputText id="storageTo" type="text" class="p-inputtext" v-model="doc.storage_to.name" :disabled="disabledStorageTo" />
+                <Button icon="pi pi-check" class="p-button-warning" @click="onStorageToClick" :disabled="disabledStorageTo"/>
+              </div>
+            </div>
+          </div>
+          <!-- <div v-if="!orderDoc" class="field col-12 md:col-4"></div> -->
+
+          <div v-if="doc.doc_type == DocumentType.POSTING_DOC" class="field col-12 md:col-6">
+            <div v-if="doc.supplier">
+              <label for="supplier" class="label">Поставщик</label><br>
+              <div class="p-inputgroup">
+                <InputText id="supplier" type="text" class="p-inputtext" v-model="doc.supplier.name" :disabled="disabledSupplier" />
+                <Button icon="pi pi-check" class="p-button-warning" @click="onSupplierClick"/>
+              </div>
+            </div>
+          </div>
+          <div v-if="doc.doc_type == DocumentType.POSTING_DOC" class="field col-12 md:col-6">
+            <div v-if="doc.recipient">
+              <label for="recipient" class="label">Получатель</label><br>
+              <div class="p-inputgroup">
+                <InputText id="recipient" type="text" class="p-inputtext" v-model="doc.recipient.name" />
+                <Button icon="pi pi-check" class="p-button-warning" @click="onRecipientClick"/>
+              </div>
+            </div>
+          </div>
+          <!-- <div v-if="doc.doc_type == DocumentType.POSTING_DOC" class="field col-12 md:col-4"></div> -->
         </div>
       </div>
       <div v-if="!orderDoc" class="field col-12 md:col-4">
-        <div v-if="doc.storage_to">
-        <label for="storageTo" class="label">на склад</label><br>
-          <div class="p-inputgroup">
-            <InputText id="storageTo" type="text" class="p-inputtext" v-model="doc.storage_to.name" :disabled="disabledStorageTo" />
-            <Button icon="pi pi-check" class="p-button-warning" @click="onStorageToClick" :disabled="disabledStorageTo"/>
-          </div>
-        </div>
+        <label for="comment" class="label">Комментарий</label><br>
+        <Textarea id="comment" v-model="comment" @change="onDocInfoChange" rows="5" cols="30" style="height: 120px"/>
       </div>
-      <div v-if="!orderDoc" class="field col-12 md:col-4"></div>
-      <div v-if="doc.doc_type == DocumentType.POSTING_DOC" class="field col-12 md:col-4">
-        <div v-if="doc.supplier">
-          <label for="supplier" class="label">Поставщик</label><br>
-          <div class="p-inputgroup">
-            <!-- v-model="doc.supplier.name" -->
-            <!-- <AutoComplete id="supplier" v-model="selectedSupplier" :suggestions="filteredSuppliers" @complete="searchSupplier($event)"  :disabled="disabledSupplier" /> -->
-            <InputText id="supplier" type="text" class="p-inputtext" v-model="doc.supplier.name" :disabled="disabledSupplier" />
-            <Button icon="pi pi-check" class="p-button-warning" @click="onSupplierClick"/>
-          </div>
-        </div>
-      </div>
-      <div v-if="doc.doc_type == DocumentType.POSTING_DOC" class="field col-12 md:col-4">
-        <div v-if="doc.recipient">
-          <label for="recipient" class="label">Получатель</label><br>
-          <div class="p-inputgroup">
-            <InputText id="recipient" type="text" class="p-inputtext" v-model="doc.recipient.name" />
-            <Button icon="pi pi-check" class="p-button-warning" @click="onRecipientClick"/>
-          </div>
-        </div>
-      </div>
-      <div v-if="doc.doc_type == DocumentType.POSTING_DOC" class="field col-12 md:col-4"></div>
       
       <div v-if="orderDoc" class="field col-12 md:col-4">
           <label for="individual" class="label">Физ лицо</label><br>
@@ -93,8 +107,13 @@
         <label for="tax" class="label">сумма</label><br>
         <InputText id="tax" @change="disableHoldButton" type="text" class="p-inputtext mr-1" v-model="doc.tax" />
       </div>
+      <div v-if="orderDoc" class="field col-12 md:col-8">
+        <label for="comment" class="label">Комментарий</label><br>
+        <Textarea id="comment" v-model="comment" @change="onDocInfoChange" rows="5" cols="40" />
+      </div>
     </div>
   </div>
+
   <div v-if="doc.check_info">
     <Divider align="left">
       <div class="inline-flex align-items-center">
@@ -340,6 +359,7 @@ import Divider from 'primevue/divider';
 import {Property, DocumentType, PaymentType} from '@/js/Constants';
 import ItemChoose from '@/components/ItemChoose.vue';
 import InputNumber from 'primevue/inputnumber';
+import Textarea from 'primevue/textarea';
 // import AutoComplete from 'primevue/autocomplete';
 
 
@@ -358,6 +378,7 @@ export default {
         Divider,
         ItemChoose,
         InputNumber,
+        Textarea
         // AutoComplete
     },
     props: {
@@ -417,7 +438,8 @@ export default {
         isMobile: Boolean,
         documentItem: null,
         documentField: null,
-        // inputNullValueProperty: false
+        comment: "",
+        supplierDocNumber: ""
       };
     },
     computed: {
@@ -551,6 +573,10 @@ export default {
           this.checkDateInput = value.check_info.date_time;
         }
         this.enableFillItemRestButton();
+        if(value.doc_info) {
+          this.comment = value.doc_info.comment;
+          this.supplierDocNumber = value.doc_info.supplier_doc_number;
+        }
       },
       itemRest(value) {
         this.doc.doc_items = value;
@@ -570,6 +596,17 @@ export default {
       //   let property = this.defaultProperties.find(prop => prop.type == Property.INPUT_NULL_VALUE);
       //   if(property) this.inputNullValueProperty = property.property == 1;
       // },
+      onDocInfoChange(event) {
+        this.disableHoldButton();
+        if(!this.doc.doc_info) {
+          this.doc.doc_info = {"id" : 0};
+        }
+        if(event.target.id == 'comment') {
+          this.doc.doc_info.comment = event.target.value;
+        } else {
+          this.doc.doc_info.supplier_doc_number = event.target.value;
+        }
+      },
       onRowReorder() {
         console.log(this.doc)
       },
@@ -959,8 +996,14 @@ export default {
   .field {
     margin: 0px 0px 10px 0px;
   }
+  .medium-inpyt {
+    width: 150px;
+  }
   .smallinput {
     width: 100px;
+  }
+  .flex-inpyt {
+    width: 100%;
   }
   .numberdatecard {
     padding: 20px 20px 20px 20px;

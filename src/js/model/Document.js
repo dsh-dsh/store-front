@@ -42,6 +42,7 @@ export default class Document {
 	storage_to = {
 		"id": 0
 		};
+	doc_info = null;
         base_document_id = 0;	
 	constructor(docType, dateTime, number){
 		this.number = number;
