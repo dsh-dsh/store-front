@@ -12,7 +12,7 @@
         </div>
         <div class="mt-3 mb-3">
           <label for="time" class="label">Дата</label><br>
-          <Calendar id="time" @change="disableHoldButton('date')" @date-select="disableHoldButton('date')" v-model="dateInput" dateFormat="dd.mm.yy" :showIcon="true" />
+          <Calendar id="time" @change="disableHoldButton($event, 'date')" @date-select="disableHoldButton($event, 'date')" v-model="dateInput" dateFormat="dd.mm.yy" :showIcon="true" />
         </div>
       </div>
       <div class="field col-12 md:col-5 center right">
@@ -439,75 +439,75 @@ export default {
         documentItem: null,
         documentField: null,
         comment: "",
-        supplierDocNumber: ""
+        supplierDocNumber: "",
+        startPeriod: ""
       };
     },
     computed: {
-        doc() {
-          return this.$store.state.ds.document;
-        },
-        projects() {
-          return this.$store.state.cs.projects
-        },
-        storages() {
-          return this.$store.state.cs.storages
-        },
-        users() {
-          return this.$store.state.cs.users;
-        },
-        companies() {
-          return this.$store.state.cs.companies;
-        },
-        items() {
-          return this.$store.state.is.items;
-        },
-        totalAmount() {
-          let total = 0;
-          for(let item of this.doc.doc_items) {
-              total += item.amount - item.discount;
-          }
-          return this.formatCurrency(total);
-        },
-        totalAmountFact() {
-          let total = 0;
-          for(let item of this.doc.doc_items) {
-              total += item.price * item.quantity_fact;
-          }
-          return this.formatCurrency(total);
-        },
-        itemRest() {
-          return this.$store.state.ds.itemRest;
-        },
-        defaultProperties() {
-          return this.$store.state.ss.defaultProperties;
-        },
-        period() {
-          return this.$store.state.ss.period;        
-        },
-        newDocNumber() {
-          return this.$store.state.ds.newDocNumber;
-        },
-        ourCompanyIdSetting() {
-          return this.$store.state.ss.ourCompanyIdProperty;
+      doc() {
+        return this.$store.state.ds.document;
+      },
+      projects() {
+        return this.$store.state.cs.projects
+      },
+      storages() {
+        return this.$store.state.cs.storages
+      },
+      users() {
+        return this.$store.state.cs.users;
+      },
+      companies() {
+        return this.$store.state.cs.companies;
+      },
+      items() {
+        return this.$store.state.is.items;
+      },
+      totalAmount() {
+        let total = 0;
+        for(let item of this.doc.doc_items) {
+            total += item.amount - item.discount;
         }
+        return this.formatCurrency(total);
+      },
+      totalAmountFact() {
+        let total = 0;
+        for(let item of this.doc.doc_items) {
+            total += item.price * item.quantity_fact;
+        }
+        return this.formatCurrency(total);
+      },
+      itemRest() {
+        return this.$store.state.ds.itemRest;
+      },
+      defaultProperties() {
+        return this.$store.state.ss.defaultProperties;
+      },
+      period() {
+        return this.$store.state.ss.period;        
+      },
+      newDocNumber() {
+        return this.$store.state.ds.newDocNumber;
+      },
+      ourCompanyIdSetting() {
+        return this.$store.state.ss.ourCompanyIdProperty;
+      },
     },
     created() {
     },
     mounted() {
-      // this.initFilters();
       if(this.type === "copyFromRequestDoc") {
         this.$store.dispatch('getMovDocFromRequest', this.docId);
       } else {
         this.$store.dispatch('getDocument', [this.docId, this.docType, this.type === "copy"]);
       }
       if(this.type === "copy") {
-        this.disableSaveButton();
+        this.disableSaveButton(true);
       }
       this.user = JSON.parse(localStorage.getItem('user'));
       this.setPaymentTypes();
       this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
       this.modalDiv = document.getElementById("numPad");
-      // this.getinputNullValueProperty();
+      this.startPeriod = new Date(this.period.start_date);
     },
     watch: {
       doc(value) { 
@@ -589,7 +589,10 @@ export default {
       },
       companies(value) {
         this.companyNames = value.map(function(company){return company.name})
-      }
+      },
+      period(value) {
+        this.startPeriod = new Date(value.start_date);
+      },
     },
     methods: {
       // getinputNullValueProperty() {
@@ -701,14 +704,20 @@ export default {
           return 'b';
         }
       },
-      disableHoldButton(inputName) {
+      disableHoldButton(event, inputName) {
         if(inputName == 'date') {
           this.$emit('disableCurrentTime');
+
+          if(event < this.startPeriod) {
+            this.disableSaveButton(true);
+          } else {
+            this.disableSaveButton(false);
+          }
         }
         this.$emit('disableHoldButton');
       },
-      disableSaveButton() {
-        this.$emit('disableSaveButton');
+      disableSaveButton(value) {
+        this.$emit('disableSaveButton', value);
       },
       getProjectById(id) {
         return this.projects.find(project => project.id == id);

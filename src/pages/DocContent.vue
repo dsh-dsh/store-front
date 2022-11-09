@@ -450,12 +450,14 @@ export default {
         command: () => {this.openCopyDocumentRedactor(this.data);}
       };
       this.menuModel.push(item);
-      let holdItem = {
-        label: this.data.is_hold? "Отменить проведение" : "Провести", 
-        icon: 'pi pi-check-circle',
-        command: () => {this.holdDocumentFromModalMenu(this.data);}
+      if(data.date_time >= this.startPeriod ) {
+        let holdItem = {
+          label: this.data.is_hold? "Отменить проведение" : "Провести", 
+          icon: 'pi pi-check-circle',
+          command: () => {this.holdDocumentFromModalMenu(this.data);}
+        }
+        this.menuModel.push(holdItem);
       }
-      this.menuModel.push(holdItem);
       if(this.user.role == 'ADMIN' || data.author.id == this.user.id) {
         if(data.date_time >= this.startPeriod ) {
           let item = {
