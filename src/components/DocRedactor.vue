@@ -485,6 +485,9 @@ export default {
       period() {
         return this.$store.state.ss.period;        
       },
+      blockTime() {
+        return this.$store.state.ss.blockTime;
+      },
       newDocNumber() {
         return this.$store.state.ds.newDocNumber;
       },
@@ -610,9 +613,6 @@ export default {
           this.doc.doc_info.supplier_doc_number = event.target.value;
         }
       },
-      onRowReorder() {
-        console.log(this.doc)
-      },
       addDigit(digit) {
         if(this.digitValue == '0') this.digitValue = '';
         this.digitValue += "" + digit;
@@ -707,8 +707,7 @@ export default {
       disableHoldButton(event, inputName) {
         if(inputName == 'date') {
           this.$emit('disableCurrentTime');
-
-          if(event < this.startPeriod) {
+          if(event < this.startPeriod || event <= this.blockTime) {
             this.disableSaveButton(true);
           } else {
             this.disableSaveButton(false);

@@ -69,7 +69,6 @@ export const DocStore = {
 			state.newDocId = res;
 		},
 		setNewDocNumber(state, res) {
-			console.log(res)
 			state.newDocNumber = res;
 		},
 		resetCurrentDocument(state) {

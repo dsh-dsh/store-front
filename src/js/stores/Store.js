@@ -86,6 +86,7 @@ const store = createStore({
 				this.dispatch('getDocTypes')
 				this.dispatch('getDefaultProperties')
 				this.dispatch('getPeriod')
+				this.dispatch('getBlockTime')
 				this.dispatch('setDates')
 				this.dispatch('getItemDirList')
 			}

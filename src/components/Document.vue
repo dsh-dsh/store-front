@@ -20,43 +20,6 @@
         </div>
     </div>
 
-    <!-- <div v-if="doc.author" class="formgrid grid" style="max-width: 750px">
-        <div class="col-12 md:col-4">
-            <label for="author" class="label">автор</label>
-            <p id="author" class="text_field">{{ doc.author.name }}</p>
-        </div>
-        <div class="col-12 md:col-4">
-            <label for="project" class="label">проект</label>
-            <p id="project" class="text_field">{{ doc.project.name }}</p>
-        </div>
-        <div class="col-12 md:col-4">
-            <div v-if="doc.doc_info">
-                <label for="supplier_doc_number" class="label">номер приходной накладной</label>
-                <p id="supplier_doc_number" class="text_field">{{ doc.doc_info.supplier_doc_number }}</p>
-            </div>
-        </div>
-
-        <div v-if="doc.doc_items" class="col-12 md:col-4">
-            <label for="storageFrom" class="label">со склада</label>
-            <p id="storageFrom" class="text_field">{{ (doc.storage_from? doc.storage_from.name:'') }}</p>
-        </div>
-        <div v-if="doc.doc_items" class="col-12 md:col-4">
-            <label for="storageTo" class="label">на склад</label>
-            <p id="storageTo" class="text_field">{{ (doc.storage_to? doc.storage_to.name:'') }}</p>
-        </div>
-        <div v-if="doc.doc_items" class="col-12 md:col-4"></div>
-
-        <div v-if="doc.doc_type == DocumentType.POSTING_DOC" class="field col-12 md:col-4">
-            <label for="supplier" class="label">отправитель</label>
-            <p id="supplier" class="text_field">{{ (doc.supplier? doc.supplier.name:'') }}</p>
-        </div>
-        <div v-if="doc.doc_type == DocumentType.POSTING_DOC" class="field col-12 md:col-4">
-            <label for="recipient" class="label">получатель</label>
-            <p id="recipient" class="text_field">{{ (doc.recipient? doc.recipient.name:'') }}</p>
-        </div>
-        <div v-if="doc.doc_type == DocumentType.POSTING_DOC" class="field col-12 md:col-4"></div>
-    </div> -->
-
     <div v-if="doc.author" class="grid" style="max-width: 750px">
         <div class="col-4">
             <label for="author" class="label">автор</label>
@@ -258,7 +221,8 @@ export default {
             DocumentType: DocumentType,
             disableRedactoring: false,
             baseDocId: 0,
-            quantityColumnName: 'Кол-во факт.'
+            quantityColumnName: 'Кол-во факт.',
+            startPeriod: null,
         };
     },
     props: {
@@ -287,7 +251,13 @@ export default {
               total += item.price * item.quantity_fact;
           }
           return this.formatCurrency(total);
-        }
+        },
+        period() {
+            return this.$store.state.ss.period;
+        },
+        blockTime() {
+            return this.$store.state.ss.blockTime;
+        },
     },
     methods: {
         getName(value) {
@@ -312,10 +282,16 @@ export default {
         },
         setEnableRedactoring(user, value) {
             this.disableRedactoring = (user.id != value.author.id && user.role != 'ADMIN');
+            if(value.date_time < this.startPeriod || value.date_time <= this.blockTime) {
+                this.disableRedactoring = true;
+            }
         }
     },
     mounted() {
         this.$store.dispatch('getDocument', [this.docId, ""]);
+        if(this.period) {
+            this.startPeriod = new Date(this.period.start_date);
+        }
     },
     watch: {
         doc(value) {
@@ -350,7 +326,10 @@ export default {
             }
             let user = JSON.parse(localStorage.getItem('user'));
             this.setEnableRedactoring(user, value); 
-        }
+        },
+        period(val) {
+            this.startPeriod = new Date(val.start_date);
+        },
     }
 }
 

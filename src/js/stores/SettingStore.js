@@ -14,6 +14,7 @@ export const SettingStore = {
             holdingDialogProperty: Boolean,
             checkHoldingEnableProperty: Boolean,
             period: null,
+            blockTime: 0,
             choosenDocFilters: [],
             docFilterTypes: [
                 {type:'POSTING_DOC_TYPE_FILTER', name:'Поступление'},
@@ -59,6 +60,9 @@ export const SettingStore = {
         }, 
         setPeriod(state, res) {
             state.period = res;
+        },
+        setBlockTime(state, res) {
+            state.blockTime = new Date(res);
         }
     },
     actions: {
@@ -172,6 +176,10 @@ export const SettingStore = {
 			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
             const response = await post('/api/v1/setting/period', headers, null, rootState);
 			commit('setPeriod', response.data);
-        }
+        },
+        async getBlockTime({commit, rootState}) {
+            const response = await get('/api/v1/setting/block/time', rootState);
+			commit('setBlockTime', response);
+        },
     }
 }

@@ -286,6 +286,9 @@ export default {
       period() {
         return this.$store.state.ss.period;
       },
+      blockTime() {
+        return this.$store.state.ss.blockTime;
+      },
       holdingDialogSetting() {
         return this.$store.state.ss.holdingDialogProperty;
       },
@@ -321,7 +324,7 @@ export default {
       },
       currentDocument(val) {
         this.holdLable = val.is_hold? 'Отменить проведение' : (val.doc_type == this.DocumentType.MOVEMENT_DOC? 'Подтвердить получение' : 'Провести');
-        if(val.date_time < this.startPeriod) {
+        if(val.date_time < this.startPeriod || val.date_time <= this.blockTime) {
           this.disabledHoldButton = true;
           this.disabledSaveButton = true;
         } else {
@@ -407,13 +410,13 @@ export default {
         icon = "pi-times-circle";
         color = "false-icon";
       }
-      if(data.date_time < this.startPeriod) {
-        color = "disabled";
-      }
+      // if(data.date_time < this.startPeriod) {
+      //   color = "disabled";
+      // }
       return color + " " + icon;
     },
     disabledClass(data) {
-      return data.date_time < this.startPeriod? 'disabled': null;
+      return (data.date_time < this.startPeriod || data.date_time <= this.blockTime)? 'disabled': null;
     },
     disableHoldButton() {
       this.disabledHoldButton = true;
@@ -450,7 +453,7 @@ export default {
         command: () => {this.openCopyDocumentRedactor(this.data);}
       };
       this.menuModel.push(item);
-      if(data.date_time >= this.startPeriod ) {
+      if(data.date_time >= this.startPeriod && data.date_time >= this.blockTime) {
         let holdItem = {
           label: this.data.is_hold? "Отменить проведение" : "Провести", 
           icon: 'pi pi-check-circle',
@@ -459,7 +462,7 @@ export default {
         this.menuModel.push(holdItem);
       }
       if(this.user.role == 'ADMIN' || data.author.id == this.user.id) {
-        if(data.date_time >= this.startPeriod ) {
+        if(data.date_time >= this.startPeriod && data.date_time >= this.blockTime) {
           let item = {
             label: 'Изменить', icon: 'pi pi-pencil',
             command: () => this.openUpdateDocumentRedactor(this.data)
