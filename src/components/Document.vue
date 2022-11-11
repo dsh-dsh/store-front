@@ -304,6 +304,9 @@ export default {
             } else {
                 header += " (не проведен)";
             }
+            if(value.is_payed) {
+                header += " (оплачен)";
+            }
             if(this.doc.base_document_id != 0) {
                 this.baseDocId = this.doc.base_document_id;
             }

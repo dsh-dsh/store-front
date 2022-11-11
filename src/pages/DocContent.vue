@@ -41,6 +41,13 @@
           <TriStateCheckbox v-model="filterModel.value" @change="filterCallback()"/>
         </template>
       </Column>
+      <Column v-if="isAdmin || isAccountant" field="is_payed" header="" :showApplyButton="false" dataType="boolean" style="max-width:3rem">
+        <template #body="{data}"><i class="pi" :class="payedIconClass(data)" v-tooltip="getPayedToolTip(data)"></i></template>
+        <template #filter="{filterModel,filterCallback}">
+          <div class="mb-3 font-bold">оплачен</div>
+          <TriStateCheckbox v-model="filterModel.value" @change="filterCallback()"/>
+        </template>
+      </Column>
       <Column field="date_time" header="Дата" sortable dataType="date" style="max-width:7rem">
         <template #body="{data}">
           <div :class="disabledClass(data)">
@@ -239,10 +246,13 @@ export default {
         closeDocAfterSave: true,
         quickSave : false,
         isMobile: Boolean,
+        isAdmin: false,
+        isAccountant: false,
         holdDoc: false,
         toltip: 'Начните набирать текст для поиска',
         filters: {
           'is_hold': {value: null, matchMode: FilterMatchMode.EQUALS},
+          'is_payed': {value: null, matchMode: FilterMatchMode.EQUALS},
           'doc_type': {value: null, matchMode: FilterMatchMode.IN},
           'supplier.name': {value: null, matchMode: FilterMatchMode.CONTAINS},
           'storage_from.name': {value: null, matchMode: FilterMatchMode.CONTAINS},
@@ -301,6 +311,12 @@ export default {
       this.lastDate = this.$store.state.ds.endDate;
       this.$store.dispatch('getDocuments', this.filter)
       this.user = JSON.parse(localStorage.getItem('user'));
+      if(this.user.role == 'ADMIN') {
+        this.isAdmin = true;
+      }
+      if(this.user.role == 'ACCOUNTANT') {
+        this.isAccountant = true;
+      }
       if(this.period) {
         this.startPeriod = new Date(this.period.start_date);
       }
@@ -415,6 +431,11 @@ export default {
       // }
       return color + " " + icon;
     },
+    payedIconClass(data) {
+      if(data.is_payed) {
+        return "true-icon pi-check";
+      }
+    },
     disabledClass(data) {
       return (data.date_time < this.startPeriod || data.date_time <= this.blockTime)? 'disabled': null;
     },
@@ -444,6 +465,9 @@ export default {
       } else {
         return 'не проведен';
       }
+    },
+    getPayedToolTip(doc) {
+      if(doc.is_payed) return "оплачен";
     },
     toggleModalMenu(event, data) {
       this.data = data;
@@ -483,7 +507,19 @@ export default {
           this.menuModel.push(delItem);
         }
       }
+      if(this.user.role == 'ADMIN' 
+            && data.doc_type == DocumentType.POSTING_DOC
+            && data.is_payed == false) {
+        let payitem = {
+          label: 'Оплатить', icon: 'pi pi-verified',
+          command: () => this.addPaymentDoc(this.data)
+        };
+        this.menuModel.push(payitem);
+      }
       this.$refs.menu.toggle(event);
+    },
+    addPaymentDoc(value) {
+      this.$store.dispatch('addPaymentDoc', value.id);
     },
     formatCurrency(value) {
       return value.toLocaleString('re-RU', {style: 'currency', currency: 'RUB'});
