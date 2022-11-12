@@ -508,18 +508,28 @@ export default {
         }
       }
       if(this.user.role == 'ADMIN' 
-            && data.doc_type == DocumentType.POSTING_DOC
-            && data.is_payed == false) {
-        let payitem = {
-          label: 'Оплатить', icon: 'pi pi-verified',
-          command: () => this.addPaymentDoc(this.data)
-        };
-        this.menuModel.push(payitem);
+            && data.doc_type == DocumentType.POSTING_DOC) {
+        let payItem;
+        if(data.is_payed == false) {
+          payItem = {
+            label: 'Оплатить', icon: 'pi pi-check',
+            command: () => this.addPaymentDoc(this.data)
+          };
+        } else {
+          payItem = {
+            label: 'Удалить оплату', icon: 'pi pi-check',
+            command: () => this.deletePaymentDoc(this.data)
+          };
+        }
+        this.menuModel.push(payItem);
       }
       this.$refs.menu.toggle(event);
     },
     addPaymentDoc(value) {
       this.$store.dispatch('addPaymentDoc', value.id);
+    },
+    deletePaymentDoc(value) {
+      this.$store.dispatch('deletePaymentDoc', value.id);
     },
     formatCurrency(value) {
       return value.toLocaleString('re-RU', {style: 'currency', currency: 'RUB'});

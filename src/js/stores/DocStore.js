@@ -216,6 +216,11 @@ export const DocStore = {
 			const response = await post('/api/v1/docs/add/payment/' + docId, headers, null, rootState);
 			if(response.data == 'ok') { commit('setSuccess'); }
 		},
+		async deletePaymentDoc({commit, rootState}, docId) {
+			let headers = {'Authorization': rootState.token };
+			const response = await post('/api/v1/docs/delete/payment/' + docId, headers, null, rootState);
+			if(response.data == 'ok') { commit('setSuccess'); }
+		},
     }
 }
 

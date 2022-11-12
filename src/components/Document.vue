@@ -128,13 +128,17 @@
         </div>
     </div>
 
-    <div v-if="!doc.doc_items" class="formgrid grid" style="max-width: 750px">
-        <div class="col-12 md:col-4">
+    <div v-if="!doc.doc_items" class="formgrid grid" style="max-width: 750px"> 
+        <div v-if="doc.individual" class="col-12 md:col-4">
             <label for="individual" class="label">
                 {{ (doc.doc_type == DocumentType.WITHDRAW_ORDER_DOC? 'получатель' : 'плательщик') }}
             </label><br>
-            <p id="individual" class="text_field">{{ getName(doc.individual) }}</p>
+            <p id="individual" class="text_field">{{ getName(doc) }}</p>
         </div>
+        <!-- <div v-if="doc.recipient" class="col-12 md:col-4">
+            <label for="order_recipient" class="label">По</label><br>
+            <p id="order_recipient" class="text_field">{{ getName(doc.recipient) }}</p>
+        </div> -->
         <div class="col-12 md:col-8"></div>
 
         <div class="field col-12 md:col-8">
@@ -260,9 +264,11 @@ export default {
         },
     },
     methods: {
-        getName(value) {
-        if(value) {
-            return value.name;
+        getName(doc) {
+        if(doc.individual.id > 0) {
+            return doc.individual.name;
+        } else {
+            return doc.recipient.name;
         }
         },
         formatCurrency(value) {
