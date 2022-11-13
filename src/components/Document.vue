@@ -135,10 +135,6 @@
             </label><br>
             <p id="individual" class="text_field">{{ getName(doc) }}</p>
         </div>
-        <!-- <div v-if="doc.recipient" class="col-12 md:col-4">
-            <label for="order_recipient" class="label">По</label><br>
-            <p id="order_recipient" class="text_field">{{ getName(doc.recipient) }}</p>
-        </div> -->
         <div class="col-12 md:col-8"></div>
 
         <div class="field col-12 md:col-8">

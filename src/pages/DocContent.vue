@@ -507,7 +507,7 @@ export default {
           this.menuModel.push(delItem);
         }
       }
-      if(this.user.role == 'ADMIN' 
+      if((this.user.role == 'ADMIN' || this.user.role == 'ACCOUNTANT')
             && data.doc_type == DocumentType.POSTING_DOC) {
         let payItem;
         if(data.is_payed == false) {

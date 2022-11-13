@@ -7,11 +7,11 @@
       </div>
       <div class="field col-12 md:col-7 flex justify-content-between numberdatecard">
         <div class="mt-3 mb-3">
-          <label for="number" class="label">Номер</label><br>
+          <label for="number" class="label">номер</label><br>
           <InputText id="number" @change="disableHoldButton" type="text" class="p-inputtext medium-inpyt" v-model="doc.number" />
         </div>
         <div class="mt-3 mb-3">
-          <label for="time" class="label">Дата</label><br>
+          <label for="time" class="label">дата</label><br>
           <Calendar id="time" @change="disableHoldButton($event, 'date')" @date-select="disableHoldButton($event, 'date')" v-model="dateInput" dateFormat="dd.mm.yy" :showIcon="true" />
         </div>
       </div>
@@ -22,14 +22,14 @@
         </div>
       </div>
       <div class="field col-12 md:col-4">
-        <label for="project" class="label">Проект</label><br>
+        <label for="project" class="label">проект</label><br>
         <div class="p-inputgroup">
           <InputText id="project" type="text" class="p-inputtext" v-model="doc.project.name" />
           <Button icon="pi pi-check" class="p-button-warning" @click="onProjectClick" />
         </div>
       </div>
       <div class="field col-12 md:col-4">
-        <label for="supplier_doc_number" class="label">Номер входящего документа</label><br>
+        <label for="supplier_doc_number" class="label">номер входящего документа</label><br>
         <!-- <InputText id="supplier_doc_number" @change="disableHoldButton(), onDocInfoChange()" type="text" class="p-inputtext flex-inpyt" v-model="supplierDocNumber" /> -->
         <InputText id="supplier_doc_number" @change="onDocInfoChange" type="text" class="p-inputtext flex-inpyt" v-model="supplierDocNumber" />
       </div>
@@ -60,7 +60,7 @@
 
           <div v-if="doc.doc_type == DocumentType.POSTING_DOC" class="field col-12 md:col-6">
             <div v-if="doc.supplier">
-              <label for="supplier" class="label">Поставщик</label><br>
+              <label for="supplier" class="label">поставщик</label><br>
               <div class="p-inputgroup">
                 <InputText id="supplier" type="text" class="p-inputtext" v-model="doc.supplier.name" :disabled="disabledSupplier" />
                 <Button icon="pi pi-check" class="p-button-warning" @click="onSupplierClick"/>
@@ -69,7 +69,7 @@
           </div>
           <div v-if="doc.doc_type == DocumentType.POSTING_DOC" class="field col-12 md:col-6">
             <div v-if="doc.recipient">
-              <label for="recipient" class="label">Получатель</label><br>
+              <label for="recipient" class="label">получатель</label><br>
               <div class="p-inputgroup">
                 <InputText id="recipient" type="text" class="p-inputtext" v-model="doc.recipient.name" />
                 <Button icon="pi pi-check" class="p-button-warning" @click="onRecipientClick"/>
@@ -80,19 +80,19 @@
         </div>
       </div>
       <div v-if="!orderDoc" class="field col-12 md:col-4">
-        <label for="comment" class="label">Комментарий</label><br>
+        <label for="comment" class="label">комментарий</label><br>
         <Textarea id="comment" v-model="comment" @change="onDocInfoChange" rows="5" cols="30" style="height: 120px"/>
       </div>
       
       <div v-if="orderDoc" class="field col-12 md:col-4">
-          <label for="individual" class="label">Физ лицо</label><br>
+          <label for="individual" class="label">физ лицо</label><br>
           <div class="p-inputgroup">
             <InputText id="individual" type="text" class="p-inputtext" v-model="doc.individual.name" />
             <Button icon="pi pi-check" class="p-button-warning" @click="onIndividualClick"/>
           </div>
       </div>
       <div v-if="orderDoc" class="field col-12 md:col-4">
-          <label for="payment_type" class="label">Физ лицо</label><br>
+          <label for="payment_type" class="label">назначение платежа</label><br>
           <div class="p-inputgroup">
             <InputText id="payment_type" type="text" class="p-inputtext" v-model="doc.payment_type" />
             <Button icon="pi pi-check" class="p-button-warning" @click="onPaymentTypeClick"/>
@@ -108,7 +108,7 @@
         <InputText id="tax" @change="disableHoldButton" type="text" class="p-inputtext mr-1" v-model="doc.tax" />
       </div>
       <div v-if="orderDoc" class="field col-12 md:col-8">
-        <label for="comment" class="label">Комментарий</label><br>
+        <label for="comment" class="label">комментарий</label><br>
         <Textarea id="comment" v-model="comment" @change="onDocInfoChange" rows="5" cols="40" />
       </div>
     </div>
