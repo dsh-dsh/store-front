@@ -6,7 +6,7 @@ import ItemContent from "@/pages/ItemContent.vue";
 import SettingPage from "@/pages/SettingPage.vue";
 import UserContent from "@/pages/UserContent.vue";
 import CompanyContent from "@/pages/CompanyContent.vue";
-import FilterTable from "@/pages/FilterTable.vue";
+import ReportPage from "@/pages/ReportPage.vue";
 
 const routes = [
   { path: '/', redirect: '/documents/posting' },
@@ -16,7 +16,7 @@ const routes = [
   { path: '/companies', component: CompanyContent },
   { path: '/users', component: UserContent },
   { path: '/settings', component: SettingPage },
-  { path: '/filter/table', component: FilterTable }
+  { path: '/reports', component: ReportPage }
 ]
 
 export const router = createRouter({

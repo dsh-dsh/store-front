@@ -46,18 +46,21 @@
             <div v-if="doc.doc_type == DocumentType.POSTING_DOC" class="grid">
                 <div class="col-6">
                     <label for="supplier" class="label">отправитель</label>
-                    <p id="supplier" class="text_field">{{ (doc.supplier? doc.supplier.name:'') }}</p>
+                    <p id="supplier" class="text_field white-space-nowrap overflow-hidden text-overflow-ellipsis">
+                        {{ (doc.supplier? doc.supplier.name:'') }}</p>
                 </div>
                 <div class="col-6">
                     <label for="recipient" class="label">получатель</label>
-                    <p id="recipient" class="text_field">{{ (doc.recipient? doc.recipient.name:'') }}</p>
+                    <p id="recipient" class="text_field white-space-nowrap overflow-hidden text-overflow-ellipsis">
+                        {{ (doc.recipient? doc.recipient.name:'') }}</p>
                 </div>
             </div>
         </div>
         <div v-if="doc.doc_items" class="col-4">
             <div v-if="doc.doc_info && doc.doc_info.comment">
                 <label for="comment" class="label">комментарий</label>
-                <p id="comment" class="text_field for-comment overflow-hidden text-overflow-ellipsis">{{ doc.doc_info.comment }}</p>
+                <p id="comment" class="text_field for-comment white-space-nowrap overflow-hidden text-overflow-ellipsis">
+                    {{ doc.doc_info.comment }}</p>
             </div>
         </div>
     </div>
@@ -133,7 +136,8 @@
             <label for="individual" class="label">
                 {{ (doc.doc_type == DocumentType.WITHDRAW_ORDER_DOC? 'получатель' : 'плательщик') }}
             </label><br>
-            <p id="individual" class="text_field">{{ getName(doc) }}</p>
+            <p id="individual" class="text_field white-space-nowrap overflow-hidden text-overflow-ellipsis">
+                {{ getName(doc) }}</p>
         </div>
         <div class="col-12 md:col-8"></div>
 

@@ -8,7 +8,7 @@ import {WebSocketStore} from "@/js/stores/WebSocketStore"
 import {SettingStore} from "@/js/stores/SettingStore"
 import {UserStore} from "@/js/stores/UserStore"
 import {CompanyStore} from "@/js/stores/CompanyStore"
-
+import {ReportStore} from "@/js/stores/ReportStore"
 
 const store = createStore({
 
@@ -19,7 +19,8 @@ const store = createStore({
 		ws: WebSocketStore,
 		ss: SettingStore,
 		us: UserStore,
-		fs: CompanyStore
+		fs: CompanyStore,
+		rs: ReportStore
 	},
 
     state () {

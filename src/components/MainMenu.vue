@@ -60,10 +60,11 @@ export default {
   mounted() {
     this.user = JSON.parse(localStorage.getItem('user'));
     if(this.user.role == 'ADMIN') {
-      this.items.push({
-          label: "aaaaaaaaaa",
-          icon: "pi pi-fw pi-cog",
-          to: "/filter/table"
+      this.items.push(
+        {
+          label: "Отчеты",
+          icon: "pi pi-fw pi-align-left",
+          to: "/reports"
         });
       }
   },
