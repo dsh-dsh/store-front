@@ -7,9 +7,9 @@
 </template>
 
 <script>
-import ItemTree from '@/components/ItemTree.vue';
-import ItemForm from '@/components/ItemForm.vue';
-import MainMenu from '@/components/MainMenu.vue';
+import ItemTree from '@/components/trees/ItemTree.vue';
+import ItemForm from '@/components/forms/ItemForm.vue';
+import MainMenu from '@/components/menus/MainMenu.vue';
 
 export default {
   name: 'ItemContent',

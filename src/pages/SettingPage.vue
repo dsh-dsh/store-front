@@ -191,7 +191,7 @@
 </template>
 
 <script>
-import MainMenu from '@/components/MainMenu.vue'
+import MainMenu from '@/components/menus/MainMenu.vue'
 import Button from 'primevue/button';
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';

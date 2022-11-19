@@ -9,7 +9,8 @@
       class="p-datatable-sm editable-cells-table"  responsiveLayout="stack" breakpoint="640px">
       <Column style="width: 2.2rem">
         <template #body="{data}">
-          <img @click="onIngredientClick(data)" src="../../src/assets/img/ii.png" />
+          <img @click="onIngredientClick(data)" src="@/assets/img/ii.png" />
+          <!-- <img @click="onIngredientClick(data)" src="../../src/assets/img/ii.png" /> -->
         </template>
       </Column>
       <Column field="name" header="Наименование"></Column>
@@ -25,8 +26,8 @@
       </Column>
       <Column  style="width:3rem">
         <template #body="{data}">
-          <img v-if="data.enable.quantity == 1.0" @click="toogleDeleted(data)" src="../../src/assets/img/v.png" />
-          <img v-else @click="toogleDeleted(data)" src="../../src/assets/img/x.png" />
+          <img v-if="data.enable.quantity == 1.0" @click="toogleDeleted(data)" src="@/assets/img/v.png" />
+          <img v-else @click="toogleDeleted(data)" src="@/assets/img/x.png" />
         </template>
       </Column>
       <ColumnGroup type="footer">

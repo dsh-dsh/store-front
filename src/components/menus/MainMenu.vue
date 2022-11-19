@@ -2,7 +2,7 @@
   <div class="mb-3">
     <Menubar :model="items">
       <template #start>
-        <img alt="logo" src="../../src/assets/img/storelogo.png" height="30" class="mr-2">
+        <img alt="logo" src="@/assets/img/storelogo.png" height="30" class="mr-2">
       </template>
       <template #end>
         <div class="conteiner">
@@ -64,7 +64,18 @@ export default {
         {
           label: "Отчеты",
           icon: "pi pi-fw pi-align-left",
-          to: "/reports"
+          items:[
+								{
+									label:'Отчет за период',
+									icon:'pi pi-fw pi-clock',
+                  to: "/reports/period"
+								},
+								{
+									label:'Движение товара по складу',
+									icon:'pi pi-fw pi-th-large',
+                  to: "/reports/itemMoves"
+								}
+							]
         });
       }
   },

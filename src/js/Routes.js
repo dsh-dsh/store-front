@@ -16,7 +16,7 @@ const routes = [
   { path: '/companies', component: CompanyContent },
   { path: '/users', component: UserContent },
   { path: '/settings', component: SettingPage },
-  { path: '/reports', component: ReportPage }
+  { path: '/reports/:type?', component: ReportPage, props: true }
 ]
 
 export const router = createRouter({

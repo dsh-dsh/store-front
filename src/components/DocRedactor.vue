@@ -357,7 +357,7 @@ import Button from 'primevue/button';
 import OverlayPanel from 'primevue/overlaypanel';
 import Divider from 'primevue/divider';
 import {Property, DocumentType, PaymentType} from '@/js/Constants';
-import ItemChoose from '@/components/ItemChoose.vue';
+import ItemChoose from '@/components/tables/ItemChoose.vue';
 import InputNumber from 'primevue/inputnumber';
 import Textarea from 'primevue/textarea';
 // import AutoComplete from 'primevue/autocomplete';

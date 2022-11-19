@@ -7,9 +7,9 @@
 </template>
 
 <script>
-import UserTree from '@/components/UserTree.vue';
-import UserForm from '@/components/UserForm.vue';
-import MainMenu from '@/components/MainMenu.vue';
+import UserTree from '@/components/trees/UserTree.vue';
+import UserForm from '@/components/forms/UserForm.vue';
+import MainMenu from '@/components/menus/MainMenu.vue';
 
 export default {
   name: 'UserContent',

@@ -144,7 +144,7 @@
 </template>
 
 <script>
-import IngredientTable from '../components/IngredientTable.vue'
+import IngredientTable from '../tables/IngredientTable.vue'
 import Calendar from 'primevue/calendar';
 import InputText from 'primevue/inputtext';
 import Checkbox from 'primevue/checkbox';

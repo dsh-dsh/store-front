@@ -7,9 +7,9 @@
 </template>
 
 <script>
-import CompanyTree from '@/components/CompanyTree.vue';
-import CompanyForm from '@/components/CompanyForm.vue';
-import MainMenu from '@/components/MainMenu.vue';
+import CompanyTree from '@/components/trees/CompanyTree.vue';
+import CompanyForm from '@/components/forms/CompanyForm.vue';
+import MainMenu from '@/components/menus/MainMenu.vue';
 
 export default {
   name: 'CompanyContent',

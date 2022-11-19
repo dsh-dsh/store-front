@@ -179,10 +179,10 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
-import DocTabs from '@/components/DocTabs';
+import DocTabs from '@/components/menus/DocTabs';
 import DocRedactor from '@/components/DocRedactor.vue';
 import Document from '@/components/Document.vue';
-import MainMenu from '@/components/MainMenu.vue';
+import MainMenu from '@/components/menus/MainMenu.vue';
 import OverlayPanel from 'primevue/overlaypanel';
 import Menu from 'primevue/menu';
 import Calendar from 'primevue/calendar';
@@ -332,6 +332,7 @@ export default {
       },
       filter(val) {
         this.$store.dispatch('getDocuments', val);
+        this.$store.dispatch('getBlockTime')
         this.filters.doc_type.value = (this.filter == '' && this.choosenDocFilters.length > 0) ? this.choosenDocFilters : null;
 
       },
