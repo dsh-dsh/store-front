@@ -158,6 +158,13 @@
           <InputSwitch v-model="holdingDialog" @click="setHoldingDialogProperty" />
         </div>
         <div class="col-12 md:col-4"></div>
+        <div class="col-12 md:col-4">
+          <span>Устанавливать блокировку по последний проведенный чек </span>
+        </div>
+        <div class="col-12 md:col-4">
+          <InputSwitch v-model="enableDocBlock" @click="setEnableDocBlockProperty" />
+        </div>
+        <div class="col-12 md:col-4"></div>
       </div>
     </AccordionTab>
 
@@ -243,6 +250,7 @@ export default {
       selectedItemDir: null,
       fontSize: 0,
       currentFontSize: 0,
+      enableDocBlock: Boolean,
       // inputNullValue: 0,
     };
   },
@@ -285,6 +293,9 @@ export default {
     },
     unholdenCheckDate() {
       return this.$store.state.ds.unholdenCheckDate;
+    },
+    enableDocBlockSetting() {
+      return this.$store.state.ss.enableDocBlockProperty;
     },
     itemDirList() {
       return this.$store.state.cs.itemDirList;
@@ -347,7 +358,6 @@ export default {
           if(storageFrom) this.defaultStorageFrom = this.getStorageById(storageFrom.property);
         }
       } else if(this.activeIndex == 1) {
-        console.log("prop", this.defaultProperties)
         let fontSizeProperty = this.defaultProperties.find(prop => prop.type == Property.FONT_SIZE);
         if(fontSizeProperty) {
           this.currentFontSize = 0;
@@ -358,20 +368,21 @@ export default {
         //   this.inputNullValue = inputNullValueProperty.property == 1;
         //   console.log(this.inputNullValue)
         // }
-      } else if(this.activeIndex == 2) {
-        this.averagePriceForPeriodClose = this.averagePriceForPeriodCloseSetting;
       } else if(this.activeIndex == 3) {
+        this.averagePriceForPeriodClose = this.averagePriceForPeriodCloseSetting;
+      } else if(this.activeIndex == 4) {
         this.checkHoldingEnable = this.checkHoldingEnableSetting;
         this.addShortageForHold = this.addShortageForHoldSetting;
         this.averagePriceForDocs = this.averagePriceForDocsSetting;
         this.disabledHoldChecksButton = this.unholdenCheckDate == "";
-      } else if(this.activeIndex == 4) {
+      } else if(this.activeIndex == 5) {
         this.companyId = this.ourCompanyIdSetting;
         this.companyName = this.companies.find(c => c.id == this.ourCompanyIdSetting).name;
         this.ingredientDirId = this.ingredientDirIdSetting;
         this.ingredientDirName  = this.itemDirList.find(i => i.id == this.ingredientDirIdSetting).name;
-      } else if(this.activeIndex == 5) {
+      } else if(this.activeIndex == 6) {
         this.holdingDialog = this.holdingDialogSetting;
+        this.enableDocBlock = this.enableDocBlockSetting;
       }
     },
     logout() {
@@ -432,6 +443,9 @@ export default {
     },
     setCheckHoldingEnable() {
       this.$store.dispatch('setCheckHoldingEnableProperty', this.checkHoldingEnable ? 0 : 1);
+    },
+    setEnableDocBlockProperty() {
+      this.$store.dispatch('setEnableDocBlockProperty', this.enableDocBlock ? 0 : 1);
     },
     onSupplierClick(event) {
       this.$refs.opCompanies.toggle(event);

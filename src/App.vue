@@ -34,6 +34,7 @@ export default {
     this.$store.dispatch('getInitialData')
     this.$store.dispatch('installToast', this.$toast)
     this.$store.dispatch('getHoldingDialogProperty');
+    this.$store.dispatch('getEnableDocBlockProperty');
     this.$store.dispatch('getOurCompanyProperty');
     this.$store.dispatch('getDefaultProperties');
   },

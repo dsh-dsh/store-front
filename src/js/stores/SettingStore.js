@@ -13,6 +13,7 @@ export const SettingStore = {
             ingredientDirIdProperty: 0,
             holdingDialogProperty: Boolean,
             checkHoldingEnableProperty: Boolean,
+            enableDocBlockProperty: Boolean,
             period: null,
             blockTime: 0,
             choosenDocFilters: [],
@@ -57,7 +58,10 @@ export const SettingStore = {
         }, 
         setCheckHoldingEnableProperty(state, res) {
             state.checkHoldingEnableProperty = res.property == 1;
-        }, 
+        },
+        setEnableDocBlockProperty(state, res) {
+            state.enableDocBlockProperty = res.property == 1;
+        },
         setPeriod(state, res) {
             state.period = res;
         },
@@ -98,6 +102,10 @@ export const SettingStore = {
         async getCheckHoldingEnableProperty({commit, rootState}) {
             const response = await get('/api/v1/setting/check/holding/enable', rootState);
 			commit('setCheckHoldingEnableProperty', response);
+        },
+        async getEnableDocBlockProperty({commit, rootState}) {
+            const response = await get('/api/v1/setting/doc/block/enable', rootState);
+			commit('setEnableDocBlockProperty', response);
         },
         async setProperty({rootState}, [user, type, value]) {
 			let request = {'user': user, 'type': type, 'property': value};
@@ -166,6 +174,14 @@ export const SettingStore = {
 			const response = await post('/api/v1/setting/check/holding/enable', headers, request, rootState);
             if(response.data == "ok") {
                 this.dispatch("getCheckHoldingEnableProperty");
+            }
+        },
+        async setEnableDocBlockProperty({rootState}, value) {
+			let request = {'type': Property.DOC_BLOCK_ENABLE, 'property': value};
+			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
+			const response = await post('/api/v1/setting/doc/block/enable', headers, request, rootState);
+            if(response.data == "ok") {
+                this.dispatch("getEnableDocBlockProperty");
             }
         },
         async getPeriod({commit, rootState}) {
