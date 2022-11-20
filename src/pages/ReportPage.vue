@@ -3,7 +3,7 @@
 
   <h3>{{ title }}</h3>
 
-    <div class="inline-flex">
+    <div class="inline-flex" style="max-width: 1200px">
       <div v-if="type == 'period'" class="flex-1 mr-3">
         <div class="p-inputgroup">
           <InputText id="project" type="text" class="p-inputtext" v-model="project.name" placeholder="проект" />
@@ -26,6 +26,7 @@
         <Button label="создать отчет" class="p-button-warning" @click="getReport" />
       </div>
     </div>
+    <br>
     <div v-if="type == 'itemMoves'" class="inline-flex mt-3" style="width: 600px">
       <div class="flex-1 mr-3">
         <div class="field-checkbox">
@@ -118,10 +119,12 @@ export default {
   },
   mounted() {
     this.setTitle(this.type);
-    let storageId = this.defaultProperties.find(prop => prop.type == Property.STORAGE_FROM).property;
-    this.storage = this.getStorageById(storageId);
-    let projectId = this.defaultProperties.find(prop => prop.type == Property.PROJECT).property;
-    this.project = this.getProjectById(projectId);
+    if(this.defaultProperties.length > 0) {
+      let storageId = this.defaultProperties.find(prop => prop.type == Property.STORAGE_FROM).property;
+      this.storage = this.getStorageById(storageId);
+      let projectId = this.defaultProperties.find(prop => prop.type == Property.PROJECT).property;
+      this.project = this.getProjectById(projectId);
+    }
   },
   methods: {
     onProjectSelect(event) {

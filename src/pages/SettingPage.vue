@@ -30,6 +30,28 @@
       </div>
     </AccordionTab>
 
+    <AccordionTab header="Настройки интерфеса">
+      <div class="formgrid grid leftAlignment">
+        <div class="col-12 md:col-4">
+          <span>размер шрифта {{fontSize/20}}</span>
+        </div>
+        <div class="col-12 md:col-4">
+          <Slider class="mt-3" v-model="fontSize" :step="20" @change="setExampleFontSize"/>
+        </div>
+        <div class="col-12 md:col-4"></div>
+
+        <!-- <div class="col-12 md:col-12"><br></div>
+
+        <div class="col-12 md:col-4">
+          <span>удвлять значение из полей при начале редактирования</span>
+        </div>
+        <div class="col-12 md:col-4">
+          <InputSwitch v-model="inputNullValue" @click="setInputNullValue" />
+        </div>
+        <div class="col-12 md:col-4"></div> -->
+      </div>
+    </AccordionTab>
+
     <AccordionTab v-if="isAdmin" header="Безвозвратное удаление документов">
       <Button label="Удалить помеченные на удаление документы" @click="deleteDocs" class="p-button-sm p-button-text" />
     </AccordionTab>
@@ -136,28 +158,6 @@
           <InputSwitch v-model="holdingDialog" @click="setHoldingDialogProperty" />
         </div>
         <div class="col-12 md:col-4"></div>
-      </div>
-    </AccordionTab>
-
-    <AccordionTab header="Настройки интерфеса">
-      <div class="formgrid grid leftAlignment">
-        <div class="col-12 md:col-4">
-          <span>размер шрифта {{fontSize/20}}</span>
-        </div>
-        <div class="col-12 md:col-4">
-          <Slider class="mt-3" v-model="fontSize" :step="20" @change="setExampleFontSize"/>
-        </div>
-        <div class="col-12 md:col-4"></div>
-
-        <!-- <div class="col-12 md:col-12"><br></div>
-
-        <div class="col-12 md:col-4">
-          <span>удвлять значение из полей при начале редактирования</span>
-        </div>
-        <div class="col-12 md:col-4">
-          <InputSwitch v-model="inputNullValue" @click="setInputNullValue" />
-        </div>
-        <div class="col-12 md:col-4"></div> -->
       </div>
     </AccordionTab>
 
@@ -346,6 +346,18 @@ export default {
           let storageFrom = this.defaultProperties.find(prop => prop.type == Property.STORAGE_FROM);
           if(storageFrom) this.defaultStorageFrom = this.getStorageById(storageFrom.property);
         }
+      } else if(this.activeIndex == 1) {
+        console.log("prop", this.defaultProperties)
+        let fontSizeProperty = this.defaultProperties.find(prop => prop.type == Property.FONT_SIZE);
+        if(fontSizeProperty) {
+          this.currentFontSize = 0;
+          this.setExampleFontSize(fontSizeProperty.property);
+        }
+        // let inputNullValueProperty = this.defaultProperties.find(prop => prop.type == Property.INPUT_NULL_VALUE);
+        // if(inputNullValueProperty) {
+        //   this.inputNullValue = inputNullValueProperty.property == 1;
+        //   console.log(this.inputNullValue)
+        // }
       } else if(this.activeIndex == 2) {
         this.averagePriceForPeriodClose = this.averagePriceForPeriodCloseSetting;
       } else if(this.activeIndex == 3) {
@@ -360,17 +372,6 @@ export default {
         this.ingredientDirName  = this.itemDirList.find(i => i.id == this.ingredientDirIdSetting).name;
       } else if(this.activeIndex == 5) {
         this.holdingDialog = this.holdingDialogSetting;
-      } else if(this.activeIndex == 6) {
-        let fontSizeProperty = this.defaultProperties.find(prop => prop.type == Property.FONT_SIZE);
-        if(fontSizeProperty) {
-          this.currentFontSize = 0;
-          this.setExampleFontSize(fontSizeProperty.property);
-        }
-        // let inputNullValueProperty = this.defaultProperties.find(prop => prop.type == Property.INPUT_NULL_VALUE);
-        // if(inputNullValueProperty) {
-        //   this.inputNullValue = inputNullValueProperty.property == 1;
-        //   console.log(this.inputNullValue)
-        // }
       }
     },
     logout() {

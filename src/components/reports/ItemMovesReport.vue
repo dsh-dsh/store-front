@@ -1,5 +1,5 @@
 <template>
-  <div v-if="report" class="border" style="height: calc(100vh - 12rem)">
+  <div v-if="report" class="border" style="height: calc(100vh - 12rem); max-width: 1200px">
     <DataTable :value="report" class="p-datatable-sm" :rowHover="true"
       @row-click="expandRow" v-model:expandedRows="expandedRows" 
       :scrollable="true" scrollHeight="flex">
@@ -66,37 +66,37 @@ export default {
       Button
     },
     data() {
-        return {
-            receiptsAmount: 0,
-            salaryAmount: 0,
-            spendsAmount: 0,
-            expandedRows: [],
-            expandedRows1: [],
-            report: null,
-            displayDocument: false,
-            docId: 0
-        };
+      return {
+        receiptsAmount: 0,
+        salaryAmount: 0,
+        spendsAmount: 0,
+        expandedRows: [],
+        report: null,
+        displayDocument: false,
+        docId: 0
+      };
     },
     computed: {
-        itemMovesReport() {
-            return this.$store.state.rs.itemMovesReport;
-        }
+      itemMovesReport() {
+        return this.$store.state.rs.itemMovesReport;
+      }
     }, 
     watch: {
-        itemMovesReport(report) {
-          this.report = report.items;
-        },
+      itemMovesReport(report) {
+        this.expandedRows = [];
+        this.report = report.items;
+      },
     },
     methods: {
       getAmount(listWithValues) {
-          let amount = 0;
-          for(let element of listWithValues) {
-              amount += element.value;
-          }
-          return amount;
+        let amount = 0;
+        for(let element of listWithValues) {
+            amount += element.value;
+        }
+        return amount;
       },
       formatWeight(value) {
-          return Number(value).toFixed(3);
+        return Number(value).toFixed(3);
       },
       openDocument(value) {
         this.docId = value.data.id;

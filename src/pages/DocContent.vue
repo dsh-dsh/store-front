@@ -374,7 +374,7 @@ export default {
           }
         } else if(val == 'choseTime') {
           this.confirmationMessage = 'Выберете время сохранения документа'
-        }
+        } 
       },
       startDate(val) {
         this.firstDate = val;
@@ -592,7 +592,6 @@ export default {
       }	else {
         this.$store.dispatch('addDocument', [this.currentDocument, this.salectedSaveTime, this.quickSave]);
         this.quickSave = false;
-        //this.type = 'update';
       }	
       if(this.currentDocument.is_hold == false && this.holdingDialogSetting == 1) {
         this.confirmationType = 'hold';
@@ -692,7 +691,7 @@ export default {
     },
     closeSaveDocDialog() {
       this.displaySaveDialog = false;
-        this.quickSave = false;
+      this.quickSave = false;
     },
     resetDocuments() {
       this.$store.dispatch('getDocuments', this.filter);

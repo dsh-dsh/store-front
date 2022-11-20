@@ -59,25 +59,32 @@ export default {
   },
   mounted() {
     this.user = JSON.parse(localStorage.getItem('user'));
+    let item;
     if(this.user.role == 'ADMIN') {
-      this.items.push(
-        {
+        item = {
           label: "Отчеты",
           icon: "pi pi-fw pi-align-left",
           items:[
-								{
-									label:'Отчет за период',
-									icon:'pi pi-fw pi-clock',
-                  to: "/reports/period"
-								},
-								{
-									label:'Движение товара по складу',
-									icon:'pi pi-fw pi-th-large',
-                  to: "/reports/itemMoves"
-								}
-							]
-        });
+            {
+              label:'Отчет за период',
+              icon:'pi pi-fw pi-clock',
+              to: "/reports/period"
+            },
+            {
+              label:'Движение товара по складу',
+              icon:'pi pi-fw pi-th-large',
+              to: "/reports/itemMoves"
+            }
+          ]
+        };
+      } else {
+        item = {
+          label: "Отчеты",
+          icon: "pi pi-fw pi-align-left",
+          to: "/reports/itemMoves"
+        };
       }
+      this.items.push(item)
   },
   methods: {
     logout() {
