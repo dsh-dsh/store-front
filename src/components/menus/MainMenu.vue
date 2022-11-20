@@ -47,12 +47,8 @@ export default {
           label: "Пользователи",
           icon: "pi pi-fw pi-users",
           to: "/users"
-        },
-        {
-          label: "Настройки",
-          icon: "pi pi-fw pi-cog",
-          to: "/settings"
         }
+        
       ],
       user: null,
     };
@@ -85,6 +81,11 @@ export default {
         };
       }
       this.items.push(item)
+      this.items.push({
+          label: "Настройки",
+          icon: "pi pi-fw pi-cog",
+          to: "/settings"
+        });
   },
   methods: {
     logout() {
