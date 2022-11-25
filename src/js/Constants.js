@@ -21,8 +21,8 @@ export const DocumentType = {
     MOVEMENT_DOC: 'Перемещение',
     WRITE_OFF_DOC: 'Списание',
     CHECK_DOC: 'Чек ККМ',
-    CREDIT_ORDER_DOC: 'ПКО',
-    WITHDRAW_ORDER_DOC: 'Расходный кассовый ордер',
+    CREDIT_ORDER_DOC: 'Расходный кассовый ордер',
+    WITHDRAW_ORDER_DOC: 'ПКО',
     REQUEST_DOC: 'Заявка',
     INVENTORY_DOC: 'Инвентаризация'
 };

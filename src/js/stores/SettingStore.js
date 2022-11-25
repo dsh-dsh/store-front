@@ -24,7 +24,7 @@ export const SettingStore = {
                 {type:'MOVEMENT_DOC_TYPE_FILTER', name:'Перемещение'},
                 {type:'WRITE_OFF_DOC_TYPE_FILTER', name:'Списание'},
                 {type:'WITHDRAW_ORDER_DOC_TYPE_FILTER', name:'ПКО'},
-                {type:'CREDIT_ORDER_DOC_TYPE_FILTER', name:'РКО'},
+                {type:'CREDIT_ORDER_DOC_TYPE_FILTER', name:'Расходный кассовый ордер'},
                 {type:'REQUEST_DOC_TYPE_FILTER', name:'Заявка'},
                 {type:'INVENTORY_DOC_TYPE_FILTER', name:'Инвентаризация'},
                 {type:'PERIOD_REST_MOVE_DOC_TYPE_FILTER', name:'Перенос остатков'}
@@ -118,7 +118,10 @@ export const SettingStore = {
         async setDocTypeFilterProperties({rootState}, [user, settings]) {
 			let request = {'user': user, 'settings': settings};
 			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
-			await post('/api/v1/setting/doc/type/properties', headers, request, rootState);
+			const response = await post('/api/v1/setting/doc/type/properties', headers, request, rootState);
+            if(response.data == "ok") {
+                this.dispatch("getDefaultProperties");
+            }
         },
         async setAddShortageForHoldProperty({rootState}, value) {
 			let request = {'type': Property.ADD_REST_FOR_HOLD_1C_DOCS, 'property': value};
