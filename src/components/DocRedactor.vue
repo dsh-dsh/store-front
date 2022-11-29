@@ -151,6 +151,11 @@
         <Calendar id="kkm_check_time" @change="disableHoldButton" v-model="checkDateInput" :showTime="true" :showSeconds="true" dateFormat="dd.mm.yy" disabled/>
       </div>
       <div class="field col-12 md:col-3">
+          <label for="check_payment_type" class="label">тип платежа</label><br>
+          <div class="p-inputgroup" style="{width: 150px}">
+            <InputText id="check_payment_type" type="text" class="p-inputtext" v-model="doc.check_info.check_payment_type" />
+            <Button icon="pi pi-check" class="p-button-warning" @click="onCheckPaymentTypeClick"/>
+          </div>
       </div>
       <div class="field col-12 md:col-2">
         <label for="isReturn" class="label">возврат</label>
@@ -250,6 +255,13 @@
       </ColumnGroup>
     </DataTable> 
   </div>  
+
+  <OverlayPanel ref="opCheckPaymentTypes">
+    <DataTable :value="checkPaymentTypes" v-model:selection="selectedCheckPaymentType" selectionMode="single" 
+        @rowSelect="onCheckPaymentTypeSelect" responsiveLayout="scroll" >
+        <Column field="value" header="Name" sortable />
+    </DataTable>
+  </OverlayPanel>
 
   <OverlayPanel ref="opPaymentTypes">
     <DataTable :value="paymentTypes" v-model:selection="selectedPaymentType" selectionMode="single" 
@@ -356,7 +368,7 @@ import Row from 'primevue/row';
 import Button from 'primevue/button';
 import OverlayPanel from 'primevue/overlaypanel';
 import Divider from 'primevue/divider';
-import {Property, DocumentType, PaymentType} from '@/js/Constants';
+import {Property, DocumentType, PaymentType, CheckPaymentType} from '@/js/Constants';
 import ItemChoose from '@/components/tables/ItemChoose.vue';
 import InputNumber from 'primevue/inputnumber';
 import Textarea from 'primevue/textarea';
@@ -397,6 +409,7 @@ export default {
         loading: false,
         user: null,
         selectedPaymentType: null,
+        selectedCheckPaymentType: null,
         selectedProject: null,
         selectedStorageFrom: null,
         disabledStorageFrom: false,
@@ -428,6 +441,7 @@ export default {
         colSpan2: 3,              
         DocumentType: DocumentType,
         paymentTypes:[],
+        checkPaymentTypes:[],
         displayItems: 1,
         multiplySelectItems: false,
         currentItem: undefined,
@@ -508,6 +522,7 @@ export default {
       }
       this.user = JSON.parse(localStorage.getItem('user'));
       this.setPaymentTypes();
+      this.setCheckPaymentTypes();
       this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
       this.modalDiv = document.getElementById("numPad");
       this.startPeriod = new Date(this.period.start_date);
@@ -550,7 +565,7 @@ export default {
           }
         }
         if(value.payment_type) {
-          this.selectedPaymentType = value.payment_type
+          this.selectedPaymentType = {"value": value.payment_type};
         }
         if(value.storage_from) {
           this.selectedStorageFrom = value.storage_from.id
@@ -688,6 +703,12 @@ export default {
             this.paymentTypes.push({'value': PaymentType[i] });
         }
       },
+      setCheckPaymentTypes() {
+        this.checkPaymentTypes = [];
+        for(var i in CheckPaymentType) {
+            this.checkPaymentTypes.push({'value': CheckPaymentType[i] });
+        }
+      },
       rowClass(data) {
         return data.is_composite === true ? 'row-composite': null;
       },
@@ -755,9 +776,17 @@ export default {
       onPaymentTypeClick(event) {
         this.$refs.opPaymentTypes.toggle(event);
       },
+      onCheckPaymentTypeClick(event) {
+        this.$refs.opCheckPaymentTypes.toggle(event);
+      },
       onPaymentTypeSelect(event) {
         this.doc.payment_type = event.data.value;
         this.$refs.opPaymentTypes.hide();
+        this.$emit('disableHoldButton');
+      },
+      onCheckPaymentTypeSelect(event) {
+        this.doc.check_info.check_payment_type = event.data.value;
+        this.$refs.opCheckPaymentTypes.hide();
         this.$emit('disableHoldButton');
       },
       enableFillItemRestButton() {

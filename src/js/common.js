@@ -49,8 +49,5 @@ function handleResponce(data, state) {
 	} else if (data.warning) {
 		state.toast?.add({ severity:'warn', summary: 'Внимание', detail: data.warning });
 	}
-    // else {
-	// 	state.toast?.add({ severity:'info', summary: 'Info Message', detail: data.message, life: 2000 });
-	// }
 	return data;
 }

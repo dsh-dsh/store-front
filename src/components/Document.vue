@@ -102,6 +102,8 @@
                 <p id="kkm_check_time" class="text_field sm">{{ checkDate }}</p>
             </div>
             <div class="col-12 md:col-3">
+                <label for="check_payment_type" class="label">время</label>
+                <p id="check_payment_type" class="text_field sm">{{ doc.check_info.check_payment_type }}</p>
             </div>
             <div class="col-12 md:col-2 center">
                 <p>возврат </p>
@@ -118,11 +120,11 @@
                 <img  v-if="doc.check_info.is_payed" src="../../src/assets/img/v.png" class="ml-2" />
                 <img  v-else src="../../src/assets/img/o.png" class="ml-2" />
             </div>
-            <div class="col-12 md:col-2 center">
+            <!-- <div class="col-12 md:col-2 center">
                 <p>эквайринг </p>
                 <img  v-if="doc.check_info.is_payed_by_card" src="../../src/assets/img/v.png" class="ml-2" />
                 <img  v-else src="../../src/assets/img/o.png" class="ml-2" />
-            </div>
+            </div> -->
             <div class="col-12 md:col-2 center">
                 <p>доставка </p>
                 <img  v-if="doc.check_info.is_delivery" src="../../src/assets/img/v.png" class="ml-2" />
@@ -388,7 +390,7 @@ function formatTime(date) {
     height: 110px;
   }
   .sm {
-    width: 150px;
+    width: 180px;
   }
   .lm {
     width: 500px;

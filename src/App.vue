@@ -70,6 +70,6 @@ export default {
   }
   .p-toast {
     position: fixed;
-    width: 28rem;
+    width: 29rem;
   }
 </style>

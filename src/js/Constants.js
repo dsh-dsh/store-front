@@ -34,5 +34,12 @@ export const PaymentType = {
     OTHER_PAYMENT: 'Прочее',
     SALARY_PAYMENT: 'Выплата заработной платы',
     SALE_CASH_PAYMENT: 'Выручка наличными',
-    SALE_CARD_PAYMENT: 'Выручка по картам'
+    SALE_CARD_PAYMENT: 'Выручка по картам',
+    SALE_QR_PAYMENT: 'Выручка по QR'
+};
+
+export const CheckPaymentType = { 
+    CASH_PAYMENT: 'Оплата наличными',
+    CARD_PAYMENT: 'Оплата по картам',
+    QR_PAYMENT: 'Оплата по QR'
 };

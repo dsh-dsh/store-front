@@ -24,8 +24,9 @@ export const router = createRouter({
     routes,
 })
 
+const publicPages = ['/login'];
+
 router.beforeEach((to, from, next) => {
-  const publicPages = ['/login'];
   const authRequired = !publicPages.includes(to.path);
   let loggedIn = JSON.parse(localStorage.getItem('user'));
   if (authRequired && !loggedIn) {
