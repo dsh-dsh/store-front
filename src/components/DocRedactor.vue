@@ -151,7 +151,7 @@
         <Calendar id="kkm_check_time" @change="disableHoldButton" v-model="checkDateInput" :showTime="true" :showSeconds="true" dateFormat="dd.mm.yy" disabled/>
       </div>
       <div class="field col-12 md:col-3">
-          <label for="check_payment_type" class="label">тип платежа</label><br>
+          <label for="check_payment_type" class="label">тип оплаты</label><br>
           <div class="p-inputgroup" style="{width: 150px}">
             <InputText id="check_payment_type" type="text" class="p-inputtext" v-model="doc.check_info.check_payment_type" />
             <Button icon="pi pi-check" class="p-button-warning" @click="onCheckPaymentTypeClick"/>
@@ -187,9 +187,9 @@
     <DataTable :value="doc.doc_items" :rowClass="rowClass" editMode="cell" 
         class="p-datatable-sm editable-cells-table" 
         @cell-edit-init="onCellEditInit" @cell-edit-complete="onCellEditComplete"
-        :rowHover="true" responsiveLayout="scroll">
-        <!-- :scrollable="true" scrollHeight="flex">  -->
-      <Column header="#" style="width:2rem">
+        :rowHover="true" responsiveLayout="scroll"
+        :scrollable="true" scrollHeight="flex"> 
+      <Column header="#" style="max-width:2rem">
         <template #body="{index}">
           {{index + 1}}
         </template>
@@ -200,45 +200,61 @@
           <Button icon="pi pi-check" class="p-button-warning" @click="onItemClick(data)"/>
         </template>
       </Column>
-        <!-- readonly style="cursor: pointer;" -->
-      <Column v-if="!isMovement" field="quantity" header="Кол-во" key="quantity" style="width:8rem">
+      <Column v-if="!isMovement" field="quantity" header="Кол-во" key="quantity"
+        class="justify-content-end mr-3" headerClass="justify-content-end mr-2" style="max-width:8rem">
+        <template #body="{data}">{{ formatQuantity(data.quantity) }}</template>
         <template #editor="{ data, field }">
           <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="3" :maxFractionDigits="3" :useGrouping="false" />
         </template>
       </Column>
-      <Column v-if="isInventory" field="quantity_fact" header="Кол-во факт" key="quantity_fact" style="width:8rem">
+      <Column v-if="isInventory" field="quantity_fact" header="Кол-во факт" key="quantity_fact"
+        class="justify-content-end mr-3" headerClass="justify-content-end mr-2" style="max-width:8rem">
+        <template #body="{data}">{{ formatQuantity(data.quantity_fact) }}</template>
         <template #editor="{ data, field }">
           <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="3" :maxFractionDigits="3" :useGrouping="false" />
         </template>
       </Column>
-      <Column v-if="isMovement" field="quantity_fact" header="Заявка" key="quantity_fact" style="width:8rem"></Column>
-      <Column v-if="isMovement" field="quantity" header="Кол-во" key="quantity" style="width:8rem">
+      <Column v-if="isMovement" field="quantity_fact" header="Заявка" key="quantity_fact"
+        class="justify-content-end mr-3" headerClass="justify-content-end mr-2" style="max-width:8rem">
+      </Column>
+      <Column v-if="isMovement" field="quantity" header="Кол-во" key="quantity"
+        class="justify-content-end mr-3" headerClass="justify-content-end mr-2" style="max-width:8rem">
+        <template #body="{data}">{{ formatQuantity(data.quantity) }}</template>
         <template #editor="{ data, field }">
           <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="3" :maxFractionDigits="3" :useGrouping="false" />
         </template>
       </Column>
-      <Column field="price" header="Цена" key="price" style="width:8rem">
+      <Column field="price" header="Цена" key="price" 
+        class="justify-content-end mr-3" headerClass="justify-content-end mr-2" style="max-width:8rem">
+        <template #body="{data}">{{ formatPrice(data.price) }}</template>
         <template #editor="{ data, field }">
           <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="2" :maxFractionDigits="2" :useGrouping="false" />
         </template>
       </Column>
-      <Column field="amount" header="Сумма" key="amount" style="width:8rem">
+      <Column field="amount" header="Сумма" key="amount"
+        class="justify-content-end mr-3" headerClass="justify-content-end mr-2" style="max-width:8rem">
+        <template #body="{data}">{{ formatPrice(data.amount) }}</template>
         <template #editor="{ data, field }">
           <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="2" :maxFractionDigits="2" :useGrouping="false" />
         </template>
       </Column>
-      <Column v-if="isInventory" field="amount_fact" header="Сумма факт." key="amount_fact" style="width:7rem"></Column>
-      <Column v-if="isCheck" field="discount" header="Скидка" key="discount" style="width:5rem">
+      <Column v-if="isInventory" field="amount_fact" header="Сумма факт." key="amount_fact"
+        class="justify-content-end mr-3" headerClass="justify-content-end mr-2" style="max-width:7rem">
+        <template #body="{data}">{{ formatPrice(data.amount_fact) }}</template>
+      </Column>
+      <Column v-if="isCheck" field="discount" header="Скидка" key="discount"
+        class="justify-content-end mr-3" headerClass="justify-content-end mr-2" style="width:5rem">
+        <template #body="{data}">{{ formatPrice(data.discount) }}</template>
         <template #editor="{ data, field }">
           <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="2" :maxFractionDigits="2" :useGrouping="false" />
         </template>
       </Column>
-      <Column style="width:3rem">
+      <Column style="max-width:3rem">
         <template #body="{data}">
           <Button icon="pi pi-minus" class="p-button-rounded p-button-secondary p-button-text" @click="deleteRow(data)" />
         </template>
       </Column>
-      <Column style="width:2rem">
+      <Column style="max-width:2rem">
         <template #body="{index, data}">
           <div class="up-down-buttons">
             <i class="pi pi-angle-up arrow-button" @click="rowUp(index, data)" />
@@ -825,7 +841,10 @@ export default {
         }
       },
       formatPrice(value) {
-        return Number(value.toFixed(2));
+        return Number(value).toFixed(2);
+      },
+      formatQuantity(value) {
+        return Number(value).toFixed(3);
       },
       formatCurrency(value) {
         return value.toLocaleString('re-RU', {style: 'currency', currency: 'RUB'});

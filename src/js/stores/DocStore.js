@@ -26,7 +26,7 @@ export const DocStore = {
     state: () => {
         return {
             document,
-			documents: null,
+			documents: [],
 			itemRest: 0,
 			startDate: 0,
 			endDate: 0,

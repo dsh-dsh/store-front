@@ -50,12 +50,13 @@
     <div class="flex">
       <div class="flex-none flex">ИТОГО ОСТАТОК НАЛИЧНЫХ:</div>
       <div class="flex-grow-1 flex  overflow-hidden"></div>
-      <div class="flex-none flex">{{ formatPrice(periodReport.receipts[0].value - (salaryAmount  + spendsAmount)) }}</div>
+      <div class="flex-none flex">{{ formatPrice(getTotalAmount()) }}</div>
     </div>
   </div>
 </template>
 
 <script>
+import { CheckPaymentType } from '@/js/Constants';
 export default {
   name: 'PeriodReport',
   components: {
@@ -80,16 +81,20 @@ export default {
         },
     },
     methods: {
-        getAmount(listWithValues) {
-            let amount = 0;
-            for(let element of listWithValues) {
-                amount += element.value;
-            }
-            return amount;
-        },
-        formatPrice(value) {
-            return Number(value).toFixed(2);
-        }
+      getTotalAmount() {
+        let cash = this.periodReport.receipts.find(receipt => receipt.name == CheckPaymentType.CASH_PAYMENT).value;
+        return cash - (this.salaryAmount  + this.spendsAmount);
+      },
+      getAmount(listWithValues) {
+          let amount = 0;
+          for(let element of listWithValues) {
+              amount += element.value;
+          }
+          return amount;
+      },
+      formatPrice(value) {
+          return Number(value).toFixed(2);
+      }
     },
 }
 </script>

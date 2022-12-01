@@ -40,6 +40,7 @@ export const PaymentType = {
 
 export const CheckPaymentType = { 
     CASH_PAYMENT: 'Оплата наличными',
-    CARD_PAYMENT: 'Оплата по картам',
-    QR_PAYMENT: 'Оплата по QR'
+    CARD_PAYMENT: 'Оплата картой',
+    QR_PAYMENT: 'Оплата QR',
+    DELIVERY_PAYMENT: 'Оплата через доставку'
 };

@@ -15,12 +15,13 @@
       filterDisplay="menu" v-model:filters="filters"
       :scrollable="true" scrollHeight="flex">
       <template #header>
-        <div class="flex justify-content-end">
+        <div class="flex justify-content-between">
+          <div class="ml-2 mt-2"><span v-if="isAdmin">{{documents.reduce((accumulator, value) => accumulator + value.amount, 0)}}</span></div>
           <div class="horizontal">
-          <span class="mlr-1">с</span>
-          <Calendar id="buttonbar" v-model="firstDate" @date-select="setStartDate" dateFormat="dd.mm.yy" :showButtonBar="true" />
-          <span class="mlr-1">до</span>
-          <Calendar id="buttonbar" v-model="lastDate" @date-select="setEndDate" dateFormat="dd.mm.yy" :showButtonBar="true" />
+            <span class="mlr-1">с</span>
+            <Calendar id="buttonbar" v-model="firstDate" @date-select="setStartDate" dateFormat="dd.mm.yy" :showButtonBar="true" />
+            <span class="mlr-1">до</span>
+            <Calendar id="buttonbar" v-model="lastDate" @date-select="setEndDate" dateFormat="dd.mm.yy" :showButtonBar="true" />
           </div>
         </div>
       </template>
@@ -93,7 +94,7 @@
         </template>
         <template #body="{data}"><div :class="disabledClass(data)">{{getName(data.storage_to)}}</div></template>
       </Column>
-      <Column v-if="!isMobile" field="amount" header="Сумма" sortable>
+      <Column v-if="!isMobile" field="amount" header="Сумма" class="justify-content-end mr-3" headerClass="justify-content-end mr-2" sortable>
         <template #body="{data}"><div :class="disabledClass(data)">{{formatCurrency(data.amount)}}</div></template>
       </Column>
       <Column  filterField="author.name" header="Автор" :showFilterMatchModes="false" :showApplyButton="false"> 

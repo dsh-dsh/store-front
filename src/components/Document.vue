@@ -102,8 +102,8 @@
                 <p id="kkm_check_time" class="text_field sm">{{ checkDate }}</p>
             </div>
             <div class="col-12 md:col-3">
-                <label for="check_payment_type" class="label">время</label>
-                <p id="check_payment_type" class="text_field sm">{{ doc.check_info.check_payment_type }}</p>
+                <label for="check_payment_type" class="label">тип оплаты</label>
+                <p id="check_payment_type" class="text_field sm white-space-nowrap overflow-hidden text-overflow-ellipsis">{{ doc.check_info.check_payment_type }}</p>
             </div>
             <div class="col-12 md:col-2 center">
                 <p>возврат </p>
@@ -171,26 +171,50 @@
 
     <div v-if="doc.doc_items">
       <DataTable :value="doc.doc_items" editMode="cell" class="p-datatable-sm" 
-        responsiveLayout="scroll" :rowHover="true"> 
-        <!-- :scrollable="true" scrollHeight="flex"> -->
-        <Column header="#" style="width: 2rem">
+        responsiveLayout="scroll" :rowHover="true" 
+        :scrollable="true" scrollHeight="flex">
+        <Column header="#" style="max-width: 2rem">
             <template #body="{index}">
                 {{index + 1}}
             </template>
         </Column>
         <Column field="item_name" header="Наименование" key="item_name" style="min-width:12rem"></Column>
-        <Column v-if="!isMovement" field="quantity" header="Кол-во" key="quantity" style="width:7rem"></Column>
-        <Column v-if="isInventory || isMovement" field="quantity_fact" :header="quantityColumnName" key="quantity_fact" style="width:7rem"></Column>
-        <Column v-if="isMovement" field="quantity" header="Кол-во" key="quantity" style="width:7rem"></Column>
-        <Column field="price" header="Цена" key="price" style="width:7rem"></Column>
-        <Column field="amount" header="Сумма" key="amount" style="width:7rem"></Column>
-        <Column v-if="isInventory" field="amount_fact" header="Сумма факт." key="amount_fact" style="width:7rem"></Column>
-        <Column v-if="isCheck" field="discount" header="Скидка" key="discount" style="width:7rem"></Column>
+        <Column v-if="!isMovement" field="quantity" header="Кол-во" key="quantity" 
+            class="justify-content-end mr-3" headerClass="justify-content-end mr-2" style="max-width:7rem">
+            <template v-if="!isRequest" #body="{data}">{{ formatQuantity(data.quantity) }}</template>
+        </Column>
+        <Column v-if="isInventory" field="quantity_fact" header="Кол-во факт" key="quantity_fact" 
+            class="justify-content-end mr-3" headerClass="justify-content-end mr-2" style="max-width:7rem">
+            <template #body="{data}">{{ formatQuantity(data.quantity_fact) }}</template>
+        </Column>
+        <Column v-if="isMovement" field="quantity_fact" header="Заявка" key="quantity_fact" 
+            class="justify-content-end mr-3" headerClass="justify-content-end mr-2" style="max-width:7rem">
+        </Column>
+        <Column v-if="isMovement" field="quantity" header="Кол-во" key="quantity" 
+            class="justify-content-end mr-3" headerClass="justify-content-end mr-2" style="max-width:7rem">
+            <template #body="{data}">{{ formatQuantity(data.quantity) }}</template>
+        </Column>
+        <Column header="Цена" key="price" 
+            class="justify-content-end mr-3" headerClass="justify-content-end mr-2" style="max-width:7rem">
+            <template #body="{data}">{{ formatPrice(data.price) }}</template>
+        </Column>
+        <Column field="amount" header="Сумма" key="amount" 
+            class="justify-content-end mr-3" headerClass="justify-content-end mr-2" style="max-width:7rem">
+            <template #body="{data}">{{ formatPrice(data.amount) }}</template>
+        </Column>
+        <Column v-if="isInventory" field="amount_fact" header="Сумма факт." key="amount_fact" 
+            class="justify-content-end mr-3" headerClass="justify-content-end mr-2" style="max-width:7rem">
+            <template #body="{data}">{{ formatPrice(data.amount_fact) }}</template>
+        </Column>
+        <Column v-if="isCheck" field="discount" header="Скидка" key="discount" 
+            class="justify-content-end mr-3" headerClass="justify-content-end mr-2" style="max-width:7rem">
+            <template #body="{data}">{{ formatPrice(data.discount) }}</template>
+        </Column>
         <ColumnGroup type="footer">
           <Row>
             <Column footer="сумма:" :colspan="colSpan" footerStyle="text-align:right" />
-            <Column v-if="!isMovement" :footer="totalAmount" />
-            <Column v-if="isInventory || isMovement" :footer="totalAmountFact" />
+            <Column v-if="!isMovement" :footer="totalAmount" footerStyle="text-align:right"  />
+            <Column v-if="isInventory || isMovement" :footer="totalAmountFact" footerStyle="text-align:right" />
           </Row>
         </ColumnGroup>
       </DataTable> 
@@ -223,6 +247,7 @@ export default {
             isMovement: false,
             isCheck: false,
             isPosting: false,
+            isRequest: false,
             colSpan: 4,
             DocumentType: DocumentType,
             disableRedactoring: false,
@@ -267,11 +292,17 @@ export default {
     },
     methods: {
         getName(doc) {
-        if(doc.individual.id > 0) {
-            return doc.individual.name;
-        } else {
-            return doc.recipient.name;
-        }
+            if(doc.individual.id > 0) {
+                return doc.individual.name;
+            } else {
+                return doc.recipient.name;
+            }
+        },
+        formatPrice(value) {
+            return Number(value).toFixed(2);
+        },
+        formatQuantity(value) {
+            return Number(value).toFixed(3);
         },
         formatCurrency(value) {
             return value.toLocaleString('re-RU', {style: 'currency', currency: 'RUB'});
@@ -334,6 +365,9 @@ export default {
             if(value.doc_type == DocumentType.INVENTORY_DOC) {
                 this.isInventory = true;
                 this.colSpan++;
+            }
+            if(value.doc_type == DocumentType.REQUEST_DOC) {
+                this.isRequest = true;
             }
             let user = JSON.parse(localStorage.getItem('user'));
             this.setEnableRedactoring(user, value); 
