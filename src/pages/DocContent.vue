@@ -328,6 +328,9 @@ export default {
       this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     },
     watch: {
+      documents() {
+        this.$store.dispatch('getBlockTime')
+      },
       choosenDocFilters(val) {
         this.filters.doc_type.value = (this.filter == '' && val.length > 0) ? val : null;
       },
@@ -336,7 +339,7 @@ export default {
       },
       filter(val) {
         this.$store.dispatch('getDocuments', val);
-        this.$store.dispatch('getBlockTime')
+        // this.$store.dispatch('getBlockTime')
         this.filters.doc_type.value = (this.filter == '' && this.choosenDocFilters.length > 0) ? this.choosenDocFilters : null;
 
       },
@@ -404,9 +407,6 @@ export default {
     },
 	methods: {
     blockDocs(value) {
-      // console.log(value)
-      // console.log(this.blockTime)
-      // console.log(this.enableDocBlockSetting)
       return (value.date_time < this.startPeriod || (value.date_time <= this.blockTime && this.enableDocBlockSetting));
     },
     onDocTypeFilterChange(event) {

@@ -5,7 +5,8 @@ export const ReportStore = {
     state: () => {
         return {
             periodReport: null,
-            itemMovesReport: null
+            itemMovesReport: null,
+            salesReport: null
         }
     },
     mutations: {
@@ -14,6 +15,9 @@ export const ReportStore = {
         },
         setItemMovesReport(state, res) {
             state.itemMovesReport = res;
+        },
+        setSalesReport(state, res) {
+            state.salesReport = res;
         },
     },
     actions: {
@@ -27,6 +31,12 @@ export const ReportStore = {
                         storageId + "&start=" + dateStart + "&end=" + dateEnd + 
                         "&includeNull=" + includeNull + "&onlyHolden=" + onlyHolden, rootState);
 			commit('setItemMovesReport', response);
+        },
+        async getSalesReport({commit, rootState}, [itemId, projectId, dateStart, dateEnd, includeNull, onlyHolden]) {
+            const response = await get('/api/v1/reports/sales?itemId=' + itemId + '&projectId=' + 
+                        projectId + "&start=" + dateStart + "&end=" + dateEnd + 
+                        "&includeNull=" + includeNull + "&onlyHolden=" + onlyHolden, rootState);
+			commit('setSalesReport', response);
         },
 
     }

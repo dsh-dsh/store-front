@@ -169,7 +169,7 @@
     </div>
     <br>
 
-    <div v-if="doc.doc_items">
+    <div v-if="doc.doc_items" style="height: calc(100vh - 30rem)">
       <DataTable :value="doc.doc_items" editMode="cell" class="p-datatable-sm" 
         responsiveLayout="scroll" :rowHover="true" 
         :scrollable="true" scrollHeight="flex">

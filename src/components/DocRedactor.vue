@@ -76,13 +76,12 @@
               </div>
             </div>
           </div>
-          <!-- <div v-if="doc.doc_type == DocumentType.POSTING_DOC" class="field col-12 md:col-4"></div> -->
         </div>
       </div>
-      <div v-if="!orderDoc" class="field col-12 md:col-4">
+      <!-- <div v-if="!orderDoc" class="field col-12 md:col-4">
         <label for="comment" class="label">комментарий</label><br>
         <Textarea id="comment" v-model="comment" @change="onDocInfoChange" rows="5" cols="30" style="height: 120px"/>
-      </div>
+      </div> -->
       
       <div v-if="orderDoc" class="field col-12 md:col-4">
           <label for="individual" class="label">физ лицо</label><br>
@@ -182,8 +181,7 @@
 
   <Button  v-if="doc.doc_items" icon="pi pi-plus" @click="onAddItemClick" class="p-button-text p-button-rounded" />
   
-  <!-- <div v-if="doc.doc_items" style="height: calc(100vh - 30rem)"> -->
-  <div v-if="doc.doc_items">
+  <div v-if="doc.doc_items" style="height: calc(100vh - 40rem)">
     <DataTable :value="doc.doc_items" :rowClass="rowClass" editMode="cell" 
         class="p-datatable-sm editable-cells-table" 
         @cell-edit-init="onCellEditInit" @cell-edit-complete="onCellEditComplete"

@@ -1,6 +1,6 @@
 <template>
-  <div v-if="report" class="border" style="height: calc(100vh - 12rem); max-width: 1200px">
-    <DataTable :value="report" class="p-datatable-sm" :rowHover="true"
+  <div v-if="report" class="border" style="height: calc(100vh - 15rem); max-width: 1200px">
+    <DataTable :value="report.items" class="p-datatable-sm" :rowHover="true"
       @row-click="expandRow" v-model:expandedRows="expandedRows" 
       :scrollable="true" scrollHeight="flex">
       <Column :expander="true" style="max-width: 3rem" />
@@ -71,20 +71,20 @@ export default {
         salaryAmount: 0,
         spendsAmount: 0,
         expandedRows: [],
-        report: null,
+        // report: null,
         displayDocument: false,
         docId: 0
       };
     },
     computed: {
-      itemMovesReport() {
+      report() {
         return this.$store.state.rs.itemMovesReport;
       }
     }, 
     watch: {
-      itemMovesReport(report) {
+      report() {
         this.expandedRows = [];
-        this.report = report.items;
+        // this.report = val.items;
       },
     },
     methods: {

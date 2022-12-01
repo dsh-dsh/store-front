@@ -4,7 +4,7 @@
   <h3>{{ title }}</h3>
 
     <div class="inline-flex" style="max-width: 1200px">
-      <div v-if="type == 'period'" class="flex-1 mr-3">
+      <div v-if="type == 'period' || type == 'sales'" class="flex-1 mr-3">
         <div class="p-inputgroup">
           <InputText id="project" type="text" class="p-inputtext" v-model="project.name" placeholder="проект" />
           <Button icon="pi pi-check" class="p-button-warning" @click="onProjectClick" />
@@ -27,7 +27,7 @@
       </div>
     </div>
     <br>
-    <div v-if="type == 'itemMoves'" class="inline-flex mt-3" style="width: 600px">
+    <div v-if="type == 'itemMoves' || type == 'sales'" class="inline-flex mt-3" style="width: 600px">
       <div class="flex-1 mr-3">
         <div class="field-checkbox">
           <Checkbox inputId="includeNull" v-model="includeNull" :binary="true" />
@@ -44,6 +44,7 @@
 
   <PeriodReport v-if="type == 'period'" />
   <ItemMovesReport v-if="type == 'itemMoves'" />
+  <SalesReport v-if="type == 'sales'" />
 
   <OverlayPanel ref="opProjects">
     <DataTable :value="projects" v-model:selection="selectedProject" selectionMode="single" 
@@ -57,6 +58,10 @@
         <Column field="name" header="Наименование склада" sortable />
     </DataTable>
   </OverlayPanel>
+
+  <!-- <ItemTreeChoose :displayItems="displayItems" :currentStorage="doc.storage_to"  :dateTime="doc.date_time" 
+        :multiplySelect="multiplySelectItems" @new-item-list="addItemsToDoc"/> -->
+
 </template>
 
 <script>
@@ -69,6 +74,8 @@ import Button from 'primevue/button';
 import Calendar from 'primevue/calendar';
 import PeriodReport from '@/components/reports/PeriodReport.vue';
 import ItemMovesReport from '@/components/reports/ItemMovesReport.vue';
+import SalesReport from '@/components/reports/SalesReport.vue';
+// import ItemTreeChoose from '@/components/tables/ItemTreeChoose.vue';
 import Checkbox from 'primevue/checkbox';
 import {Property} from '@/js/Constants';
 export default {
@@ -83,6 +90,8 @@ export default {
     Calendar,
     PeriodReport,
     ItemMovesReport,
+    SalesReport,
+    // ItemTreeChoose,
     Checkbox
   },
   props: {
@@ -98,7 +107,9 @@ export default {
       dateEnd: new Date(),
       title: '',
       includeNull: false,
-      onlyHolden: true
+      onlyHolden: true,
+      displayItems: 1,
+      itemId: 716
     }
   },
   computed: {
@@ -141,11 +152,17 @@ export default {
     onStorageClick(event) {
       this.$refs.opStorages.toggle(event);
     },
+    onAddItemClick() {
+      this.$store.dispatch('getItemsWithRest', this.doc.date_time);
+      this.displayItems++;
+    },
     getReport() {
       if(this.type == 'period' && this.project.name != '') {
         this.$store.dispatch('getPeriodReport', [this.project.id, this.dateStart.getTime(), this.dateEnd.getTime()]);
       } else if(this.type == 'itemMoves' && this.storage.name != '') {
         this.$store.dispatch('getItemMovesReport', [this.storage.id, this.dateStart.getTime(), this.dateEnd.getTime(), this.includeNull, this.onlyHolden]);
+      } else if(this.type == 'sales' && this.project.name != '') {
+        this.$store.dispatch('getSalesReport', [this.itemId, this.project.id, this.dateStart.getTime(), this.dateEnd.getTime(), this.includeNull, this.onlyHolden]);
       }
     },
     setTitle(value) {
@@ -153,6 +170,8 @@ export default {
         this.title = 'Отчет за период';
       } else if(value == 'itemMoves') {
         this.title = 'Движение товара по складу';
+      } else if(value == 'sales') {
+        this.title = 'Продажи по проекту';
       } else {
         this.title = '';
       }

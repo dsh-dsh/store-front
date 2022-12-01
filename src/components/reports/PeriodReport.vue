@@ -62,23 +62,23 @@ export default {
   components: {
     },
     data() {
-        return {
-            receiptsAmount: 0,
-            salaryAmount: 0,
-            spendsAmount: 0,
-        };
+      return {
+        receiptsAmount: 0,
+        salaryAmount: 0,
+        spendsAmount: 0,
+      };
     },
     computed: {
-        periodReport() {
-            return this.$store.state.rs.periodReport;
-        }
+      periodReport() {
+        return this.$store.state.rs.periodReport;
+      }
     }, 
     watch: {
-        periodReport(report) {
-            this.receiptsAmount = this.getAmount(report.receipts);
-            this.salaryAmount = this.getAmount(report.salary);
-            this.spendsAmount = this.getAmount(report.spends);
-        },
+      periodReport(report) {
+        this.receiptsAmount = this.getAmount(report.receipts);
+        this.salaryAmount = this.getAmount(report.salary);
+        this.spendsAmount = this.getAmount(report.spends);
+      },
     },
     methods: {
       getTotalAmount() {
@@ -86,14 +86,14 @@ export default {
         return cash - (this.salaryAmount  + this.spendsAmount);
       },
       getAmount(listWithValues) {
-          let amount = 0;
-          for(let element of listWithValues) {
-              amount += element.value;
-          }
-          return amount;
+        let amount = 0;
+        for(let element of listWithValues) {
+            amount += element.value;
+        }
+        return amount;
       },
       formatPrice(value) {
-          return Number(value).toFixed(2);
+        return Number(value).toFixed(2);
       }
     },
 }
