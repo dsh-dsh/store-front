@@ -272,7 +272,7 @@ export default {
         totalAmount() {
           let total = 0;
           for(let item of this.doc.doc_items) {
-              total += (item.price * item.quantity) - item.discount;
+              total += item.amount - item.discount;
           }
           return this.formatCurrency(total);
         },
