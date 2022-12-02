@@ -10,16 +10,16 @@
           <Button icon="pi pi-check" class="p-button-warning" @click="onProjectClick" />
         </div>
       </div>
-      <div v-if="type == 'sales'" class="flex-1 mr-3">
-        <div class="p-inputgroup">
-          <InputText id="item" type="text" class="p-inputtext" v-model="selectedItem.name" placeholder="номенклатура" />
-          <Button icon="pi pi-check" class="p-button-warning" @click="onItemClick" />
-        </div>
-      </div>
       <div v-if="type == 'itemMoves'" class="flex-1 mr-3">
         <div class="p-inputgroup">
           <InputText id="storage" type="text" class="p-inputtext" v-model="storage.name" placeholder="склад" />
           <Button icon="pi pi-check" class="p-button-warning" @click="onStorageClick" />
+        </div>
+      </div>
+      <div v-if="type == 'itemMoves' || type == 'sales'" class="flex-1 mr-3">
+        <div class="p-inputgroup">
+          <InputText id="item" type="text" class="p-inputtext" v-model="selectedItem.name" placeholder="номенклатура" />
+          <Button icon="pi pi-check" class="p-button-warning" @click="onItemClick" />
         </div>
       </div>
       <div class="flex-1 mr-3">
@@ -183,7 +183,7 @@ export default {
       if(this.type == 'period' && this.project.name != '') {
         this.$store.dispatch('getPeriodReport', [this.project.id, this.dateStart.getTime(), this.dateEnd.getTime()]);
       } else if(this.type == 'itemMoves' && this.storage.name != '') {
-        this.$store.dispatch('getItemMovesReport', [this.storage.id, this.dateStart.getTime(), this.dateEnd.getTime(), this.includeNull, this.onlyHolden]);
+        this.$store.dispatch('getItemMovesReport', [this.itemId, this.storage.id, this.dateStart.getTime(), this.dateEnd.getTime(), this.includeNull, this.onlyHolden]);
       } else if(this.type == 'sales' && this.project.name != '') {
         this.$store.dispatch('getSalesReport', [this.itemId, this.project.id, this.dateStart.getTime(), this.dateEnd.getTime(), this.includeNull, this.onlyHolden]);
       }

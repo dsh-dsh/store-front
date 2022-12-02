@@ -1,5 +1,5 @@
 <template>
-    <Tree :value="nodes" :expandedKeys="expandedKeys" selectionMode="single" v-model:selectionKeys="selectedKey" 
+    <Tree :value="nodes" :filter="true" filterMode="strict" :expandedKeys="expandedKeys" selectionMode="single" v-model:selectionKeys="selectedKey" 
     :metaKeySelection="false" @node-collapse="onNodeCollapse" @node-expand="onNodeExpand" @node-select="onNodeSelect"
     scrollHeight="600px"></Tree>
 </template>

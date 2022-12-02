@@ -1,5 +1,5 @@
 <template>
-<div v-if="salesReport" style="height: calc(100vh - 15rem); max-width: 850px">
+  <div v-if="salesReport" style="height: calc(100vh - 15rem); max-width: 850px">
     <DataTable :value="salesReport.lines" class="p-datatable-sm" :rowHover="true"
       :scrollable="true" scrollHeight="flex">
       <Column field="name">
@@ -15,32 +15,54 @@
             class="justify-content-end mr-3" headerClass="justify-content-end mr-2">
         <template #body="{data}">{{ formatPrice(data.amount) }}</template>
       </Column>
+      <ColumnGroup type="footer">
+        <Row>
+          <Column footer="сумма:" colspan="3" footerStyle="text-align:right" />
+          <Column :footer="totalAmount" footerStyle="text-align:right" />
+        </Row>
+      </ColumnGroup>
     </DataTable>
-</div>
+  </div>
 </template>
 
 <script>
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
+import ColumnGroup from 'primevue/columngroup';     //optional for column grouping
+import Row from 'primevue/row'; 
 export default {
   name: 'SalesReport',
   components: {
       DataTable,
       Column, 
+      ColumnGroup,
+      Row
     },
     data() {
-        return {
-            report: null,
-        };
+      return {
+        report: null,
+        totalAmount: 0.00
+      };
     },
     computed: {
-        salesReport() {
-            return this.$store.state.rs.salesReport;
-        }
+      salesReport() {
+        return this.$store.state.rs.salesReport;
+      }
     }, 
     watch: {
+      salesReport(report) {
+        this.totalAmount = this.formatCurrency(report.lines.reduce((accumulator, value) => accumulator + value.amount, 0));
+      }
+    },
+    mounted() {
+      if(this.salesReport) {
+        this.totalAmount = this.formatCurrency(this.salesReport.lines.reduce((accumulator, value) => accumulator + value.amount, 0));
+      }
     },
     methods: {
+      formatCurrency(value) {
+        return value.toLocaleString('re-RU', {style: 'currency', currency: 'RUB'});
+      },
       formatWeight(value) {
         return Number(value).toFixed(3);
       },

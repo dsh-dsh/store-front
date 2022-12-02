@@ -26,8 +26,8 @@ export const ReportStore = {
                         projectId + "&start=" + dateStart + "&end=" + dateEnd, rootState);
 			commit('setPeriodReport', response);
         },
-        async getItemMovesReport({commit, rootState}, [storageId, dateStart, dateEnd, includeNull, onlyHolden]) {
-            const response = await get('/api/v1/reports/item/moves?storageId=' + 
+        async getItemMovesReport({commit, rootState}, [itemId, storageId, dateStart, dateEnd, includeNull, onlyHolden]) {
+            const response = await get('/api/v1/reports/item/moves?itemId=' + itemId + '&storageId=' + 
                         storageId + "&start=" + dateStart + "&end=" + dateEnd + 
                         "&includeNull=" + includeNull + "&onlyHolden=" + onlyHolden, rootState);
 			commit('setItemMovesReport', response);
