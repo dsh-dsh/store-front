@@ -1,9 +1,7 @@
 <template>
-  <div class="tree">
     <Tree :value="nodes" :expandedKeys="expandedKeys" selectionMode="single" v-model:selectionKeys="selectedKey" 
     :metaKeySelection="false" @node-collapse="onNodeCollapse" @node-expand="onNodeExpand" @node-select="onNodeSelect"
-    scrollHeight="900px"></Tree>
-  </div>
+    scrollHeight="600px"></Tree>
 </template>
 
 <script>
@@ -19,6 +17,12 @@ export default {
       parentNode: null
     }
   },
+  props: {
+    type: String
+  },
+  emits: {
+    getItemId: null,
+  },
   computed: {
     nodes() {
       return this.$store.state.is.itemTree;
@@ -33,6 +37,10 @@ export default {
   },
   methods: {
     onNodeSelect(node) {
+      if(this.type == 'direct') {
+        this.$emit('getItemId', node);
+        return;
+      }
       if(!node.is_node) {
         this.$store.dispatch('getItem', node.data);
         this.$store.dispatch('delCrumbs');
@@ -55,7 +63,4 @@ export default {
 }
 </script>
 <style scoped>
-  .tree {
-    width: 40%;
-  }
 </style>

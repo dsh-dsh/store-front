@@ -10,6 +10,12 @@
           <Button icon="pi pi-check" class="p-button-warning" @click="onProjectClick" />
         </div>
       </div>
+      <div v-if="type == 'sales'" class="flex-1 mr-3">
+        <div class="p-inputgroup">
+          <InputText id="item" type="text" class="p-inputtext" v-model="selectedItem.name" placeholder="номенклатура" />
+          <Button icon="pi pi-check" class="p-button-warning" @click="onItemClick" />
+        </div>
+      </div>
       <div v-if="type == 'itemMoves'" class="flex-1 mr-3">
         <div class="p-inputgroup">
           <InputText id="storage" type="text" class="p-inputtext" v-model="storage.name" placeholder="склад" />
@@ -59,8 +65,13 @@
     </DataTable>
   </OverlayPanel>
 
-  <!-- <ItemTreeChoose :displayItems="displayItems" :currentStorage="doc.storage_to"  :dateTime="doc.date_time" 
-        :multiplySelect="multiplySelectItems" @new-item-list="addItemsToDoc"/> -->
+  <Dialog header="Подбор номенклатуры" class="dialog" :contentStyle="{height: '100%'}" :style="{width: '700px', height: '750px'}" v-model:visible="displayItemTreeDialog" :modal="true" :showHeader="false">
+    <br>
+    <ItemTree type="direct" @get-item-id="getItemId"/>
+    <template #footer>
+      <Button label="Закрыть" icon="pi pi-times" @click="closeItemTreeDialog" class="p-button-text" />
+    </template>
+  </Dialog>
 
 </template>
 
@@ -76,6 +87,8 @@ import PeriodReport from '@/components/reports/PeriodReport.vue';
 import ItemMovesReport from '@/components/reports/ItemMovesReport.vue';
 import SalesReport from '@/components/reports/SalesReport.vue';
 // import ItemTreeChoose from '@/components/tables/ItemTreeChoose.vue';
+import ItemTree from '@/components/trees/ItemTree.vue';
+import Dialog from 'primevue/dialog';
 import Checkbox from 'primevue/checkbox';
 import {Property} from '@/js/Constants';
 export default {
@@ -91,6 +104,8 @@ export default {
     PeriodReport,
     ItemMovesReport,
     SalesReport,
+    ItemTree,
+    Dialog,
     // ItemTreeChoose,
     Checkbox
   },
@@ -108,7 +123,8 @@ export default {
       title: '',
       includeNull: false,
       onlyHolden: true,
-      displayItems: 1,
+      selectedItem: {name: ''},
+      displayItemTreeDialog: false,
       itemId: 716
     }
   },
@@ -138,6 +154,11 @@ export default {
     }
   },
   methods: {
+    getItemId(val) {
+      this.selectedItem.name = val.label;
+      this.itemId = val.data;
+      this.displayItemTreeDialog = false;
+    },
     onProjectSelect(event) {
       this.project = this.selectedProject = event.data;
       this.$refs.opProjects.hide();
@@ -152,9 +173,11 @@ export default {
     onStorageClick(event) {
       this.$refs.opStorages.toggle(event);
     },
-    onAddItemClick() {
-      this.$store.dispatch('getItemsWithRest', this.doc.date_time);
-      this.displayItems++;
+    onItemClick() {
+      this.displayItemTreeDialog = true;
+    },
+    closeItemTreeDialog() {
+      this.displayItemTreeDialog = false;
     },
     getReport() {
       if(this.type == 'period' && this.project.name != '') {
@@ -187,4 +210,12 @@ export default {
 </script>
 
 <style scoped>
+  .dialog {
+    border: 1px solid #dee2e6;
+    border-radius: 3px;
+    background-color: aqua;
+  }
+  ::v-deep(.p-dialog) {
+    background-color: rgb(255, 255, 255);
+  }
 </style>

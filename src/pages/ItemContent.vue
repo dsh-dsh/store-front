@@ -1,7 +1,9 @@
 <template>
   <MainMenu />
   <div class="conteiner">
-    <ItemTree />
+    <div class="tree">
+      <ItemTree />
+    </div>
     <ItemForm />
   </div>
 </template>
@@ -29,5 +31,8 @@ export default {
   .conteiner {
     display: flex;
     flex: 0 0 100%;
+  }
+  .tree {
+    width: 40%;
   }
 </style>
