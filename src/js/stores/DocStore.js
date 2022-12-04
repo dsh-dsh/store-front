@@ -221,6 +221,11 @@ export const DocStore = {
 			const response = await post('/api/v1/docs/delete/payment/' + docId, headers, null, rootState);
 			if(response.data == 'ok') { commit('setSuccess'); }
 		},
+		async addSupplierPaymentsDoc({commit, rootState}, supplierName) {
+			let headers = {'Authorization': rootState.token };
+			const response = await post('/api/v1/docs/add/payments/' + supplierName, headers, null, rootState);
+			if(response.data == 'ok') { commit('setSuccess'); }
+		}
     }
 }
 

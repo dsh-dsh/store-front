@@ -78,6 +78,13 @@ export default {
               to: "/reports/period"
             }
         );
+        item.items.push(
+            {
+              label:'Оплаты',
+              icon:'pi pi-fw pi-money-bill',
+              to: "/reports/payments"
+            }
+        );
       }
       this.items.push(item)
       this.items.push({

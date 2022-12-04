@@ -6,7 +6,8 @@ export const ReportStore = {
         return {
             periodReport: null,
             itemMovesReport: null,
-            salesReport: null
+            salesReport: null,
+            paymentsReport: null
         }
     },
     mutations: {
@@ -18,6 +19,9 @@ export const ReportStore = {
         },
         setSalesReport(state, res) {
             state.salesReport = res;
+        },
+        setPaymentsReport(state, res) {
+            state.paymentsReport = res;
         },
     },
     actions: {
@@ -37,6 +41,10 @@ export const ReportStore = {
                         projectId + "&start=" + dateStart + "&end=" + dateEnd + 
                         "&includeNull=" + includeNull + "&onlyHolden=" + onlyHolden, rootState);
 			commit('setSalesReport', response);
+        },
+        async getPaymentsReport({commit, rootState}, companyId) {
+            const response = await get('/api/v1/docs/to/pay?companyId=' + companyId, rootState);
+			commit('setPaymentsReport', response);
         },
 
     }
