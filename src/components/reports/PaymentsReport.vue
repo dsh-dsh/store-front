@@ -33,9 +33,17 @@
       </template>
 
       <template #groupfooter="slotProps">
-        <td colspan="3" class="justify-content-end b">сумма:</td>
-        <td class="justify-content-end mr-3 amount b">{{getSupplierAmount(slotProps.data.supplier)}}</td>
+        <td colspan="3" class="justify-content-end b mr-sum">сумма:</td>
+        <td class="justify-content-end mr-amount amount b">{{getSupplierAmount(slotProps.data.supplier)}}</td>
       </template>
+
+      <ColumnGroup type="footer">
+        <Row>
+          <Column footer="общая сумма:" colspan="3" footerStyle="text-align:right" />
+          <Column :footer="formatPrice(totalAmount)" footerStyle="text-align:right" />
+          <Column footerStyle="width:5rem" />
+        </Row>
+      </ColumnGroup>
 
     </DataTable>
   </div>
@@ -45,16 +53,16 @@
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
-// import ColumnGroup from 'primevue/columngroup';     //optional for column grouping
-// import Row from 'primevue/row'; 
+import ColumnGroup from 'primevue/columngroup';     //optional for column grouping
+import Row from 'primevue/row'; 
 export default {
   name: 'PaymentsReport',
   components: {
       DataTable,
       Column,
-      Button 
-      // ColumnGroup,
-      // Row
+      Button,
+      ColumnGroup,
+      Row
     },
     data() {
       return {
@@ -67,6 +75,22 @@ export default {
         return this.$store.state.rs.paymentsReport;
       }
     }, 
+    watch: {
+      paymentsReport(report) {
+        this.totalAmount = 0.0;
+        for(let doc of report) {
+          this.totalAmount += doc.amount;
+        }
+      }
+    },
+    mounted() {
+      if(this.paymentsReport) {
+        this.totalAmount = 0.0;
+        for(let doc of this.paymentsReport) {
+          this.totalAmount += doc.amount;
+        }
+      }
+    },
     methods: {
       getSupplierAmount(suplierName) {
         let amount = 0;
@@ -92,6 +116,9 @@ export default {
       },
       formatPrice(value) {
         return Number(value).toFixed(2);
+      },
+      formatCurrency(value) {
+        return value.toLocaleString('re-RU', {style: 'currency', currency: 'RUB'});
       },
       addPayment(value) {
         console.log(value)
@@ -135,5 +162,11 @@ export default {
 .payment-report {
   width: 750px;
   margin-bottom: 10px;
+}
+.mr-amount {
+  margin-right: 5rem;
+}
+.mr-sum {
+  margin-right: 54px;
 }
 </style>

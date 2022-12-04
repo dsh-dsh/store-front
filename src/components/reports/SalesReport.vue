@@ -51,6 +51,7 @@ export default {
     }, 
     watch: {
       salesReport(report) {
+        console.log(report)
         this.totalAmount = this.formatCurrency(report.lines.reduce((accumulator, value) => accumulator + value.amount, 0));
       }
     },
