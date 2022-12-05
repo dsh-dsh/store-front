@@ -170,7 +170,7 @@ export default {
   mounted() {
     this.setTitle(this.type);
     if(this.defaultProperties.length > 0) {
-      let storageId = this.defaultProperties.find(prop => prop.type == Property.STORAGE_FROM).property;
+      let storageId = this.defaultProperties.find(prop => prop.type == Property.STORAGE_TO).property;
       this.storage = this.getStorageById(storageId);
       let projectId = this.defaultProperties.find(prop => prop.type == Property.PROJECT).property;
       this.project = this.getProjectById(projectId);
