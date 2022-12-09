@@ -168,47 +168,43 @@
         <div class="field col-12 md:col-4"></div>
     </div>
     <br>
-
-    <div v-if="doc.doc_items" style="height: calc(100vh - 30rem)">
-      <DataTable :value="doc.doc_items" editMode="cell" class="p-datatable-sm" 
-        responsiveLayout="scroll" :rowHover="true" 
-        :scrollable="true" scrollHeight="flex">
-        <Column header="#" style="max-width: 2rem">
-            <template #body="{index}">
-                {{index + 1}}
-            </template>
+    <div v-if="doc.doc_items">
+      <DataTable :value="doc.doc_items" editMode="cell" class="p-datatable-sm" responsiveLayout="scroll" :rowHover="true"> 
+        <Column header="#" style="width: 2rem">
+            <template #body="{index}">{{index + 1}}</template>
         </Column>
-        <Column field="item_name" header="Наименование" key="item_name" style="min-width:12rem"></Column>
-        <Column v-if="!isMovement" field="quantity" header="Кол-во" key="quantity" 
-            class="justify-content-end mr-3" headerClass="justify-content-end mr-2" style="max-width:7rem">
-            <template v-if="!isRequest" #body="{data}">{{ formatQuantity(data.quantity) }}</template>
+        <Column field="item_name" header="Наименование" key="item_name"></Column>
+        <Column v-if="!isMovement" field="quantity" key="quantity" style="width:7rem">
+            <template #header><div class="text-right mr-2" style="width: 100%">Кол-во</div></template>
+            <template #body="{data}"><div class="text-right pr-2" style="width: 100%">{{ formatQuantity(data.quantity) }}</div></template>
         </Column>
-        <Column v-if="isInventory" field="quantity_fact" header="Кол-во факт" key="quantity_fact" 
-            class="justify-content-end mr-3" headerClass="justify-content-end mr-2" style="max-width:7rem">
-            <template #body="{data}">{{ formatQuantity(data.quantity_fact) }}</template>
+        <Column v-if="isInventory" field="quantity_fact" key="quantity_fact" style="width:9rem">
+            <template #header><div class="text-right mr-2" style="width: 100%">Кол-во факт</div></template>
+            <template #body="{data}"><div class="text-right pr-2" style="width: 100%">{{ formatQuantity(data.quantity_fact) }}</div></template>
         </Column>
-        <Column v-if="isMovement" field="quantity_fact" header="Заявка" key="quantity_fact" 
-            class="justify-content-end mr-3" headerClass="justify-content-end mr-2" style="max-width:7rem">
+        <Column v-if="isMovement" field="quantity_fact" key="quantity_fact" style="width:7rem">
+            <template #header><div class="text-right mr-2" style="width: 100%">Заявка</div></template>
+            <template #body="{data}"><div class="text-right pr-2" style="width: 100%">{{ data.quantity_fact }}</div></template>
         </Column>
-        <Column v-if="isMovement" field="quantity" header="Кол-во" key="quantity" 
-            class="justify-content-end mr-3" headerClass="justify-content-end mr-2" style="max-width:7rem">
-            <template #body="{data}">{{ formatQuantity(data.quantity) }}</template>
+        <Column v-if="isMovement" field="quantity" key="quantity" style="width:7rem">
+            <template #header><div class="text-right mr-2" style="width: 100%">Кол-во</div></template>
+            <template #body="{data}"><div class="text-right pr-2" style="width: 100%">{{ formatQuantity(data.quantity) }}</div></template>
         </Column>
-        <Column header="Цена" key="price" 
-            class="justify-content-end mr-3" headerClass="justify-content-end mr-2" style="max-width:7rem">
-            <template #body="{data}">{{ formatPrice(data.price) }}</template>
+        <Column key="price" style="width: 7rem">
+            <template #header><div class="text-right mr-2" style="width: 100%">Цена</div></template>
+            <template #body="{data}"><div class="text-right pr-2" style="width: 100%">{{ formatPrice(data.price) }}</div></template>
         </Column>
-        <Column field="amount" header="Сумма" key="amount" 
-            class="justify-content-end mr-3" headerClass="justify-content-end mr-2" style="max-width:7rem">
-            <template #body="{data}">{{ formatPrice(data.amount) }}</template>
+        <Column field="amount" key="amount" style="width:7rem">
+            <template #header><div class="text-right mr-2" style="width: 100%">Сумма</div></template>
+            <template #body="{data}"><div class="text-right pr-2" style="width: 100%">{{ formatPrice(data.amount) }}</div></template>
         </Column>
-        <Column v-if="isInventory" field="amount_fact" header="Сумма факт." key="amount_fact" 
-            class="justify-content-end mr-3" headerClass="justify-content-end mr-2" style="max-width:7rem">
-            <template #body="{data}">{{ formatPrice(data.amount_fact) }}</template>
+        <Column v-if="isInventory" field="amount_fact" key="amount_fact" style="width:9rem">
+            <template #header><div class="text-right mr-2" style="width: 100%">Сумма факт</div></template>
+            <template #body="{data}"><div class="text-right pr-2" style="width: 100%">{{ formatPrice(data.amount_fact) }}</div></template>
         </Column>
-        <Column v-if="isCheck" field="discount" header="Скидка" key="discount" 
-            class="justify-content-end mr-3" headerClass="justify-content-end mr-2" style="max-width:7rem">
-            <template #body="{data}">{{ formatPrice(data.discount) }}</template>
+        <Column v-if="isCheck" field="discount" key="discount" style="width:7rem">
+            <template #header><div class="text-right mr-2" style="width: 100%">Скидка</div></template>
+            <template #body="{data}"><div class="text-right pr-2" style="width: 100%">{{ formatPrice(data.discount) }}</div></template>
         </Column>
         <ColumnGroup type="footer">
           <Row>
@@ -447,5 +443,8 @@ function formatTime(date) {
   }
   .mr-2 {
     margin-right: 10 px;
+  }
+  .cell-right {
+    text-align: right;
   }
 </style>

@@ -49,17 +49,17 @@
           <TriStateCheckbox v-model="filterModel.value" @change="filterCallback()"/>
         </template>
       </Column>
-      <Column field="date_time" header="Дата" sortable dataType="date" style="max-width:7rem">
+      <Column field="date_time" header="Дата" sortable dataType="date" style="max-width:6rem">
         <template #body="{data}">
           <div :class="disabledClass(data)">
             {{new Date(data.date_time).toLocaleDateString('ru-RU', {day: '2-digit', month: '2-digit', year: 'numeric'})}}
           </div>
         </template>
       </Column>
-      <Column field="number" header="№" sortable>
+      <Column field="number" header="№" sortable style="max-width:7rem">
         <template #body="{data}"><div :class="disabledClass(data)">{{data.number}}</div></template>
       </Column>
-      <Column filterField="doc_type" header="Документ" :showFilterMatchModes="false" :showApplyButton="false" sortable>
+      <Column filterField="doc_type" header="Документ" :showFilterMatchModes="false" :showApplyButton="false" sortable style="max-width:9rem">
         <template #filter="{filterModel, filterCallback}">
           <div class="mb-3 font-bold">тип документа</div>
           <MultiSelect v-model="filterModel.value" @change="filterCallback();onDocTypeFilterChange($event)" :options="docTypeFilters" />
