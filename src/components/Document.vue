@@ -174,6 +174,7 @@
             <template #body="{index}">{{index + 1}}</template>
         </Column>
         <Column field="item_name" header="Наименование" key="item_name"></Column>
+        <Column field="unit" header=" " style="width:3rem"/>
         <Column v-if="!isMovement" field="quantity" key="quantity" style="width:7rem">
             <template #header><div class="text-right mr-2" style="width: 100%">Кол-во</div></template>
             <template #body="{data}"><div class="text-right pr-2" style="width: 100%">{{ formatQuantity(data.quantity) }}</div></template>

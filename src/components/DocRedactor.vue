@@ -195,6 +195,7 @@
           <Button icon="pi pi-check" class="p-button-warning" @click="onItemClick(data)"/>
         </template>
       </Column>
+      <Column field="unit" header=" " style="width:3rem"/>
       <Column v-if="!isMovement" field="quantity" key="quantity" style="width:8rem">
         <template #header><div class="text-right mr-2" style="width: 100%">Кол-во</div></template>
         <template #body="{data}"><div class="text-right pr-2" style="width: 100%">{{ formatQuantity(data.quantity) }}</div></template>
@@ -923,10 +924,6 @@ export default {
           this.currentField = field;
           this.currentData = data;
         } else {
-          // if(this.inputNullValueProperty) {
-          //   console.log(data, field)
-          //   data[field] = 0;
-          // }
           if(this.isMobile) {
             this.openNumPud(data, field);
           }
@@ -939,6 +936,7 @@ export default {
           for(const item of newItemList) {
             this.currentItem = this.doc.doc_items.filter(i => i.item_id == item.item_id).pop();
             if (this.currentItem == undefined) {
+              console.log(item)
               this.doc.doc_items.push(item);
             } else {
               this.currentItem.quantity = item.quantity;
