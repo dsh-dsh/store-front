@@ -14,14 +14,17 @@
         </template>
       </Column>
       <Column field="name" header="Наименование"></Column>
-      <Column field="gross.quantity" header="Брутто">
+      <Column field="gross.quantity" header="Брутто" style="width: 6rem">
+        <template #body="{data}">{{ formatQuantity(data['gross']['quantity']) }}</template>
         <template #editor="{ data }">
           <InputNumber v-model="data['gross']['quantity']" :minFractionDigits="3" :maxFractionDigits="3" autofocus />
         </template>
       </Column>
-      <Column field="netto.quantity" header="Нетто">
+      <Column field="netto.quantity" header="Нетто" style="width: 6rem">
+        <template #body="{data}">{{ formatQuantity(data['netto']['quantity']) }}</template>
         <template #editor="{ data }">
-          <InputNumber v-model="data['netto']['quantity']" :minFractionDigits="3" :maxFractionDigits="3" autofocus />
+          <!-- <InputNumber v-model="data['netto']['quantity']" :minFractionDigits="3" :maxFractionDigits="3" autofocus /> -->
+          <InputNumber v-model="data['netto']['quantity']" inputmode="none" :minFractionDigits="3" :maxFractionDigits="3" :useGrouping="false" />
         </template>
       </Column>
       <Column  style="width:3rem">
@@ -33,8 +36,8 @@
       <ColumnGroup type="footer">
         <Row>
           <Column colspan="2" />
-          <Column :footer="totalGross" />
-          <Column :footer="totalNetto" colspan="2" />
+          <Column :footer="formatQuantity(totalGross())" />
+          <Column :footer="formatQuantity(totalNetto())" colspan="2" />
         </Row>
       </ColumnGroup>
     </DataTable>
@@ -123,23 +126,21 @@ export default {
   },
   methods: {
     totalNetto() {
-      // let total = 0;
-      // for(let ingredient of this.ingredients) {
-      //     total += ingredient.netto.quantity;
-      // }
-      // console.log(total)
-      return this.formatCurrency(2);
+      let total = 0;
+      for(let ingredient of this.ingredients) {
+          total += ingredient.netto.quantity;
+      }
+      return total;
     },
     totalGross() {
-      // let total = 0;
-      // for(let ingredient of this.ingredients) {
-      //     total += ingredient.gross.quantity;
-      // }
-      // console.log(total)
-      return this.formatCurrency(1);
+      let total = 0;
+      for(let ingredient of this.ingredients) {
+          total += ingredient.gross.quantity;
+      }
+      return total;
     },
-    formatCurrency(value) {
-      return value.toLocaleString('re-RU', {style: 'currency', currency: 'RUB'});
+    formatQuantity(value) {
+        return Number(value).toFixed(3);
     },
     initFilters() {
       this.filters = {
@@ -211,5 +212,8 @@ function atStartOfDay(date) {
   .p-dialog, :deep(.p-dialog) {
     height : 500px;
     width : 900px;
+  }
+  ::v-deep(.p-inputnumber-input) {
+    width: 80px;
   }
 </style>

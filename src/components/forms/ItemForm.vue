@@ -71,10 +71,6 @@
                             <Checkbox id="garnish" v-model="item.is_include_garnish" :binary="true" />
                         </span>
                         <span class="checkBoxLabel">
-                            <label for="weight">Весовой  </label>
-                            <Checkbox id="weight" v-model="item.is_weight" :binary="true" />
-                        </span>
-                        <span class="checkBoxLabel">
                             <label for="alcohol">Алкоголь  </label>
                             <Checkbox id="alcohol" v-model="item.is_alcohol" :binary="true" />
                         </span>
@@ -87,7 +83,7 @@
                             <Checkbox id="garnish" v-model="item.is_sauce" :binary="true" />
                         </span>
                         <span class="checkBoxLabel">
-                            <label for="includgarnish">Включает соус  </label>
+                            <label for="includgarnish">Включает соус</label>
                             <Checkbox id="includgarnish" v-model="item.is_include_sauce" :binary="true" />
                         </span>
                         <span class="checkBoxLabel">
