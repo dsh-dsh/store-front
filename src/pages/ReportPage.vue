@@ -3,60 +3,59 @@
 
   <h3>{{ title }}</h3>
 
-    <div class="inline-flex" style="max-width: 1200px">
-      <div v-if="type == 'period' || type == 'sales'" class="flex-1 mr-3">
-        <div class="p-inputgroup">
+  <div v-if="type != 'payments'" class="flex flex-wrap">
+    <div class="formgrid grid mr-3" style="max-width: 700px">
+      <div class="col-12 md:col-4 mt-2">
+        <div v-if="type == 'period' || type == 'sales'" class="p-inputgroup">
           <InputText id="project" type="text" class="p-inputtext" v-model="project.name" placeholder="проект" />
           <Button icon="pi pi-check" class="p-button-warning" @click="onProjectClick" />
-          <Button icon="pi pi-times" class="p-button-danger p-button-text" @click="onDeleteProjectClick" />
         </div>
-      </div>
-      <div v-if="type == 'itemMoves'" class="flex-1 mr-3">
-        <div class="p-inputgroup">
+        <div v-if="type == 'itemMoves'" class="p-inputgroup">
           <InputText id="storage" type="text" class="p-inputtext" v-model="storage.name" placeholder="склад" />
           <Button icon="pi pi-check" class="p-button-warning" @click="onStorageClick" />
-          <Button icon="pi pi-times" class="p-button-danger p-button-text" @click="onDeleteStorageClick" />
         </div>
       </div>
-      <div v-if="type == 'itemMoves' || type == 'sales'" class="flex-1 mr-3">
-        <div class="p-inputgroup">
-          <InputText id="item" type="text" class="p-inputtext" v-model="selectedItem.name" placeholder="номенклатура" />
-          <Button icon="pi pi-check" class="p-button-warning" @click="onItemClick" />
-          <Button icon="pi pi-times" class="p-button-danger p-button-text" @click="onDeleteItemClick" />
-        </div>
-      </div>
-      <div v-if="type == 'payments'" class="flex-1 mr-3">
-        <div class="p-inputgroup">
-          <InputText id="supplieer" type="text" class="p-inputtext" v-model="selectedSupplier.name" placeholder="поставщик" />
-          <Button icon="pi pi-check" class="p-button-warning" @click="onSupplierClick" />
-          <Button icon="pi pi-times" class="p-button-danger p-button-text" @click="onDeleteSupplierClick" />
-        </div>
-      </div>
-      <div v-if="type != 'payments'" class="flex-1 mr-3">
+      <div class="col-12 md:col-4 mt-2 p-inputgroup">
         <Calendar id="start" v-model="dateStart" dateFormat="dd.mm.yy" :showIcon="true" />
       </div>
-      <div v-if="type != 'payments'" class="flex-1 mr-3">
+      <div  class="col-12 md:col-4 mt-2 p-inputgroup">
         <Calendar id="end" v-model="dateEnd" dateFormat="dd.mm.yy" :showIcon="true" />
       </div>
-      <div class="flex-1 mr-3">
-        <Button label="создать отчет" @click="getReport" />
+      <div v-if="type == 'itemMoves' || type == 'sales'" class="col-12 md:col-12 mt-2">
+          <div class="p-inputgroup">
+            <TreeSelect v-model="selectedKeys" :options="nodes" selectionMode="multiple" 
+              @node-select="onNodeSelect" @node-unselect="onNodeUnSelect"
+              :metaKeySelection="false" display="chip" placeholder="номенклатура"/>
+            <Button icon="pi pi-arrow-left" class="p-button-danger" @click="deleteItemFromSelected" />
+          </div>
       </div>
-    </div>
-    <br>
-    <div v-if="type == 'itemMoves' || type == 'sales'" class="inline-flex mt-3" style="width: 600px">
-      <div class="flex-1 mr-3">
+      <div v-if="type == 'itemMoves' || type == 'sales'" class="col-12 md:col-6 mt-2">
         <div class="field-checkbox">
           <Checkbox inputId="includeNull" v-model="includeNull" :binary="true" />
           <label for="includeNull">Включать нулевые движения</label>
         </div>
       </div>
-      <div class="flex-1 mr-3">
+      <div v-if="type == 'itemMoves' || type == 'sales'" class="col-12 md:col-6 mt-2">
         <div class="field-checkbox">
           <Checkbox inputId="onlyHolden" v-model="onlyHolden" :binary="true" />
           <label for="onlyHolden">Только проведенные документы</label>
         </div>
       </div>
     </div>
+    <div class="mt-2">
+      <Button label="создать отчет" @click="getReport" />
+    </div> 
+  </div>
+  <div v-if="type == 'payments'" class="formgrid grid mr-3" style="max-width: 700px">
+    <div class="col-12 md:col-6 p-inputgroup mt-2">
+      <InputText id="supplieer" type="text" class="p-inputtext" v-model="selectedSupplier.name" placeholder="поставщик" />
+      <Button icon="pi pi-check" class="p-button-warning" @click="onSupplierClick" />
+      <Button icon="pi pi-times" class="p-button-danger" @click="onDeleteSupplierClick" />
+    </div>
+    <div class="col-12 md:col-6 p-inputgroup mt-2">
+      <Button label="создать отчет" @click="getReport" />
+    </div>
+  </div>
 
   <PeriodReport v-if="type == 'period'" />
   <ItemMovesReport v-if="type == 'itemMoves'" />
@@ -84,14 +83,6 @@
     </DataTable>
   </OverlayPanel>
 
-  <Dialog header="Подбор номенклатуры" class="dialog" :contentStyle="{height: '100%'}" :style="{width: '700px', height: '750px'}" v-model:visible="displayItemTreeDialog" :modal="true" :showHeader="false">
-    <br>
-    <ItemTree type="direct" @get-item-id="getItemId"/>
-    <template #footer>
-      <Button label="Закрыть" icon="pi pi-times" @click="closeItemTreeDialog" class="p-button-text" />
-    </template>
-  </Dialog>
-
 </template>
 
 <script>
@@ -106,10 +97,9 @@ import PeriodReport from '@/components/reports/PeriodReport.vue';
 import ItemMovesReport from '@/components/reports/ItemMovesReport.vue';
 import SalesReport from '@/components/reports/SalesReport.vue';
 import PaymentsReport from '@/components/reports/PaymentsReport.vue';
-import ItemTree from '@/components/trees/ItemTree.vue';
-import Dialog from 'primevue/dialog';
 import Checkbox from 'primevue/checkbox';
 import {Property} from '@/js/Constants';
+import TreeSelect from 'primevue/treeselect';
 export default {
   name: 'ReportPage',
   components: {
@@ -124,9 +114,8 @@ export default {
     ItemMovesReport,
     SalesReport,
     PaymentsReport,
-    ItemTree,
-    Dialog,
-    Checkbox
+    Checkbox,
+    TreeSelect
   },
   props: {
       type: String,
@@ -145,7 +134,8 @@ export default {
       includeNull: false,
       onlyHolden: true,
       displayItemTreeDialog: false,
-      itemId: 716
+      selectedKeys: null,
+      selectedNodes: []
     }
   },
   computed: {
@@ -161,6 +151,9 @@ export default {
     companies() {
       return this.$store.state.cs.companies;
     },
+    nodes() {
+      return this.$store.state.is.itemTree;
+    },
   },
   watch: {
     type(value) {
@@ -168,6 +161,7 @@ export default {
     }
   },
   mounted() {
+    this.$store.dispatch('getItemTree');
     this.setTitle(this.type);
     if(this.defaultProperties.length > 0) {
       let storageId = this.defaultProperties.find(prop => prop.type == Property.STORAGE_TO).property;
@@ -177,10 +171,17 @@ export default {
     }
   },
   methods: {
-    getItemId(val) {
-      this.selectedItem.name = val.label;
-      this.itemId = val.data;
-      this.displayItemTreeDialog = false;
+    onNodeSelect(node) {
+      this.selectedNodes.push(node);
+    },
+    onNodeUnSelect(node) {
+      this.selectedNodes = this.selectedNodes.filter(n => n != node);
+    },
+    deleteItemFromSelected() {
+      if(this.selectedNodes.length > 0) {
+        let node = this.selectedNodes.pop();
+        this.selectedKeys[node.key] = false;
+      }
     },
     onProjectSelect(event) {
       this.project = this.selectedProject = event.data;
@@ -225,9 +226,11 @@ export default {
       if(this.type == 'period' && this.project.name != '') {
         this.$store.dispatch('getPeriodReport', [this.project.id, this.dateStart.getTime(), this.dateEnd.getTime()]);
       } else if(this.type == 'itemMoves' && this.storage.name != '') {
-        this.$store.dispatch('getItemMovesReport', [this.itemId, this.storage.id, this.dateStart.getTime(), this.dateEnd.getTime(), this.includeNull, this.onlyHolden]);
+        let itemIdList = this.selectedNodes.map(n => n.data);
+        this.$store.dispatch('getItemMovesReport', [itemIdList, this.storage.id, this.dateStart.getTime(), this.dateEnd.getTime(), this.includeNull, this.onlyHolden]);
       } else if(this.type == 'sales' && this.project.name != '') {
-        this.$store.dispatch('getSalesReport', [this.itemId, this.project.id, this.dateStart.getTime(), this.dateEnd.getTime(), this.includeNull, this.onlyHolden]);
+        let itemIdList = this.selectedNodes.map(n => n.data);
+        this.$store.dispatch('getSalesReport', [itemIdList, this.project.id, this.dateStart.getTime(), this.dateEnd.getTime(), this.includeNull, this.onlyHolden]);
       } else if(this.type == 'payments') {
         let supplierId = this.selectedSupplier.name != '' ? this.selectedSupplier.id : 0;
         this.$store.dispatch('getPaymentsReport', supplierId);

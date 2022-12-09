@@ -30,14 +30,14 @@ export const ReportStore = {
                         projectId + "&start=" + dateStart + "&end=" + dateEnd, rootState);
 			commit('setPeriodReport', response);
         },
-        async getItemMovesReport({commit, rootState}, [itemId, storageId, dateStart, dateEnd, includeNull, onlyHolden]) {
-            const response = await get('/api/v1/reports/item/moves?itemId=' + itemId + '&storageId=' + 
+        async getItemMovesReport({commit, rootState}, [itemIdList, storageId, dateStart, dateEnd, includeNull, onlyHolden]) {
+            const response = await get('/api/v1/reports/item/moves?itemIdList=' + itemIdList + '&storageId=' + 
                         storageId + "&start=" + dateStart + "&end=" + dateEnd + 
                         "&includeNull=" + includeNull + "&onlyHolden=" + onlyHolden, rootState);
 			commit('setItemMovesReport', response);
         },
-        async getSalesReport({commit, rootState}, [itemId, projectId, dateStart, dateEnd, includeNull, onlyHolden]) {
-            const response = await get('/api/v1/reports/sales?itemId=' + itemId + '&projectId=' + 
+        async getSalesReport({commit, rootState}, [itemIdList, projectId, dateStart, dateEnd, includeNull, onlyHolden]) {
+            const response = await get('/api/v1/reports/sales?itemIdList=' + itemIdList + '&projectId=' + 
                         projectId + "&start=" + dateStart + "&end=" + dateEnd + 
                         "&includeNull=" + includeNull + "&onlyHolden=" + onlyHolden, rootState);
 			commit('setSalesReport', response);
