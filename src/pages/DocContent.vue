@@ -438,9 +438,6 @@ export default {
         icon = "pi-times-circle";
         color = "false-icon";
       }
-      // if(data.date_time < this.startPeriod) {
-      //   color = "disabled";
-      // }
       return color + " " + icon;
     },
     payedIconClass(data) {
@@ -450,7 +447,6 @@ export default {
     },
     disabledClass(data) {
       return this.blockDocs(data) ? 'disabled': null;
-      // return (data.date_time < this.startPeriod || data.date_time <= this.blockTime)? 'disabled': null;
     },
     disableHoldButton() {
       this.disabledHoldButton = true;
@@ -485,28 +481,23 @@ export default {
     toggleModalMenu(event, data) {
       this.data = data;
       this.menuModel = [];
-      let item = {
+      this.menuModel.push({
         label: 'Копировать', icon: 'pi pi-copy',
         command: () => {this.openCopyDocumentRedactor(this.data);}
-      };
-      this.menuModel.push(item);
-      // if(data.date_time >= this.startPeriod && data.date_time >= this.blockTime) {
+      });
       if(!this.blockDocs(data)) {
-        let holdItem = {
+        this.menuModel.push({
           label: this.data.is_hold? "Отменить проведение" : "Провести", 
           icon: 'pi pi-check-circle',
           command: () => {this.holdDocumentFromModalMenu(this.data);}
-        }
-        this.menuModel.push(holdItem);
+        });
       }
       if(this.user.role == 'ADMIN' || data.author.id == this.user.id) {
-        // if(data.date_time >= this.startPeriod && data.date_time >= this.blockTime) {
         if(!this.blockDocs(data)) {
-          let item = {
+          this.menuModel.push({
             label: 'Изменить', icon: 'pi pi-pencil',
             command: () => this.openUpdateDocumentRedactor(this.data)
-          };
-          this.menuModel.push(item);
+          });
           let deleteLable = '';
           if(data.is_deleted) {
             deleteLable = 'Отменить'
@@ -515,11 +506,10 @@ export default {
             deleteLable = 'Удалить'
             this.confirmationType = 'delete';
           }
-          let delItem = {
+          this.menuModel.push({
             label: deleteLable, icon: 'pi pi-times',
             command: () => this.openConfirmation(data)
-          };
-          this.menuModel.push(delItem);
+          });
         }
       }
       if((this.user.role == 'ADMIN' || this.user.role == 'ACCOUNTANT')

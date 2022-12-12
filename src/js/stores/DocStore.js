@@ -176,7 +176,7 @@ export const DocStore = {
 			let headers = {'Authorization': rootState.token };
 			let path = isHold? '/api/v1/docs/un/hold/' : '/api/v1/docs/hold/';
 			const response = await post(path + docId, headers, null, rootState);
-			if(response.type == 1) {
+			if(response.type > 0) {
 				commit('setExsistNotHoldenDocs');
 			}
 			if(response.data == 'ok') { 

@@ -164,10 +164,14 @@ export default {
     this.$store.dispatch('getItemTree');
     this.setTitle(this.type);
     if(this.defaultProperties.length > 0) {
-      let storageId = this.defaultProperties.find(prop => prop.type == Property.STORAGE_TO).property;
-      this.storage = this.getStorageById(storageId);
-      let projectId = this.defaultProperties.find(prop => prop.type == Property.PROJECT).property;
-      this.project = this.getProjectById(projectId);
+      if(this.storage.name == '') {
+        let storageId = this.defaultProperties.find(prop => prop.type == Property.STORAGE_TO).property;
+        this.storage = this.getStorageById(storageId);
+      }
+      if(this.project.name == '') {
+        let projectId = this.defaultProperties.find(prop => prop.type == Property.PROJECT).property;
+        this.project = this.getProjectById(projectId);
+      }
     }
   },
   methods: {

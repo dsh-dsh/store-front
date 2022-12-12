@@ -52,6 +52,12 @@
       <div class="flex-grow-1 flex  overflow-hidden"></div>
       <div class="flex-none flex">{{ formatPrice(getTotalAmount()) }}</div>
     </div>
+    <br>
+    <div class="flex">
+      <div class="flex-none flex title">Приход товара за период:</div>
+      <div class="flex-grow-1 flex  overflow-hidden"></div>
+      <div class="flex-none flex">{{ formatPrice(periodReport.incomingAmount) }}</div>
+    </div>
   </div>
 </template>
 
