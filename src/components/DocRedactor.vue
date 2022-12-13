@@ -62,8 +62,10 @@
             <div v-if="doc.supplier">
               <label for="supplier" class="label">поставщик</label><br>
               <div class="p-inputgroup">
-                <InputText id="supplier" type="text" class="p-inputtext" v-model="doc.supplier.name" :disabled="disabledSupplier" />
-                <Button icon="pi pi-check" class="p-button-warning" @click="onSupplierClick"/>
+                <AutoComplete v-model="selectedSupplierName" :suggestions="filteredSuppliers" 
+                    @complete="searchSupplier($event)" @item-select="setSupplierToDoc" @item-unselect="setSupplierToDoc" optionLabel="Номенклатура" />
+                <!-- <InputText id="supplier" type="text" class="p-inputtext" v-model="doc.supplier.name" :disabled="disabledSupplier" />
+                <Button icon="pi pi-check" class="p-button-warning" @click="onSupplierClick"/> -->
               </div>
             </div>
           </div>
@@ -71,8 +73,10 @@
             <div v-if="doc.recipient">
               <label for="recipient" class="label">получатель</label><br>
               <div class="p-inputgroup">
-                <InputText id="recipient" type="text" class="p-inputtext" v-model="doc.recipient.name" />
-                <Button icon="pi pi-check" class="p-button-warning" @click="onRecipientClick"/>
+                <AutoComplete v-model="selectedRecipientName" :suggestions="filteredRecipients" 
+                    @complete="searchRecipient($event)" @item-select="setRecipientToDoc" @item-unselect="setRecipientToDoc" optionLabel="Номенклатура" />
+                <!-- <InputText id="recipient" type="text" class="p-inputtext" v-model="doc.recipient.name" />
+                <Button icon="pi pi-check" class="p-button-warning" @click="onRecipientClick"/> -->
               </div>
             </div>
           </div>
@@ -385,8 +389,7 @@ import {Property, DocumentType, PaymentType, CheckPaymentType} from '@/js/Consta
 import ItemChoose from '@/components/tables/ItemChoose.vue';
 import InputNumber from 'primevue/inputnumber';
 import Textarea from 'primevue/textarea';
-// import AutoComplete from 'primevue/autocomplete';
-
+import AutoComplete from 'primevue/autocomplete';
 
 export default {
     name: 'DocContent',
@@ -403,8 +406,8 @@ export default {
         Divider,
         ItemChoose,
         InputNumber,
-        Textarea
-        // AutoComplete
+        Textarea,
+        AutoComplete
     },
     props: {
         docId: Number,
@@ -459,7 +462,6 @@ export default {
         multiplySelectItems: false,
         currentItem: undefined,
         baseDocId: 0,
-        filteredSuppliers: null,
         companyNames: null,
         digitValue: 0,
         isMobile: Boolean,
@@ -467,7 +469,11 @@ export default {
         documentField: null,
         comment: "",
         supplierDocNumber: "",
-        startPeriod: ""
+        startPeriod: "",
+        selectedSupplierName: "",
+        filteredSuppliers: [],
+        selectedRecipientName: "",
+        filteredRecipients: []
       };
     },
     computed: {
@@ -608,6 +614,10 @@ export default {
           this.comment = value.doc_info.comment;
           this.supplierDocNumber = value.doc_info.supplier_doc_number;
         }
+        if(value.supplier) {
+          this.selectedSupplierName = value.supplier.name;
+          this.selectedRecipientName = value.recipient.name;
+        }
       },
       itemRest(value) {
         this.doc.doc_items = value;
@@ -630,6 +640,34 @@ export default {
       //   let property = this.defaultProperties.find(prop => prop.type == Property.INPUT_NULL_VALUE);
       //   if(property) this.inputNullValueProperty = property.property == 1;
       // },
+      searchSupplier(event) {
+        if (!event.query.trim().length) {
+          this.filteredSuppliers = [...this.company];
+        }
+        else {
+          this.filteredSuppliers = this.companies.filter((company) => {
+            return company.name.toLowerCase().includes(event.query.toLowerCase());
+          }).map(company => company.name);
+        } 
+      },
+      searchRecipient(event) {
+        if (!event.query.trim().length) {
+          this.filteredRecipients = [...this.company];
+        }
+        else {
+          this.filteredRecipients = this.companies.filter((company) => {
+            return company.name.toLowerCase().includes(event.query.toLowerCase());
+          }).map(company => company.name);
+        } 
+      },
+      setSupplierToDoc() {
+        this.doc.supplier = this.companies.find(company => company.name == this.selectedSupplierName);
+        this.$emit('disableHoldButton');
+      },
+      setRecipientToDoc() {
+        this.doc.recipient = this.companies.find(company => company.name == this.selectedRecipientName);
+        this.$emit('disableHoldButton');
+      },
       onDocInfoChange(event) {
         this.disableHoldButton();
         if(!this.doc.doc_info) {
@@ -693,18 +731,6 @@ export default {
         if(key == 'Backspace' || key == 'Delete' || key == ' ') {
           this.delDigit();
         }
-      },
-      searchSupplier(event) {
-        setTimeout(() => {
-          if (!event.query.trim().length) {
-            this.filteredSuppliers = [...this.companyNames];
-          }
-          else {
-            this.filteredSuppliers = this.companyNames.filter((company) => {
-              return company.name.toLowerCase().includes(event.query.toLowerCase());
-            });
-          }
-        }, 250);
       },
       virtualKeyboard() {
         blur();
@@ -868,27 +894,27 @@ export default {
         this.$refs.opProjects.hide();
         this.$emit('disableHoldButton');
       },
-      onRecipientClick(event) {
-        this.companyType = 'recipient';
-        this.$refs.opCompanies.toggle(event);
-      },
+      // onRecipientClick(event) {
+      //   this.companyType = 'recipient';
+      //   this.$refs.opCompanies.toggle(event);
+      // },
       onIndividualClick(event) {
         this.userType = 'individual';
         this.$refs.opUsers.toggle(event);
       },
-      onSupplierClick(event) {
-        this.companyType = 'supplier';
-        this.$refs.opCompanies.toggle(event);
-      },
-      onCompanySelect(event) {
-        if(this.companyType == 'recipient') {
-          this.doc.recipient = event.data;
-        } else {
-          this.doc.supplier = event.data;
-        }
-        this.$refs.opCompanies.hide();
-        this.$emit('disableHoldButton');
-      },
+      // onSupplierClick(event) {
+      //   this.companyType = 'supplier';
+      //   this.$refs.opCompanies.toggle(event);
+      // },
+      // onCompanySelect(event) {
+      //   if(this.companyType == 'recipient') {
+      //     this.doc.recipient = event.data;
+      //   } else {
+      //     this.doc.supplier = event.data;
+      //   }
+      //   this.$refs.opCompanies.hide();
+      //   this.$emit('disableHoldButton');
+      // },
       onStorageFromClick(event) {
         this.storageType = 'storageFrom';
         this.$refs.opStorage.toggle(event);
