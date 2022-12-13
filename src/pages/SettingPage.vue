@@ -123,10 +123,10 @@
 
     <AccordionTab v-if="isAdmin" header="Настройки каталогов">
       <div class="formgrid grid leftAlignment">
-        <div class="col-12 md:col-4">
+        <div class="col-12 md:col-3">
           <span>Наша компания </span>
         </div>
-        <div class="col-12 md:col-4">
+        <div class="col-12 md:col-5">
           <div class="p-inputgroup">
             <InputText type="text" class="p-inputtext-sm  input" v-model="companyName" />
             <Button icon="pi pi-check" class="p-button-sm p-button-warning" @click="onSupplierClick"/>
@@ -136,16 +136,28 @@
 
         <div class="col-12 md:col-12"><br></div>
         
-        <div class="col-12 md:col-4">
+        <div class="col-12 md:col-3">
           <span>Каталог ингредиентов </span>
         </div>
-        <div class="col-12 md:col-4">
+        <div class="col-12 md:col-5">
           <div class="p-inputgroup">
             <InputText type="text" class="p-inputtext-sm  input" v-model="ingredientDirName" />
             <Button icon="pi pi-check" class="p-button-sm p-button-warning" @click="onItemDirClick"/>
           </div>
         </div>
         <div class="col-12 md:col-4"></div>
+
+        <div class="col-12 md:col-12"><br></div>
+        
+        <div class="col-12 md:col-3">
+          <span>Не списывать при расчете </span>
+        </div>
+        <div class="col-12 md:col-9">
+          <div class="p-inputgroup">
+            <AutoComplete :multiple="true" v-model="selectedStringItems" :suggestions="filteredItems" 
+                @complete="searchItem($event)" @item-select="setDisabledItem" optionLabel="Номенклатура" />
+          </div>
+        </div>
       </div>
     </AccordionTab>
 
@@ -209,6 +221,7 @@ import InputText from 'primevue/inputtext';
 import InputSwitch from 'primevue/inputswitch';
 import {Property} from '@/js/Constants';
 import Slider from 'primevue/slider';
+import AutoComplete from 'primevue/autocomplete';
 
 export default {
   name: 'Settings',
@@ -222,7 +235,8 @@ export default {
     Column,
     OverlayPanel,
     InputSwitch,
-    Slider
+    Slider,
+    AutoComplete
   },
   data() {
     return {
@@ -251,7 +265,11 @@ export default {
       fontSize: 0,
       currentFontSize: 0,
       enableDocBlock: Boolean,
-      // inputNullValue: 0,
+      selectedItem: null,
+      itemName: "",
+      itemId: 0,
+      selectedStringItems: [],
+      filteredItems: null
     };
   },
   computed: {
@@ -299,7 +317,13 @@ export default {
     },
     itemDirList() {
       return this.$store.state.cs.itemDirList;
-    }
+    },
+    allItems() {
+      return this.$store.state.cs.allItems;
+    },
+    disabledItems() {
+      return this.$store.state.ss.disabledItems;
+    },
   },
   watch: {
     user(val) {
@@ -312,6 +336,9 @@ export default {
     period(val) {
       this.periodString = 'Закрыть период? (текущий период: ' 
             +  formatDate(new Date(val.start_date)) + ' - ' + formatDate(new Date(val.end_date)) + ')';
+    },
+    disabledItems(ids) {
+      this.selectedStringItems = ids.map(id => this.allItems.find(item => item.id == id)).map(item => item.name);
     }
   },
   mounted() {
@@ -325,12 +352,25 @@ export default {
     this.$store.dispatch('getIngredientDirIdProperty');
     this.$store.dispatch('getHoldingDialogProperty');
     this.$store.dispatch('getCheckHoldingEnableProperty');
+    this.$store.dispatch('getAllItems');
+    this.$store.dispatch('getDisabledItem');
   },
   methods: {
-    // setInputNullValue() {
-    //   console.log("setInputNullValue", this.inputNullValue)
-    //   this.setProperty(this.user, Property.INPUT_NULL_VALUE, this.inputNullValue == false ? 1 : 0);
-    // },
+    searchItem(event) {
+      if (!event.query.trim().length) {
+        this.filteredItems = [...this.allItems];
+      }
+      else {
+        this.filteredItems = this.allItems.filter((item) => {
+          return item.name.toLowerCase().includes(event.query.toLowerCase());
+        }).map(item => item.name);
+      }
+    },
+    setDisabledItem() {
+      if(!this.selectedStringItems.length) return;
+      let itemIds = this.selectedStringItems.map(itemName => this.allItems.find(item => item.name == itemName).id);
+      this.$store.dispatch('setDisabledItems', itemIds);
+    },
     setExampleFontSize(event) {
       if(event != this.currentFontSize) {
         let root= document.documentElement;
@@ -459,12 +499,21 @@ export default {
     onItemDirClick(event) {
       this.$refs.opItemDirs.toggle(event);
     },
+    onItemClick(event) {
+      this.$refs.opItems.toggle(event);
+    },
     onItemDirSelect(event) {
       this.ingredientDirName = event.data.name;
       this.ingredientDirId = event.data.id;
       this.$store.dispatch('setIngredientDirIdProperty', this.ingredientDirId);
       this.$refs.opItemDirs.hide();
     },
+    onItemSelect(event) {
+      this.itemName = event.data.name;
+      this.itemId = event.data.id;
+      // this.$store.dispatch('setIngredientDirIdProperty', this.ingredientDirId);
+      this.$refs.opItems.hide();
+    }
   },
 }
 

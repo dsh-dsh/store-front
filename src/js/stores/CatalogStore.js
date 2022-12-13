@@ -12,7 +12,8 @@ export const CatalogStore = {
             storages: [],
             users: [],
             items: [],
-			itemDirList: []
+			itemDirList: [],
+			allItems: []
         }
     },
     mutations: {
@@ -43,6 +44,9 @@ export const CatalogStore = {
 		},
 		setItemDirList (state, res) {
 			state.itemDirList = res;
+		},
+		setAllItems(state, res) {
+			state.allItems = res;
 		},
     },
     actions: {
@@ -75,8 +79,12 @@ export const CatalogStore = {
 			commit('setCompanies', response)
 		},
 		async getItems({rootState, commit}) {
-			const response = await get('/api/v1/items/list', rootState)
+			const response = await get('/api/v1/items/rest/list', rootState)
 			commit('setItems', response)
+		},
+		async getAllItems({rootState, commit}) {
+			const response = await get('/api/v1/items/list', rootState)
+			commit('setAllItems', response)
 		},
 		async getItemDirList({rootState, commit}) {
 			const response = await get('/api/v1/items/dirs/list', rootState)

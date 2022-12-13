@@ -133,7 +133,7 @@ export const ItemStore = {
 		async getItemsWithRest({rootState, commit}, time) {
 			if(time.getTime() != this.timeOfRest) {
 				this.timeOfRest = time.getTime();
-				const response = await get('/api/v1/items/list?time=' + this.timeOfRest, rootState)
+				const response = await get('/api/v1/items/rest/list?time=' + this.timeOfRest, rootState)
 				commit('setItemsWithRest', response)
 			}
 		},

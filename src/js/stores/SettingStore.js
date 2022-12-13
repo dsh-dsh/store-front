@@ -28,7 +28,8 @@ export const SettingStore = {
                 {type:'REQUEST_DOC_TYPE_FILTER', name:'Заявка'},
                 {type:'INVENTORY_DOC_TYPE_FILTER', name:'Инвентаризация'},
                 {type:'PERIOD_REST_MOVE_DOC_TYPE_FILTER', name:'Перенос остатков'}
-            ]
+            ],
+            disabledItems: []
         }
     },
     mutations: {
@@ -67,7 +68,10 @@ export const SettingStore = {
         },
         setBlockTime(state, res) {
             state.blockTime = new Date(res);
-        }
+        },
+        setDisabledItems(state, res) {
+            state.disabledItems = res.itemIds;
+        },
     },
     actions: {
         async getDefaultProperties({commit, rootState}) {
@@ -186,6 +190,18 @@ export const SettingStore = {
             if(response.data == "ok") {
                 this.dispatch("getEnableDocBlockProperty");
             }
+        },
+        async setDisabledItems({rootState}, value) {
+			let request = {'itemIds': value};
+			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
+			const response = await post('/api/v1/setting/disabled/items', headers, request, rootState);
+            if(response.data == "ok") {
+                this.dispatch("getDisabledItem");
+            }
+        },
+        async getDisabledItem({commit, rootState}) {
+            const response = await get('/api/v1/setting/disabled/items', rootState);
+			commit('setDisabledItems', response);
         },
         async getPeriod({commit, rootState}) {
             const response = await get('/api/v1/setting/period', rootState);

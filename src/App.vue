@@ -72,4 +72,20 @@ export default {
     position: fixed;
     width: 29rem;
   }
+  /* width */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 4px grey;
+    border-radius: 4px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: rgb(145, 144, 144);
+    border-radius: 6px;
+}
 </style>
