@@ -155,9 +155,22 @@
         <div class="col-12 md:col-9">
           <div class="p-inputgroup">
             <AutoComplete :multiple="true" v-model="selectedStringItems" :suggestions="filteredItems" 
-                @complete="searchItem($event)" @item-select="setDisabledItem" optionLabel="Номенклатура" />
+                @complete="searchItem($event)" @item-select="setDisabledItem" @item-unselect="setDisabledItem" optionLabel="Номенклатура" />
           </div>
         </div>
+
+        <div class="col-12 md:col-12"><br></div>
+        
+        <div class="col-12 md:col-3">
+          <span>Блокирующие авторы документы </span>
+        </div>
+        <div class="col-12 md:col-9">
+          <div class="p-inputgroup">
+            <AutoComplete :multiple="true" v-model="selectedUserNames" :suggestions="filteredUsers" 
+                @complete="searchUsers($event)" @item-select="setBlockingUsers" @item-unselect="setBlockingUsers" optionLabel="Номенклатура" />
+          </div>
+        </div>
+
       </div>
     </AccordionTab>
 
@@ -265,11 +278,13 @@ export default {
       fontSize: 0,
       currentFontSize: 0,
       enableDocBlock: Boolean,
-      selectedItem: null,
-      itemName: "",
-      itemId: 0,
+      // selectedItem: null,
+      // itemName: "",
+      // itemId: 0,
       selectedStringItems: [],
-      filteredItems: null
+      filteredItems: null,
+      selectedUserNames: [],
+      filteredUsers: null
     };
   },
   computed: {
@@ -318,11 +333,17 @@ export default {
     itemDirList() {
       return this.$store.state.cs.itemDirList;
     },
+    disabledItems() {
+      return this.$store.state.ss.disabledItems;
+    },
+    blockingUsers() {
+      return this.$store.state.ss.blockingUsers;
+    },
     allItems() {
       return this.$store.state.cs.allItems;
     },
-    disabledItems() {
-      return this.$store.state.ss.disabledItems;
+    users() {
+      return this.$store.state.cs.allUsers;
     },
   },
   watch: {
@@ -336,9 +357,6 @@ export default {
     period(val) {
       this.periodString = 'Закрыть период? (текущий период: ' 
             +  formatDate(new Date(val.start_date)) + ' - ' + formatDate(new Date(val.end_date)) + ')';
-    },
-    disabledItems(ids) {
-      this.selectedStringItems = ids.map(id => this.allItems.find(item => item.id == id)).map(item => item.name);
     }
   },
   mounted() {
@@ -352,10 +370,27 @@ export default {
     this.$store.dispatch('getIngredientDirIdProperty');
     this.$store.dispatch('getHoldingDialogProperty');
     this.$store.dispatch('getCheckHoldingEnableProperty');
-    this.$store.dispatch('getAllItems');
     this.$store.dispatch('getDisabledItem');
+    this.$store.dispatch('getBlockingUsers');
+    this.$store.dispatch('getAllItems');
+    this.$store.dispatch('getAllUsers');
   },
   methods: {
+    searchUsers(event) {
+      if (!event.query.trim().length) {
+        this.filteredUsers = [...this.users];
+      }
+      else {
+        this.filteredUsers = this.users.filter((item) => {
+          return item.name.toLowerCase().includes(event.query.toLowerCase());
+        }).map(user => user.name);
+      } 
+    },
+    setBlockingUsers() {
+      if(!this.selectedUserNames.length) return;
+      let userIds = this.selectedUserNames.map(userName => this.users.find(user => user.name == userName).id);
+      this.$store.dispatch('setBlockingUsers', userIds);
+    },
     searchItem(event) {
       if (!event.query.trim().length) {
         this.filteredItems = [...this.allItems];
@@ -420,6 +455,8 @@ export default {
         this.companyName = this.companies.find(c => c.id == this.ourCompanyIdSetting).name;
         this.ingredientDirId = this.ingredientDirIdSetting;
         this.ingredientDirName  = this.itemDirList.find(i => i.id == this.ingredientDirIdSetting).name;
+        this.selectedStringItems = this.disabledItems.map(id => this.allItems.find(item => item.id == id)).map(item => item.name);
+        this.selectedUserNames = this.blockingUsers.map(id => this.users.find(user => user.id == id)).map(user => user.name);
       } else if(this.activeIndex == 6) {
         this.holdingDialog = this.holdingDialogSetting;
         this.enableDocBlock = this.enableDocBlockSetting;
@@ -499,20 +536,11 @@ export default {
     onItemDirClick(event) {
       this.$refs.opItemDirs.toggle(event);
     },
-    onItemClick(event) {
-      this.$refs.opItems.toggle(event);
-    },
     onItemDirSelect(event) {
       this.ingredientDirName = event.data.name;
       this.ingredientDirId = event.data.id;
       this.$store.dispatch('setIngredientDirIdProperty', this.ingredientDirId);
       this.$refs.opItemDirs.hide();
-    },
-    onItemSelect(event) {
-      this.itemName = event.data.name;
-      this.itemId = event.data.id;
-      // this.$store.dispatch('setIngredientDirIdProperty', this.ingredientDirId);
-      this.$refs.opItems.hide();
     }
   },
 }

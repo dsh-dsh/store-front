@@ -29,7 +29,8 @@ export const SettingStore = {
                 {type:'INVENTORY_DOC_TYPE_FILTER', name:'Инвентаризация'},
                 {type:'PERIOD_REST_MOVE_DOC_TYPE_FILTER', name:'Перенос остатков'}
             ],
-            disabledItems: []
+            disabledItems: [],
+            blockingUsers: []
         }
     },
     mutations: {
@@ -70,7 +71,10 @@ export const SettingStore = {
             state.blockTime = new Date(res);
         },
         setDisabledItems(state, res) {
-            state.disabledItems = res.itemIds;
+            state.disabledItems = res.ids;
+        },
+        setBlockingUsers(state, res) {
+            state.blockingUsers = res.ids;
         },
     },
     actions: {
@@ -192,16 +196,28 @@ export const SettingStore = {
             }
         },
         async setDisabledItems({rootState}, value) {
-			let request = {'itemIds': value};
+			let request = {'ids': value};
 			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
 			const response = await post('/api/v1/setting/disabled/items', headers, request, rootState);
             if(response.data == "ok") {
                 this.dispatch("getDisabledItem");
             }
         },
+        async setBlockingUsers({rootState}, value) {
+			let request = {'ids': value};
+			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
+			const response = await post('/api/v1/setting/blocking/users', headers, request, rootState);
+            if(response.data == "ok") {
+                this.dispatch("getBlockingUsers");
+            }
+        },
         async getDisabledItem({commit, rootState}) {
             const response = await get('/api/v1/setting/disabled/items', rootState);
 			commit('setDisabledItems', response);
+        },
+        async getBlockingUsers({commit, rootState}) {
+            const response = await get('/api/v1/setting/blocking/users', rootState);
+			commit('setBlockingUsers', response);
         },
         async getPeriod({commit, rootState}) {
             const response = await get('/api/v1/setting/period', rootState);

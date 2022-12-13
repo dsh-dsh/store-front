@@ -13,7 +13,8 @@ export const CatalogStore = {
             users: [],
             items: [],
 			itemDirList: [],
-			allItems: []
+			allItems: [],
+			allUsers: []
         }
     },
     mutations: {
@@ -48,6 +49,9 @@ export const CatalogStore = {
 		setAllItems(state, res) {
 			state.allItems = res;
 		},
+		setAllUsers(state, res) {
+			state.allUsers = res;
+		},
     },
     actions: {
 		async getDocTypes({rootState, commit}) {
@@ -73,6 +77,10 @@ export const CatalogStore = {
 		async getUsers({rootState, commit}) {
 			const response = await get('/api/v1/catalogs/users', rootState)
 			commit('setUsers', response)
+		},
+		async getAllUsers({rootState, commit}) {
+			const response = await get('/api/v1/catalogs/users/all', rootState)
+			commit('setAllUsers', response)
 		},
 		async getCompanies({rootState, commit}) {
 			const response = await get('/api/v1/catalogs/companies', rootState)
