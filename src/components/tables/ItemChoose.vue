@@ -152,7 +152,6 @@ export default {
             this.displayQuantityDialog = false;
         },
         onItemSelect(event) {
-            console.log(event.data)
             this.newItem = new DocItem(event.data.id, event.data.name, event.data.unit, 0.0, event.data.price, 0, 0, event.data.is_composite);
             if(this.multiplySelect) {
                 this.displayQuantityDialog = true;

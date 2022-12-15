@@ -33,9 +33,10 @@ export default {
   mounted() {
     this.$store.dispatch('getInitialData')
     this.$store.dispatch('installToast', this.$toast)
-    this.$store.dispatch('getHoldingDialogProperty');
-    this.$store.dispatch('getEnableDocBlockProperty');
-    this.$store.dispatch('getOurCompanyProperty');
+    this.$store.dispatch('getAllSystemSettings');
+    // this.$store.dispatch('getHoldingDialogProperty');
+    // this.$store.dispatch('getEnableDocBlockProperty');
+    // this.$store.dispatch('getOurCompanyProperty');
     this.$store.dispatch('getDefaultProperties');
   },
   methods: {

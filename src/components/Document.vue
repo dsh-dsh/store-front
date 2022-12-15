@@ -245,7 +245,7 @@ export default {
             isCheck: false,
             isPosting: false,
             isRequest: false,
-            colSpan: 4,
+            colSpan: 5,
             DocumentType: DocumentType,
             disableRedactoring: false,
             baseDocId: 0,

@@ -453,7 +453,7 @@ export default {
         isInventory: false,
         isCheck: false,
         isMovement: false,
-        colSpan: 4,  
+        colSpan: 5,  
         colSpan2: 3,              
         DocumentType: DocumentType,
         paymentTypes:[],
@@ -962,7 +962,6 @@ export default {
           for(const item of newItemList) {
             this.currentItem = this.doc.doc_items.filter(i => i.item_id == item.item_id).pop();
             if (this.currentItem == undefined) {
-              console.log(item)
               this.doc.doc_items.push(item);
             } else {
               this.currentItem.quantity = item.quantity;

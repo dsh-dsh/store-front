@@ -1,6 +1,6 @@
 <template>
   <MainMenu />
-  <Accordion  v-model:activeIndex="activeIndex"  @tab-open="setDefaultProperties">
+  <Accordion  v-model:activeIndex="activeIndex"  @tab-open="setProperties">
 
     <AccordionTab header="Реквизиты документов по умолчанию">
       <div v-if="defaultProject" class="formgrid grid">  
@@ -265,22 +265,19 @@ export default {
       addShortageForHold: Boolean,
       averagePriceForPeriodClose: Boolean,
       averagePriceForDocs: Boolean,
+      holdingDialog: Boolean,
+      checkHoldingEnable: Boolean,
+      enableDocBlock: Boolean,
+      ingredientDirId: 0,
+      ingredientDirName: "",
       periodString: '',
       disabledHoldChecksButton: true,
       selectedCompany: null,
       companyName: "",
       companyId: 0,
-      ingredientDirId: 0,
-      ingredientDirName: "",
-      holdingDialog: Boolean,
-      checkHoldingEnable: Boolean,
       selectedItemDir: null,
       fontSize: 0,
       currentFontSize: 0,
-      enableDocBlock: Boolean,
-      // selectedItem: null,
-      // itemName: "",
-      // itemId: 0,
       selectedStringItems: [],
       filteredItems: null,
       selectedUserNames: [],
@@ -303,32 +300,11 @@ export default {
     companies() {
       return this.$store.state.cs.companies;
     },
-    addShortageForHoldSetting() {
-      return this.$store.state.ss.addShortageForHold;
-    },
-    averagePriceForPeriodCloseSetting() {
-      return this.$store.state.ss.аveragePriceForPeriodCloseProperty;
-    },
-    averagePriceForDocsSetting() {
-      return this.$store.state.ss.аveragePriceForDocsProperty;
-    },
-    ourCompanyIdSetting() {
-      return this.$store.state.ss.ourCompanyIdProperty;
-    },
-    ingredientDirIdSetting() {
-      return this.$store.state.ss.ingredientDirIdProperty;
-    },
-    holdingDialogSetting() {
-      return this.$store.state.ss.holdingDialogProperty;
-    },
-    checkHoldingEnableSetting() {
-      return this.$store.state.ss.checkHoldingEnableProperty;
+    systemSettingMap() {
+      return this.$store.state.ss.systemSettingMap;
     },
     unholdenCheckDate() {
       return this.$store.state.ds.unholdenCheckDate;
-    },
-    enableDocBlockSetting() {
-      return this.$store.state.ss.enableDocBlockProperty;
     },
     itemDirList() {
       return this.$store.state.cs.itemDirList;
@@ -357,19 +333,12 @@ export default {
     period(val) {
       this.periodString = 'Закрыть период? (текущий период: ' 
             +  formatDate(new Date(val.start_date)) + ' - ' + formatDate(new Date(val.end_date)) + ')';
-    }
+    },
   },
   mounted() {
     this.user = JSON.parse(localStorage.getItem('user'));
-    this.$store.dispatch('getAddShortageForHold');
-    this.$store.dispatch('getAveragePriceForPeriodCloseProperty');
-    this.$store.dispatch('getAveragePriceForDocsProperty');
     this.$store.dispatch('getPeriod');
     this.$store.dispatch('checkUnholden1CDocuments');
-    this.$store.dispatch('getOurCompanyProperty');
-    this.$store.dispatch('getIngredientDirIdProperty');
-    this.$store.dispatch('getHoldingDialogProperty');
-    this.$store.dispatch('getCheckHoldingEnableProperty');
     this.$store.dispatch('getDisabledItem');
     this.$store.dispatch('getBlockingUsers');
     this.$store.dispatch('getAllItems');
@@ -420,15 +389,13 @@ export default {
     closePeriod() {
       this.$store.dispatch('closePeriod');
     },
-    setDefaultProperties() {
+    setProperties() {
       if(this.activeIndex == 0) {
         if(this.defaultProperties.length > 0) {
           let project = this.defaultProperties.find(prop => prop.type == Property.PROJECT);
           if(project) this.defaultProject = this.getProjectById(project.property);
-
           let storageTo = this.defaultProperties.find(prop => prop.type == Property.STORAGE_TO);
           if(storageTo) this.defaultStorageTo = this.getStorageById(storageTo.property);
-
           let storageFrom = this.defaultProperties.find(prop => prop.type == Property.STORAGE_FROM);
           if(storageFrom) this.defaultStorageFrom = this.getStorageById(storageFrom.property);
         }
@@ -438,33 +405,28 @@ export default {
           this.currentFontSize = 0;
           this.setExampleFontSize(fontSizeProperty.property);
         }
-        // let inputNullValueProperty = this.defaultProperties.find(prop => prop.type == Property.INPUT_NULL_VALUE);
-        // if(inputNullValueProperty) {
-        //   this.inputNullValue = inputNullValueProperty.property == 1;
-        //   console.log(this.inputNullValue)
-        // }
       } else if(this.activeIndex == 3) {
-        this.averagePriceForPeriodClose = this.averagePriceForPeriodCloseSetting;
+        this.averagePriceForPeriodClose = this.systemSettingMap.get(Property.PERIOD_AVERAGE_PRICE) == 1; //averagePriceForPeriodCloseSetting;
       } else if(this.activeIndex == 4) {
-        this.checkHoldingEnable = this.checkHoldingEnableSetting;
-        this.addShortageForHold = this.addShortageForHoldSetting;
-        this.averagePriceForDocs = this.averagePriceForDocsSetting;
+        this.checkHoldingEnable = this.systemSettingMap.get(Property.CHECK_HOLDING_ENABLE) == 1; //checkHoldingEnableSetting;
+        this.addShortageForHold = this.systemSettingMap.get(Property.ADD_REST_FOR_HOLD_1C_DOCS) == 1; //addShortageForHoldSetting;
+        this.averagePriceForDocs = this.systemSettingMap.get(Property.DOCS_AVERAGE_PRICE) == 1; //averagePriceForDocsSetting;
         this.disabledHoldChecksButton = this.unholdenCheckDate == "";
       } else if(this.activeIndex == 5) {
-        this.companyId = this.ourCompanyIdSetting;
-        this.companyName = this.companies.find(c => c.id == this.ourCompanyIdSetting).name;
-        this.ingredientDirId = this.ingredientDirIdSetting;
-        this.ingredientDirName  = this.itemDirList.find(i => i.id == this.ingredientDirIdSetting).name;
+        this.companyId = this.systemSettingMap.get(Property.OUR_COMPANY_ID); //ourCompanyIdSetting;
+        this.companyName = this.companies.find(c => c.id == this.companyId).name;
+        this.ingredientDirId = this.systemSettingMap.get(Property.INGREDIENT_DIR_ID); //ingredientDirIdSetting;
+        this.ingredientDirName  = this.itemDirList.find(i => i.id == this.ingredientDirId).name;
         this.selectedStringItems = this.disabledItems.map(id => this.allItems.find(item => item.id == id)).map(item => item.name);
         this.selectedUserNames = this.blockingUsers.map(id => this.users.find(user => user.id == id)).map(user => user.name);
       } else if(this.activeIndex == 6) {
-        this.holdingDialog = this.holdingDialogSetting;
-        this.enableDocBlock = this.enableDocBlockSetting;
+        this.holdingDialog = this.systemSettingMap.get(Property.HOLDING_DIALOG_ENABLE) == 1; //holdingDialogSetting;
+        this.enableDocBlock = this.systemSettingMap.get(Property.DOC_BLOCK_ENABLE) == 1; //enableDocBlockSetting;
       }
     },
-    logout() {
-      this.$store.dispatch('logout');
-    },
+    // logout() {
+    //   this.$store.dispatch('logout');
+    // },
     getProjectById(id) {
       return this.projects.filter(project => project.id == id).pop();
     },
@@ -497,9 +459,6 @@ export default {
       }
       this.$refs.opStorage.hide();
     },
-    setAddShortageForHold() {
-      this.$store.dispatch('setAddShortageForHoldProperty', this.addShortageForHold ? 0 : 1);
-    },
     setProperty(user, type, value) {
       this.$store.dispatch('setProperty', [user, type, value]);
     },
@@ -509,20 +468,29 @@ export default {
     hold1CDocs() {
       this.$store.dispatch('hold1CDocuments');
     },
+    setAddShortageForHold() {
+      this.$store.dispatch('setSystemSetting', 
+          [Property.ADD_REST_FOR_HOLD_1C_DOCS, this.addShortageForHold ? 0 : 1]);
+    },
     setAveragePriceForPeriodClose() {
-      this.$store.dispatch('setAveragePriceForPeriodCloseProperty', this.averagePriceForPeriodClose ? 0 : 1);
+      this.$store.dispatch('setSystemSetting', 
+          [Property.PERIOD_AVERAGE_PRICE, this.averagePriceForPeriodClose ? 0 : 1]);
     },
     setAveragePriceForDocs() {
-      this.$store.dispatch('setAveragePriceForDocsProperty', this.averagePriceForDocs ? 0 : 1);
+      this.$store.dispatch('setSystemSetting', 
+          [Property.DOCS_AVERAGE_PRICE, this.averagePriceForDocs ? 0 : 1]);
     },
     setHoldingDialogProperty() {
-      this.$store.dispatch('setHoldingDialogEnableProperty', this.holdingDialog ? 0 : 1);
+      this.$store.dispatch('setSystemSetting', 
+          [Property.HOLDING_DIALOG_ENABLE, this.holdingDialog ? 0 : 1]);
     },
     setCheckHoldingEnable() {
-      this.$store.dispatch('setCheckHoldingEnableProperty', this.checkHoldingEnable ? 0 : 1);
+      this.$store.dispatch('setSystemSetting', 
+          [Property.CHECK_HOLDING_ENABLE, this.checkHoldingEnable ? 0 : 1]);
     },
     setEnableDocBlockProperty() {
-      this.$store.dispatch('setEnableDocBlockProperty', this.enableDocBlock ? 0 : 1);
+      this.$store.dispatch('setSystemSetting', 
+          [Property.DOC_BLOCK_ENABLE, this.enableDocBlock ? 0 : 1]);
     },
     onSupplierClick(event) {
       this.$refs.opCompanies.toggle(event);
@@ -530,7 +498,8 @@ export default {
     onCompanySelect(event) {
       this.companyName = event.data.name;
       this.companyId = event.data.id; 
-      this.$store.dispatch('setOurCompanyProperty', this.companyId);
+      this.$store.dispatch('setSystemSetting', 
+          [Property.OUR_COMPANY_ID, this.companyId]);
       this.$refs.opCompanies.hide();
     },
     onItemDirClick(event) {
@@ -539,7 +508,8 @@ export default {
     onItemDirSelect(event) {
       this.ingredientDirName = event.data.name;
       this.ingredientDirId = event.data.id;
-      this.$store.dispatch('setIngredientDirIdProperty', this.ingredientDirId);
+      this.$store.dispatch('setSystemSetting', 
+          [Property.INGREDIENT_DIR_ID, this.ingredientDirId]);
       this.$refs.opItemDirs.hide();
     }
   },
@@ -561,20 +531,20 @@ function formatDate(date, withTime) {
 </script>
 
 <style scoped>
-  .conteiner {
+  /* .conteiner {
     display: flex;
   }
   .content {
     display: flex;
     flex-direction: column;
     flex: 0 0 100%;
-  }
+  } */
   .input {
     width: 200 px;
   }
-  .ml-5 {
+  /* .ml-5 {
     margin-left: 50px;
-  }
+  } */
   .mt-3 {
     margin-top: 30px;
   }
