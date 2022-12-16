@@ -187,7 +187,7 @@ import MainMenu from '@/components/menus/MainMenu.vue';
 import OverlayPanel from 'primevue/overlaypanel';
 import Menu from 'primevue/menu';
 import Calendar from 'primevue/calendar';
-import {DocumentType} from '@/js/Constants';
+import {DocumentType, Property} from '@/js/Constants';
 import RadioButton from 'primevue/radiobutton';
 import {FilterMatchMode} from 'primevue/api';
 import InputText from 'primevue/inputtext';
@@ -300,11 +300,8 @@ export default {
       blockTime() {
         return this.$store.state.ss.blockTime;
       },
-      holdingDialogSetting() {
-        return this.$store.state.ss.holdingDialogProperty;
-      },
-      enableDocBlockSetting() {
-        return this.$store.state.ss.enableDocBlockProperty;
+      systemSettingMap() {
+        return this.$store.state.ss.systemSettingMap;
       },
       newDocId() {
         return this.$store.state.ds.newDocId;
@@ -407,7 +404,8 @@ export default {
     },
 	methods: {
     blockDocs(value) {
-      return (value.date_time < this.startPeriod || (value.date_time <= this.blockTime && this.enableDocBlockSetting));
+      return (value.date_time < this.startPeriod 
+                || (value.date_time <= this.blockTime && this.systemSettingMap.get(Property.DOC_BLOCK_ENABLE) == 1));
     },
     onDocTypeFilterChange(event) {
       let choosenTypes = event.value;
@@ -601,7 +599,7 @@ export default {
         this.$store.dispatch('addDocument', [this.currentDocument, this.salectedSaveTime, this.quickSave]);
         this.quickSave = false;
       }	
-      if(this.currentDocument.is_hold == false && this.holdingDialogSetting == 1) {
+      if(this.currentDocument.is_hold == false && this.systemSettingMap.get(Property.HOLDING_DIALOG_ENABLE) == 1) {
         this.confirmationType = 'hold';
         this.displayConfirmation = true;
       } else {

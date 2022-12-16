@@ -22,12 +22,10 @@
         <Calendar id="end" v-model="dateEnd" dateFormat="dd.mm.yy" :showIcon="true" />
       </div>
       <div v-if="type == 'itemMoves' || type == 'sales'" class="col-12 md:col-12 mt-2">
-          <div class="p-inputgroup">
-            <TreeSelect v-model="selectedKeys" :options="nodes" selectionMode="multiple" 
-              @node-select="onNodeSelect" @node-unselect="onNodeUnSelect"
-              :metaKeySelection="false" display="chip" placeholder="номенклатура"/>
-            <Button icon="pi pi-arrow-left" class="p-button-danger" @click="deleteItemFromSelected" />
-          </div>
+        <div class="p-inputgroup">
+          <AutoComplete :multiple="true" v-model="selectedStringItems" :suggestions="filteredItems" 
+                @complete="searchItem($event)" @item-select="setDisabledItem" @item-unselect="setDisabledItem" optionLabel="Номенклатура" />
+        </div>
       </div>
       <div v-if="type == 'itemMoves' || type == 'sales'" class="col-12 md:col-6 mt-2">
         <div class="field-checkbox">
@@ -99,7 +97,7 @@ import SalesReport from '@/components/reports/SalesReport.vue';
 import PaymentsReport from '@/components/reports/PaymentsReport.vue';
 import Checkbox from 'primevue/checkbox';
 import {Property} from '@/js/Constants';
-import TreeSelect from 'primevue/treeselect';
+import AutoComplete from 'primevue/autocomplete';
 export default {
   name: 'ReportPage',
   components: {
@@ -115,7 +113,7 @@ export default {
     SalesReport,
     PaymentsReport,
     Checkbox,
-    TreeSelect
+    AutoComplete
   },
   props: {
       type: String,
@@ -135,7 +133,10 @@ export default {
       onlyHolden: true,
       displayItemTreeDialog: false,
       selectedKeys: null,
-      selectedNodes: []
+      selectedNodes: [],
+      selectedStringItems: [],
+      filteredItems: null,
+      itemIdList:[]
     }
   },
   computed: {
@@ -151,8 +152,8 @@ export default {
     companies() {
       return this.$store.state.cs.companies;
     },
-    nodes() {
-      return this.$store.state.is.itemTree;
+    allItems() {
+      return this.$store.state.cs.allItems;
     },
   },
   watch: {
@@ -161,7 +162,7 @@ export default {
     }
   },
   mounted() {
-    this.$store.dispatch('getItemTree');
+    this.$store.dispatch('getAllItems');
     this.setTitle(this.type);
     if(this.defaultProperties.length > 0) {
       if(this.storage.name == '') {
@@ -175,17 +176,19 @@ export default {
     }
   },
   methods: {
-    onNodeSelect(node) {
-      this.selectedNodes.push(node);
-    },
-    onNodeUnSelect(node) {
-      this.selectedNodes = this.selectedNodes.filter(n => n != node);
-    },
-    deleteItemFromSelected() {
-      if(this.selectedNodes.length > 0) {
-        let node = this.selectedNodes.pop();
-        this.selectedKeys[node.key] = false;
+    searchItem(event) {
+      if (!event.query.trim().length) {
+        this.filteredItems = [...this.allItems];
       }
+      else {
+        this.filteredItems = this.allItems.filter((item) => {
+          return item.name.toLowerCase().includes(event.query.toLowerCase());
+        }).map(item => item.name);
+      }
+    },
+    setDisabledItem() {
+      if(!this.selectedStringItems.length) return;
+      this.itemIdList = this.selectedStringItems.map(itemName => this.allItems.find(item => item.name == itemName).id);
     },
     onProjectSelect(event) {
       this.project = this.selectedProject = event.data;
@@ -230,11 +233,9 @@ export default {
       if(this.type == 'period' && this.project.name != '') {
         this.$store.dispatch('getPeriodReport', [this.project.id, this.dateStart.getTime(), this.dateEnd.getTime()]);
       } else if(this.type == 'itemMoves' && this.storage.name != '') {
-        let itemIdList = this.selectedNodes.map(n => n.data);
-        this.$store.dispatch('getItemMovesReport', [itemIdList, this.storage.id, this.dateStart.getTime(), this.dateEnd.getTime(), this.includeNull, this.onlyHolden]);
+        this.$store.dispatch('getItemMovesReport', [this.itemIdList, this.storage.id, this.dateStart.getTime(), this.dateEnd.getTime(), this.includeNull, this.onlyHolden]);
       } else if(this.type == 'sales' && this.project.name != '') {
-        let itemIdList = this.selectedNodes.map(n => n.data);
-        this.$store.dispatch('getSalesReport', [itemIdList, this.project.id, this.dateStart.getTime(), this.dateEnd.getTime(), this.includeNull, this.onlyHolden]);
+        this.$store.dispatch('getSalesReport', [this.itemIdList, this.project.id, this.dateStart.getTime(), this.dateEnd.getTime(), this.includeNull, this.onlyHolden]);
       } else if(this.type == 'payments') {
         let supplierId = this.selectedSupplier.name != '' ? this.selectedSupplier.id : 0;
         this.$store.dispatch('getPaymentsReport', supplierId);

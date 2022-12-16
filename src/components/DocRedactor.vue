@@ -524,8 +524,8 @@ export default {
       newDocNumber() {
         return this.$store.state.ds.newDocNumber;
       },
-      ourCompanyIdSetting() {
-        return this.$store.state.ss.ourCompanyIdProperty;
+      systemSettingMap() {
+        return this.$store.state.ss.systemSettingMap;
       },
     },
     created() {
@@ -578,8 +578,8 @@ export default {
               let storageFromId = this.defaultProperties.filter(prop => prop.type == Property.STORAGE_FROM).pop().property;
               value.storage_from = this.getStorageById(storageFromId);
             }
-            if(this.ourCompanyIdSetting != 0) {
-              value.recipient = this.getRecipientById(this.ourCompanyIdSetting);
+            if(this.systemSettingMap.get(Property.OUR_COMPANY_ID) != 0) {
+              value.recipient = this.getRecipientById(this.systemSettingMap.get(Property.OUR_COMPANY_ID));
             }
           }
         }
