@@ -75,10 +75,10 @@
       </Column>
       <Column v-if="!isMobile" field="project.name" header="проект" :showFilterMatchModes="false" :showApplyButton="false" sortable>
         <template #filter="{filterModel, filterCallback}">
-          <div class="mb-3 font-bold">со склада</div>
+          <div class="mb-3 font-bold">проект</div>
           <InputText type="text" v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" v-tooltip.top.focus="toltip"/>
         </template>
-        <template #body="{data}"><div :class="disabledClass(data)">{{getName(data.storage_from)}}</div></template>
+        <template #body="{data}"><div :class="disabledClass(data)">{{getName(data.project)}}</div></template>
       </Column>
       <Column field="storage_from.name" header="со склада" :showFilterMatchModes="false" :showApplyButton="false" sortable>
         <template #filter="{filterModel, filterCallback}">
@@ -460,11 +460,15 @@ export default {
     },
     setStartDate(date) {
       this.$store.dispatch('setStartDate', date)
-      this.$store.dispatch('getDocuments', this.filter);
+      if(this.firstDate <= this.lastDate) {
+        this.$store.dispatch('getDocuments', this.filter);
+      }
     },
     setEndDate(date) {
       this.$store.dispatch('setEndDate', date)
-      this.$store.dispatch('getDocuments', this.filter);
+      if(this.firstDate <= this.lastDate) {
+        this.$store.dispatch('getDocuments', this.filter);
+      }
     },
     getToolTipText(doc) {
       if(doc.is_hold) {
