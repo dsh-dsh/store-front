@@ -249,6 +249,7 @@ export default {
         isMobile: Boolean,
         isAdmin: false,
         isAccountant: false,
+        isMoveDoc: false,
         holdDoc: false,
         toltip: 'Начните набирать текст для поиска',
         filters: {
@@ -306,6 +307,9 @@ export default {
       newDocId() {
         return this.$store.state.ds.newDocId;
       },
+      hasRalative() {
+        return this.$store.state.ds.hasRalative;
+      }
     },
     mounted() {
       this.firstDate = this.$store.state.ds.startDate;
@@ -345,6 +349,7 @@ export default {
       },
       currentDocument(val) {
         this.holdLable = val.is_hold? 'Отменить проведение' : (val.doc_type == this.DocumentType.MOVEMENT_DOC? 'Подтвердить получение' : 'Провести');
+        this.isMoveDoc = val.doc_type == this.DocumentType.MOVEMENT_DOC? false : true;
         // if(val.date_time < this.startPeriod || val.date_time <= this.blockTime) {
         if(this.blockDocs(val)) {
           this.disabledHoldButton = true;
@@ -356,6 +361,9 @@ export default {
         if(this.holdDoc == true) {
           this.holdDocument();
           this.holdDoc = false;
+        }
+        if(val.doc_type == DocumentType.INVENTORY_DOC) {
+          this.$store.dispatch('checkRelativeDocuments', val.id);
         }
       },
       confirmationType(val) {
@@ -370,7 +378,7 @@ export default {
           this.confirmationMessage = 'Отменить удаление документа?';
         } else if(val == 'price') {
           this.buttonNoEnabled = false;
-          this.confirmationMessage = 'Для проведения заполните все цены в документе';
+          this.confirmationMessage = 'Для проведения заполните все цены не составных позиций';
         } else if(val == 'serialHold') {
           if(this.currentDocument.is_hold == true) {
             this.confirmationMessage = 'После этого документа есть другие проведенные документы. Отменить их проведение?';
@@ -400,6 +408,10 @@ export default {
       }, 
       newDocId(val) {
         this.currentDocument.id = val;
+      },
+      hasRalative(value) {
+        console.log(value)
+        this.disabledHoldButton = !value;
       }
     },
 	methods: {
@@ -487,12 +499,14 @@ export default {
         label: 'Копировать', icon: 'pi pi-copy',
         command: () => {this.openCopyDocumentRedactor(this.data);}
       });
-      if(!this.blockDocs(data)) {
-        this.menuModel.push({
-          label: this.data.is_hold? "Отменить проведение" : "Провести", 
-          icon: 'pi pi-check-circle',
-          command: () => {this.holdDocumentFromModalMenu(this.data);}
-        });
+      if(this.user.role == 'ADMIN' || data.author.id == this.user.id) {
+        if(!this.blockDocs(data) ) {
+          this.menuModel.push({
+            label: this.data.is_hold? "Отменить проведение" : "Провести", 
+            icon: 'pi pi-check-circle',
+            command: () => {this.holdDocumentFromModalMenu(this.data);}
+          });
+        }
       }
       if(this.user.role == 'ADMIN' || data.author.id == this.user.id) {
         if(!this.blockDocs(data)) {
@@ -657,7 +671,7 @@ export default {
     checkPrices() {
       if(this.currentDocument.doc_type == this.DocumentType.INVENTORY_DOC) {
         for(let docItem of this.currentDocument.doc_items) {
-          if(docItem.price == 0) {
+          if(!docItem.children && docItem.price == 0) {
             return false;
           }
         }

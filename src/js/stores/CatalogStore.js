@@ -13,7 +13,7 @@ export const CatalogStore = {
             users: [],
             items: [],
 			itemDirList: [],
-			allItems: [],
+			allItems: null,
 			allUsers: []
         }
     },
@@ -90,8 +90,8 @@ export const CatalogStore = {
 			const response = await get('/api/v1/items/rest/list', rootState)
 			commit('setItems', response)
 		},
-		async getAllItems({rootState, commit}) {
-			const response = await get('/api/v1/items/list', rootState)
+		async getAllItems({rootState, commit}, includeNodes) {
+			const response = await get('/api/v1/items/list?includeNodes=' + includeNodes, rootState)
 			commit('setAllItems', response)
 		},
 		async getItemDirList({rootState, commit}) {

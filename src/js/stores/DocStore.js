@@ -3,23 +3,53 @@ import {get, post, put, del} from "@/js/common"
 import DocItem from "@/js/model/DocItem";
 import {DocumentType} from '@/js/Constants';
 
-function fillRelativeDoc(relativeDoc, inventiryDoc) {
-	relativeDoc.author = inventiryDoc.author;
-	relativeDoc.project = inventiryDoc.project;
+function fillRelativeDoc(relativeDoc, inventeryDoc) {
+	relativeDoc.author = inventeryDoc.author;
+	relativeDoc.project = inventeryDoc.project;
 	if(relativeDoc.doc_type == DocumentType.WRITE_OFF_DOC) {
-		relativeDoc.storage_from = inventiryDoc.storage_from;
+		relativeDoc.storage_from = inventeryDoc.storage_from;
 	} else {
-		relativeDoc.storage_to = inventiryDoc.storage_from;
+		relativeDoc.storage_to = inventeryDoc.storage_from;
 	}
-	relativeDoc.base_document_id = inventiryDoc.id;
-	let k = relativeDoc.doc_type == DocumentType.WRITE_OFF_DOC? -1 : 1; 
-	for(let docItem of inventiryDoc.doc_items) {
-		let difference = (docItem.quantity_fact - docItem.quantity) * k;
+	relativeDoc.base_document_id = inventeryDoc.id;
+	let sing = relativeDoc.doc_type == DocumentType.WRITE_OFF_DOC? -1 : 1; 
+	for(let docItem of flatInventoryDocItems(inventeryDoc.doc_items)) {
+		let difference = (docItem.quantity_fact - docItem.quantity) * sing;
 		if(difference > 0) {
-			let newDocItem = new DocItem(docItem.item_id, docItem.item_name, difference, docItem.price);
+			let newDocItem = new DocItem(docItem.item_id, docItem.item_name, docItem.unit, difference, docItem.price);
 			relativeDoc.doc_items.push(newDocItem);
 		}
 	}
+	// console.log(relativeDoc);
+}
+
+function flatInventoryDocItems(docItems){
+	let flatItems = [];
+	for(let docItem of docItems) {
+		if(!docItem.children) {
+			flatItems.push(getDocItem(docItem));
+		}
+	}
+	let index;
+	for(let docItem of docItems) {
+		if(docItem.children) {
+			for(let child of docItem.children) {
+				index = flatItems.findIndex(item => item.item_id == child.item_id);
+				if(index >= 0) {
+					flatItems[index].quantity_fact += child.quantity_fact;
+					flatItems[index].amount_fact += child.amount_fact;
+				} else {
+					flatItems.push(getDocItem(child));
+				}
+			}
+		}
+	}
+	return flatItems;
+}
+
+function getDocItem(docItem) {
+	return new DocItem(docItem.item_id, docItem.item_name, docItem.unit, 
+							docItem.quantity, docItem.price, docItem.quantity_fact);
 }
 
 export const DocStore = {
@@ -33,7 +63,10 @@ export const DocStore = {
 			exsistNotHoldenDocs: 0,
 			unholdenCheckDate: "",
 			newDocId: 0,
-			newDocNumber: 0
+			newDocNumber: 0,
+			itemIngredients:[],
+			ralativeDocIds: [],
+			hasRalative: false
         }
     },
     mutations: {
@@ -73,6 +106,16 @@ export const DocStore = {
 		},
 		resetCurrentDocument(state) {
 			state.document = new Document(null, new Date(), 0);
+		},
+		setIngredientsOfItems(state, res) {
+			state.itemIngredients = res;
+		},
+		setRalativeDocIds(state, res) {
+			state.ralativeDocIds = res;
+			state.hasRalative = res.length ? true : false;
+		},
+		setHasRelativeTrue(state) {
+			state.hasRalative = true;
 		}
     },
     actions: {
@@ -152,18 +195,24 @@ export const DocStore = {
 				commit('resetCurrentDocument');
 			}
 		},
-		createRelativeDocks({commit}, doc) {
-			let writeOffDocument = new Document(DocumentType.WRITE_OFF_DOC, doc.date_time, "");
+		async addRelativeDocks({commit, rootState}, doc) {
+			let writeOffDocument = new Document(DocumentType.WRITE_OFF_DOC, doc.date_time.getTime(), "");
 			fillRelativeDoc(writeOffDocument, doc);
-			if(writeOffDocument.doc_items.length > 0) {
-				this.dispatch("addDocument", [writeOffDocument, 'dayEnd']);
-			}
-			let receiptDocument = new Document(DocumentType.RECEIPT_DOC, doc.date_time, "");
+			let receiptDocument = new Document(DocumentType.RECEIPT_DOC, doc.date_time.getTime(), "");
 			fillRelativeDoc(receiptDocument, doc);
-			if(receiptDocument.doc_items.length > 0) {
-				this.dispatch("addDocument", [receiptDocument, 'dayEnd']);
+			let request = {'item_doc_dto_list': []}; 
+			if(writeOffDocument.doc_items.length > 0) {
+				request.item_doc_dto_list.push(writeOffDocument);
 			}
-			commit('setSuccess');
+			if(receiptDocument.doc_items.length > 0) {
+				request.item_doc_dto_list.push(receiptDocument);
+			}
+			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token };
+			const response = await post('/api/v1/docs/relative/' + doc.id, headers, request, rootState);
+			if(response.data == 'ok') { 
+				commit('setSuccess');
+				commit('setHasRelativeTrue');
+			}
 		},
 		async deleteDocument({commit, rootState}, doc) {
 			doc.date_time = doc.date_time.getTime();
@@ -225,7 +274,23 @@ export const DocStore = {
 			let headers = {'Authorization': rootState.token };
 			const response = await post('/api/v1/docs/add/payments/' + supplierName, headers, null, rootState);
 			if(response.data == 'ok') { commit('setSuccess'); }
-		}
+		},
+		async getIngredientsOfItems({commit, rootState}, itemList) {
+			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token};
+			let body = {'doc_item_list': itemList};
+			const response = await post('/api/v1/docs/item/ingredients', headers, body, rootState);
+			commit('setIngredientsOfItems', response)
+		},
+		async checkRelativeDocuments({commit, rootState}, docId) {
+			const response = await get('/api/v1/docs/relative/doc/ids?docId=' + docId, rootState);
+			commit('setRalativeDocIds', response)
+		},
+		async fixShortages({commit, rootState}, [docId, shortages]) {
+			let headers = {'Content-Type': 'application/json', 'Authorization': rootState.token};
+			let body = {'docId': docId, 'shortages': shortages};
+			const response = await post('/api/v1/docs/fix/shortages', headers, body, rootState);
+			if(response.data == 'ok') { commit('setSuccess'); }
+		},
     }
 }
 

@@ -341,7 +341,7 @@ export default {
     this.$store.dispatch('checkUnholden1CDocuments');
     this.$store.dispatch('getDisabledItem');
     this.$store.dispatch('getBlockingUsers');
-    this.$store.dispatch('getAllItems');
+    this.$store.dispatch('getAllItems', true);
     this.$store.dispatch('getAllUsers');
   },
   methods: {
@@ -428,10 +428,10 @@ export default {
     //   this.$store.dispatch('logout');
     // },
     getProjectById(id) {
-      return this.projects.filter(project => project.id == id).pop();
+      return this.projects.find(project => project.id == id);
     },
     getStorageById(id) {
-      return this.storages.filter(storage => storage.id == id).pop();
+      return this.storages.find(storage => storage.id == id);
     },
     onProjectClick(event) {
       this.$refs.opProjects.toggle(event);

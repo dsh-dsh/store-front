@@ -169,7 +169,10 @@
     </div>
     <br>
     <div v-if="doc.doc_items">
-      <DataTable :value="doc.doc_items" editMode="cell" class="p-datatable-sm" responsiveLayout="scroll" :rowHover="true"> 
+      <DataTable :value="doc.doc_items" editMode="cell" class="p-datatable-sm"
+        v-model:expandedRows="expandedRows" 
+        responsiveLayout="scroll" :rowHover="true"> 
+        <Column v-if="isInventory" :expander="true" style="max-width: 3rem" />
         <Column header="#" style="width: 2rem">
             <template #body="{index}">{{index + 1}}</template>
         </Column>
@@ -214,6 +217,25 @@
             <Column v-if="isInventory || isMovement" :footer="totalAmountFact" footerStyle="text-align:right" />
           </Row>
         </ColumnGroup>
+        <template #expansion="{data}">
+            <div v-if="data.children" style="width: 100%">
+            <DataTable :value="data.children" class="p-datatable-sm" responsiveLayout="scroll">
+                <Column field="item_name" header="ингредиент" />
+                <Column field="quantity_fact" header="количество" style="max-width: 9rem"
+                    class="justify-content-end mr-2" headerClass="justify-content-end mr-2">
+                <template #body="{data}">{{ formatQuantity(data.quantity_fact) }}</template>
+                </Column>
+                <Column field="price" header="цена" style="max-width: 9rem"
+                    class="justify-content-end mr-2" headerClass="justify-content-end mr-2">
+                <template #body="{data}">{{ formatPrice(data.price) }}</template>
+                </Column>
+                <Column field="amount_fact" header="сумма" style="max-width: 9rem"
+                    class="justify-content-end mr-2" headerClass="justify-content-end mr-2">
+                <template #body="{data}">{{ formatPrice(data.amount_fact) }}</template>
+                </Column>
+            </DataTable>
+            </div>
+        </template>
       </DataTable> 
     </div>      
 </template>
@@ -251,6 +273,7 @@ export default {
             baseDocId: 0,
             quantityColumnName: 'Кол-во факт.',
             startPeriod: null,
+            expandedRows: [],
         };
     },
     props: {
@@ -361,7 +384,7 @@ export default {
             }
             if(value.doc_type == DocumentType.INVENTORY_DOC) {
                 this.isInventory = true;
-                this.colSpan++;
+                this.colSpan+=2;
             }
             if(value.doc_type == DocumentType.REQUEST_DOC) {
                 this.isRequest = true;

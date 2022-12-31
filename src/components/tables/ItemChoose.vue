@@ -16,12 +16,12 @@
                 </template>
                 <Column field="name" header="Наименование" sortable />
                 <Column field="unit" header="Еденица" sortable />
-                <Column v-for="storage of storages" :header="storage.name" :key="storage.id" style="max-width:7rem" >
+                <Column  v-for="storage of storages" :header="storage.name" :key="storage.id" style="max-width:7rem" >
                 <template #body="{data}">
-                    <div :class="boldClass(currentStorage, storage)"> {{getItemRestOnStorage(data, storage)}} </div>
+                    <div v-if="!complexItems" :class="boldClass(currentStorage, storage)"> {{getItemRestOnStorage(data, storage)}} </div>
                 </template>
                 </Column>
-                <Column field="price" header="цена" sortable  style="max-width:7rem" />
+                <Column v-if="!complexItems" field="price" header="цена" sortable  style="max-width:7rem" />
             </DataTable>
 
             <Divider v-if="multiplySelect" align="left">
@@ -101,7 +101,9 @@ export default {
         multiplySelect: Boolean,
         currentStorage: null,
         dateTime: null,
-        displayItems: Number
+        displayItems: Number,
+        complexItems: Boolean,
+        factQuantity: Boolean
     },
     emits: {
         newItemList:  null
@@ -113,7 +115,11 @@ export default {
     },
     computed: {
         items() {
-            return this.$store.state.is.items;
+            if(this.complexItems) {
+                return this.$store.state.cs.allItems;
+            } else {
+                return this.$store.state.is.items;
+            }
         },
         storages() {
             return this.$store.state.cs.storages
@@ -161,7 +167,7 @@ export default {
             }
         },
         addItemAndQuantity() {
-            let currentItem = this.chosenItems.filter(item => item.item_id == this.newItem.item_id).pop();
+            let currentItem = this.chosenItems.find(item => item.item_id == this.newItem.item_id);
             if(currentItem != undefined) {
                 currentItem.quantity = this.newQuantity;
                 currentItem.amount = this.formatPrice(currentItem.quantity * currentItem.price);
@@ -180,6 +186,14 @@ export default {
         },
         addItemsToDoc() {
             if(this.chosenItems.length > 0) {
+                if(this.factQuantity) {
+                    for(let item of this.chosenItems) {
+                        item.quantity_fact = item.quantity;
+                        item.amount_fact = item.amount;
+                        item.quantity = 0;
+                        item.amount = 0;
+                    }
+                }
                 this.$emit('newItemList', this.chosenItems);
             }
             this.displayDialog = false;

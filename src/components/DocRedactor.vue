@@ -18,7 +18,7 @@
       <div class="field col-12 md:col-5 center right">
         <div v-if="doc.doc_type === DocumentType.INVENTORY_DOC" class="mr-5">
           <Button label="Заполнить" class="p-button-rounded p-button-secondary mr-1" @click="onFillRestClick" :disabled="disabledFillItemRest"/>
-          <Button label="Создать подчиненные документы" class="p-button-rounded p-button-secondary" @click="onCreateDockClick" :disabled="disabledFillItemRest"/>
+          <Button icon="pi pi-plus" label="подчиненные" class="p-button-rounded p-button-secondary" @click="onCreateDocksClick" :disabled="hasRalative"/>
         </div>
       </div>
       <div class="field col-12 md:col-4">
@@ -183,17 +183,21 @@
     </div>
   </div>
 
-  <Button  v-if="doc.doc_items" icon="pi pi-plus" @click="onAddItemClick" class="p-button-text p-button-rounded" />
+  <Button  v-if="doc.doc_items" icon="pi pi-plus" @click="onAddItemClick(false)" class="p-button-text p-button-rounded" />
+  <Button  v-if="doc.doc_items && isInventory" label="ПФ" @click="onAddItemClick(true)" class="p-button-text p-button-rounded" />
   
   <div v-if="doc.doc_items">
     <DataTable :value="doc.doc_items" :rowClass="rowClass" editMode="cell" 
         class="p-datatable-sm editable-cells-table" 
         @cell-edit-init="onCellEditInit" @cell-edit-complete="onCellEditComplete"
+        v-model:expandedRows="expandedRows"
         :rowHover="true" responsiveLayout="scroll"> 
+      <Column v-if="isInventory" :expander="true" style="max-width: 3rem" />
       <Column header="#" style="width:2rem">
         <template #body="{index}">{{index + 1}}</template>
       </Column>
-      <Column field="item_name" header="Наименование" key="item_name" filter style="min-width:12rem">
+      <Column v-if="isInventory" field="item_name" header="Наименование" key="item_name" filter style="min-width:12rem" />
+      <Column v-if="!isInventory" field="item_name" header="Наименование" key="item_name" filter style="min-width:12rem">
         <template #editor="{ data, field }">
           <InputText @change="disableHoldButton" v-model="data[field]" autofocus/>
           <Button icon="pi pi-check" class="p-button-warning" @click="onItemClick(data)"/>
@@ -211,7 +215,8 @@
         <template #header><div class="text-right mr-2" style="width: 100%">Кол-во факт</div></template>
         <template #body="{data}"><div class="text-right pr-2" style="width: 100%">{{ formatQuantity(data.quantity_fact) }}</div></template>
         <template #editor="{ data, field }">
-          <InputNumber @change="disableHoldButton" v-model="data[field]" inputmode="none" :minFractionDigits="3" :maxFractionDigits="3" :useGrouping="false" />
+          <InputNumber @change="disableHoldButton($event, 'quantity_fact'), recalculateCompositeItem(data)" 
+              @focus="onFocusAmountFact" v-model="data[field]" inputmode="none" :minFractionDigits="3" :maxFractionDigits="3" :useGrouping="false" />
         </template>
       </Column>
       <Column v-if="isMovement" field="quantity_fact" key="quantity_fact" style="width:8rem">
@@ -270,6 +275,25 @@
           <Column v-if="isInventory" :footer="totalAmountFact" :colspan="3" />
         </Row>
       </ColumnGroup>
+      <template #expansion="{data}">
+        <div v-if="data.children" style="width: 100%">
+          <DataTable :value="data.children" class="p-datatable-sm" responsiveLayout="scroll">
+            <Column field="item_name" header="ингредиент" />
+            <Column field="quantity_fact" header="количество" style="max-width: 9rem"
+                class="justify-content-end mr-2" headerClass="justify-content-end mr-2">
+              <template #body="{data}">{{ formatQuantity(data.quantity_fact) }}</template>
+            </Column>
+            <Column field="price" header="цена" style="max-width: 9rem"
+                class="justify-content-end mr-2" headerClass="justify-content-end mr-2">
+              <template #body="{data}">{{ formatPrice(data.price) }}</template>
+            </Column>
+            <Column field="amount_fact" header="сумма" style="max-width: 9rem"
+                class="justify-content-end mr-2" headerClass="justify-content-end mr-2">
+              <template #body="{data}">{{ formatPrice(data.amount_fact) }}</template>
+            </Column>
+          </DataTable>
+        </div>
+      </template>
     </DataTable> 
   </div>  
 
@@ -314,8 +338,8 @@
     </DataTable>
   </OverlayPanel>
 
-  <ItemChoose :displayItems="displayItems" :currentStorage="doc.storage_to"  :dateTime="doc.date_time" 
-        :multiplySelect="multiplySelectItems" @new-item-list="addItemsToDoc"/>
+  <ItemChoose :displayItems="displayItems" :currentStorage="doc.storage_to"  :dateTime="doc.date_time" :factQuantity = "isInventory"
+        :multiplySelect="multiplySelectItems" :complexItems="complexItems" @new-item-list="addItemsToDoc"/>
 
   <div id="numPad" class="num-pad" @click="outsideCloseNumPad($event)">
     <div class="modal-content border shadow"  @keyup="onKeyUp">
@@ -421,7 +445,6 @@ export default {
     },
     data() {
       return {
-        // filters: null,
         loading: false,
         user: null,
         selectedPaymentType: null,
@@ -460,6 +483,7 @@ export default {
         checkPaymentTypes:[],
         displayItems: 1,
         multiplySelectItems: false,
+        complexItrems: false,
         currentItem: undefined,
         baseDocId: 0,
         companyNames: null,
@@ -473,7 +497,10 @@ export default {
         selectedSupplierName: "",
         filteredSuppliers: [],
         selectedRecipientName: "",
-        filteredRecipients: []
+        filteredRecipients: [],
+        complexItems: false,
+        expandedRows: [],
+        lastValue: 0
       };
     },
     computed: {
@@ -527,8 +554,12 @@ export default {
       systemSettingMap() {
         return this.$store.state.ss.systemSettingMap;
       },
-    },
-    created() {
+      itemIngredients() {
+        return this.$store.state.ds.itemIngredients;
+      },
+      hasRalative() {
+        return this.$store.state.ds.hasRalative;
+      }
     },
     mounted() {
       if(this.type === "copyFromRequestDoc") {
@@ -565,17 +596,17 @@ export default {
           this.disabledStorageTo = true;
         }
         if(value.id == 0) {
-          let author = this.users.filter(u => u.id == this.user.id).pop();
+          let author = this.users.find(u => u.id == this.user.id);
           value.author = author;
           if(this.defaultProperties.length > 0) {
-            let projectId = this.defaultProperties.filter(prop => prop.type == Property.PROJECT).pop().property;
+            let projectId = this.defaultProperties.find(prop => prop.type == Property.PROJECT).property;
             value.project = this.getProjectById(projectId);
             if(!this.disabledStorageTo && value.storage_to.id == 0) {
-              let storageToId = this.defaultProperties.filter(prop => prop.type == Property.STORAGE_TO).pop().property;
+              let storageToId = this.defaultProperties.find(prop => prop.type == Property.STORAGE_TO).property;
               value.storage_to = this.getStorageById(storageToId);
             }
             if(!this.disabledStorageFrom && value.storage_from.id == 0) {
-              let storageFromId = this.defaultProperties.filter(prop => prop.type == Property.STORAGE_FROM).pop().property;
+              let storageFromId = this.defaultProperties.find(prop => prop.type == Property.STORAGE_FROM).property;
               value.storage_from = this.getStorageById(storageFromId);
             }
             if(this.systemSettingMap.get(Property.OUR_COMPANY_ID) != 0) {
@@ -598,7 +629,7 @@ export default {
         }
         if(value.doc_type == DocumentType.INVENTORY_DOC) {
           this.isInventory = true;
-          this.colSpan++;
+          this.colSpan+=2;
           this.colSpan2 -= 2;
         }
         if(value.doc_type == DocumentType.MOVEMENT_DOC && this.baseDocId) {
@@ -618,6 +649,9 @@ export default {
           this.selectedSupplierName = value.supplier.name;
           this.selectedRecipientName = value.recipient.name;
         }
+        if(this.isInventory) {
+          this.$store.dispatch('checkRelativeDocuments', value.id);
+        }
       },
       itemRest(value) {
         this.doc.doc_items = value;
@@ -634,12 +668,14 @@ export default {
       period(value) {
         this.startPeriod = new Date(value.start_date);
       },
+      itemIngredients(docItems) {
+        for(let docItem of docItems.data.doc_item_list) {
+          let index = this.doc.doc_items.findIndex(item => item.item_id == docItem.item_id);
+          this.doc.doc_items[index].children = docItem.children;
+        }
+      }
     },
     methods: {
-      // getinputNullValueProperty() {
-      //   let property = this.defaultProperties.find(prop => prop.type == Property.INPUT_NULL_VALUE);
-      //   if(property) this.inputNullValueProperty = property.property == 1;
-      // },
       searchSupplier(event) {
         if (!event.query.trim().length) {
           this.filteredSuppliers = [...this.company];
@@ -765,6 +801,7 @@ export default {
         }
       },
       disableHoldButton(event, inputName) {
+        console.log(event, inputName)
         if(inputName == 'date') {
           this.$emit('disableCurrentTime');
           if(event < this.startPeriod || event <= this.blockTime) {
@@ -837,8 +874,8 @@ export default {
         this.$store.dispatch('getRestOnDateAndStorage', [this.doc.id, this.dateInput, this.doc.storage_from.id]);
         this.$emit('disableHoldButton');
       },
-      onCreateDockClick() {
-        this.$store.dispatch('createRelativeDocks', this.doc);
+      onCreateDocksClick() {
+        this.$store.dispatch('addRelativeDocks', this.doc);
       },
       onCellEditComplete(event) {
         let { data, newValue, field } = event;
@@ -894,27 +931,10 @@ export default {
         this.$refs.opProjects.hide();
         this.$emit('disableHoldButton');
       },
-      // onRecipientClick(event) {
-      //   this.companyType = 'recipient';
-      //   this.$refs.opCompanies.toggle(event);
-      // },
       onIndividualClick(event) {
         this.userType = 'individual';
         this.$refs.opUsers.toggle(event);
       },
-      // onSupplierClick(event) {
-      //   this.companyType = 'supplier';
-      //   this.$refs.opCompanies.toggle(event);
-      // },
-      // onCompanySelect(event) {
-      //   if(this.companyType == 'recipient') {
-      //     this.doc.recipient = event.data;
-      //   } else {
-      //     this.doc.supplier = event.data;
-      //   }
-      //   this.$refs.opCompanies.hide();
-      //   this.$emit('disableHoldButton');
-      // },
       onStorageFromClick(event) {
         this.storageType = 'storageFrom';
         this.$refs.opStorage.toggle(event);
@@ -939,9 +959,14 @@ export default {
         this.$store.dispatch('getItemsWithRest', this.doc.date_time);
         this.displayItems++;
       },
-      onAddItemClick() {
+      onAddItemClick(complex) {
         this.multiplySelectItems = true;
-        this.$store.dispatch('getItemsWithRest', this.doc.date_time);
+        this.complexItems = complex;
+        if(complex) {
+          this.$store.dispatch('getAllItems', false);
+        } else {
+          this.$store.dispatch('getItemsWithRest', this.doc.date_time);
+        }
         this.displayItems++;
       },
       onCellEditInit(event) {
@@ -957,36 +982,50 @@ export default {
       },
       addItemsToDoc(newItemList) {
         if(newItemList.length == 0) return;
-        if(this.multiplySelectItems) {
-          this.currentItem = undefined;
-          for(const item of newItemList) {
-            this.currentItem = this.doc.doc_items.filter(i => i.item_id == item.item_id).pop();
-            if (this.currentItem == undefined) {
-              this.doc.doc_items.push(item);
+        let curItem;
+        if (this.multiplySelectItems) {
+          for(let item of newItemList) {
+            curItem = this.doc.doc_items.find(i => i.item_id == item.item_id);
+            if (curItem && curItem.item_id) {
+              if(this.isInventory) {
+                curItem.quantity_fact = item.quantity_fact;
+                curItem.amount_fact = this.formatPrice(item.amount_fact);
+              } else {
+                curItem.quantity = item.quantity;
+                curItem.amount = this.formatPrice(item.amount);
+              }
             } else {
-              this.currentItem.quantity = item.quantity;
-              this.currentItem.amount = this.formatPrice(this.currentItem.price * this.currentItem.quantity);
+              this.doc.doc_items.push(item);
             }
-            this.currentItem = undefined;
           }
         } else {
           let item = newItemList[0];
           if (this.currentItem != undefined) {
-              let currentItem = this.doc.doc_items.filter(i => i.item_id == this.currentItem.item_id).pop();
-              currentItem.item_name = item.item_name;
-              currentItem.item_id = item.item_id;
+              let curItem = this.doc.doc_items.find(i => i.item_id == this.currentItem.item_id);
+              curItem.item_name = item.item_name;
+              curItem.item_id = item.item_id;
           }
           this.currentItem = undefined;
         }
         this.$emit('disableHoldButton');
+        this.$store.dispatch('getIngredientsOfItems', newItemList);
+      },
+      copyDocItems() {
+        let docItems = [];
+        for(let item of this.doc.doc_items) {
+          docItems.push(Object.assign(item));
+        }
+        return docItems;
+      },
+      onFocusAmountFact(event) {
+        this.lastValue = event.target.value;
+      },
+      recalculateCompositeItem(data) {
+        console.log(this.lastValue, data);
       }
     }
-}
 
-// function checkComposite(docItems) {
-//   let itemArr = docItems.filter(item => item.is_composite == true);
-//   return itemArr.length > 0;
-// }
+}
 
 </script>
 

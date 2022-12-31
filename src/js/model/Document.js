@@ -11,15 +11,15 @@ export default class Document {
 	is_delivery = false;
     project = this.getDefaultProject();
     author = {
-			"id": 0,
-			"email": "",
-			"name": ""
-		};
+		"id": 0,
+		"email": "",
+		"name": ""
+	};
 	individual = {
-			"id": 0,
-			"email": "",
-			"name": ""
-		};
+		"id": 0,
+		"email": "",
+		"name": ""
+	};
 	supplier = {
 		"id": 0,
 		"name": "",
@@ -27,24 +27,25 @@ export default class Document {
 		"kpp": 0,
 		"accounts": [],
 		"is_mine": false
-		};
+	};
 	recipient = {
 		"id": 0,
 		"inn": 0,
 		"kpp": 0,
 		"is_mine": false
-		};
+	};
 	storage_from = {
 		"id": 0,
 		"name": "",
 		"type": ""
-		};
+	};
 	storage_to = {
 		"id": 0
-		};
+	};
 	doc_info = null;
-        base_document_id = 0;	
-	constructor(docType, dateTime, number){
+	base_document_id = 0;
+
+	constructor(docType, dateTime, number) {
 		this.number = number;
 		this.doc_type = docType;
 		this.date_time = dateTime;
@@ -62,7 +63,7 @@ export default class Document {
 				"is_payed": false,
 				"is_payed_by_card": false,
 				"is_delivery": false
-				};
+			};
 		}
 		if(docType != DocumentType.CREDIT_ORDER_DOC 
 				&& docType != DocumentType.WITHDRAW_ORDER_DOC) {

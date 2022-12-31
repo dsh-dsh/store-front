@@ -162,7 +162,7 @@ export default {
     }
   },
   mounted() {
-    this.$store.dispatch('getAllItems');
+    this.$store.dispatch('getAllItems', true);
     this.setTitle(this.type);
     if(this.defaultProperties.length > 0) {
       if(this.storage.name == '') {

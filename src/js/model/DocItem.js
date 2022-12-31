@@ -10,6 +10,7 @@ export default class DocItem {
     amount_fact = 0.0;
     discount = 0.0;
     is_composite = false;
+    
     constructor(item_id, item_name, unit, quantity, price, quantity_fact = 0, document_id = 0, is_composite = false) {
         this.item_id = item_id;
         this.item_name = item_name;
