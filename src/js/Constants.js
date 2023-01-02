@@ -24,7 +24,8 @@ export const DocumentType = {
     CREDIT_ORDER_DOC: 'Расходный кассовый ордер',
     WITHDRAW_ORDER_DOC: 'ПКО',
     REQUEST_DOC: 'Заявка',
-    INVENTORY_DOC: 'Инвентаризация'
+    INVENTORY_DOC: 'Инвентаризация',
+    PERIOD_REST_MOVE_DOC: 'Перенос остатков'
 };
 
 export const PaymentType = { 

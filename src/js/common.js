@@ -18,7 +18,6 @@ export async function post(url, headers, body, state) {
     })
     .then(res => res.json())
 	.then(res => handleResponce(res, state));
-    // .then(res => res.data);
 }
 
 export async function put(url, headers, body, state) {

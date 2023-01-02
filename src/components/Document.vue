@@ -14,7 +14,7 @@
                     <Button label="Изменить" class="p-button-rounded p-button-secondary" @click="onUpdateClick" :disabled="disableRedactoring" />
                 </div>
                 <div>
-                    <Button label="Копировать" class="p-button-rounded p-button-secondary" @click="onCopyClick"/>
+                    <Button label="Копировать" class="p-button-rounded p-button-secondary" @click="onCopyClick" :disabled="diasableCoping" />
                 </div>
             </div>
         </div>
@@ -274,6 +274,7 @@ export default {
             quantityColumnName: 'Кол-во факт.',
             startPeriod: null,
             expandedRows: [],
+            diasableCoping: false
         };
     },
     props: {
@@ -388,6 +389,9 @@ export default {
             }
             if(value.doc_type == DocumentType.REQUEST_DOC) {
                 this.isRequest = true;
+            }
+            if(value.doc_type == DocumentType.PERIOD_REST_MOVE_DOC) {
+                this.diasableCoping = true;
             }
             let user = JSON.parse(localStorage.getItem('user'));
             this.setEnableRedactoring(user, value); 

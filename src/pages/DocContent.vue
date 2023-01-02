@@ -495,10 +495,12 @@ export default {
     toggleModalMenu(event, data) {
       this.data = data;
       this.menuModel = [];
-      this.menuModel.push({
-        label: 'Копировать', icon: 'pi pi-copy',
-        command: () => {this.openCopyDocumentRedactor(this.data);}
-      });
+      if(data.doc_type != DocumentType.PERIOD_REST_MOVE_DOC) {
+        this.menuModel.push({
+          label: 'Копировать', icon: 'pi pi-copy',
+          command: () => {this.openCopyDocumentRedactor(this.data);}
+        });
+      }
       if(this.user.role == 'ADMIN' || data.author.id == this.user.id) {
         if(!this.blockDocs(data) ) {
           this.menuModel.push({
@@ -544,7 +546,9 @@ export default {
         }
         this.menuModel.push(payItem);
       }
-      this.$refs.menu.toggle(event);
+      if(this.menuModel.length > 0) {
+        this.$refs.menu.toggle(event);
+      }
     },
     addPaymentDoc(value) {
       this.$store.dispatch('addPaymentDoc', value.id);
