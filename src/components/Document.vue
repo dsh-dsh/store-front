@@ -213,8 +213,8 @@
         <ColumnGroup type="footer">
           <Row>
             <Column footer="сумма:" :colspan="colSpan" footerStyle="text-align:right" />
-            <Column v-if="!isMovement" :footer="totalAmount" footerStyle="text-align:right"  />
-            <Column v-if="isInventory || isMovement" :footer="totalAmountFact" footerStyle="text-align:right" />
+            <Column :footer="totalAmount" footerStyle="text-align:right"  />
+            <Column v-if="isInventory" :footer="totalAmountFact" footerStyle="text-align:right" />
           </Row>
         </ColumnGroup>
         <template #expansion="{data}">

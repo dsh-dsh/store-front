@@ -44,9 +44,9 @@ export async function del(url, headers, body, state) {
 
 function handleResponce(data, state) {
 	if (data.error) {
-		state.toast?.add({ severity:'error', summary: 'Ошибка', detail: data.error, life: 5000 });
+		state.toast?.add({ severity:'error', summary: 'Ошибка', detail: data.error, life: 3000 });
 	} else if (data.warning) {
-		state.toast?.add({ severity:'warn', summary: 'Внимание', detail: data.warning });
+		state.toast?.add({ severity:'warn', summary: 'Внимание', detail: data.warning, life: 3000 });
 	} else if (data.info && data.id) {
 		state.toast?.add({ severity:'warn', summary: 'Внимание', detail: data.info, list: data.list, docId: data.id });
 	}

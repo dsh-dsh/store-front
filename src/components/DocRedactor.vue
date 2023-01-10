@@ -599,8 +599,10 @@ export default {
           let author = this.users.find(u => u.id == this.user.id);
           value.author = author;
           if(this.defaultProperties.length > 0) {
-            let projectId = this.defaultProperties.find(prop => prop.type == Property.PROJECT).property;
-            value.project = this.getProjectById(projectId);
+            if(value.project.id == 0) {
+              let projectId = this.defaultProperties.find(prop => prop.type == Property.PROJECT).property;
+              value.project = this.getProjectById(projectId);
+            }
             if(!this.disabledStorageTo && value.storage_to.id == 0) {
               let storageToId = this.defaultProperties.find(prop => prop.type == Property.STORAGE_TO).property;
               value.storage_to = this.getStorageById(storageToId);
@@ -633,10 +635,10 @@ export default {
           this.colSpan2 -= 2;
         }
         if(value.doc_type == DocumentType.MOVEMENT_DOC && this.baseDocId) {
-            this.isMovement = true;
-            this.colSpan++;     }
-        this.selectedProject = value.project
-        this.dateInput = value.date_time;
+          this.isMovement = true;
+          this.colSpan++;     }
+          this.selectedProject = value.project
+          this.dateInput = value.date_time;
         if(value.check_info) {
           this.checkDateInput = value.check_info.date_time;
         }

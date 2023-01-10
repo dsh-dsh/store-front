@@ -312,6 +312,7 @@ export default {
       }
     },
     mounted() {
+      this.$store.dispatch('installToast', this.$toast)
       this.firstDate = this.$store.state.ds.startDate;
       this.lastDate = this.$store.state.ds.endDate;
       this.$store.dispatch('getDocuments', this.filter)

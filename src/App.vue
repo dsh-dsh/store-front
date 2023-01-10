@@ -13,7 +13,8 @@
                 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . </div>
               <div class="flex-none flex ml-2">{{ formatQuantity(line.value)}}</div>
             </div>
-            <Button icon="pi pi-check" label="исправить и провести" class="p-button-sm p-button-outlined p-button-success mt-2" @click="fixShortages(slotProps.message.docId, slotProps.message.list)" />
+            <Button v-if="isAdmin" icon="pi pi-check" label="исправить и провести" class="p-button-sm p-button-outlined p-button-success mt-2" 
+                @click="fixShortages(slotProps.message.docId, slotProps.message.list)" />
           </div>
         </div>
       </template>
@@ -33,6 +34,7 @@ export default {
   },
   data() {
     return {
+      isAdmin: Boolean
     }
   },
   computed: {
@@ -49,6 +51,8 @@ export default {
     }
   },
   mounted() {
+    let user = JSON.parse(localStorage.getItem('user'));
+    this.isAdmin = user.role == 'ADMIN' ? true : false;
     this.$store.dispatch('getInitialData')
     this.$store.dispatch('installToast', this.$toast)
     this.$store.dispatch('getAllSystemSettings');
@@ -70,7 +74,6 @@ export default {
     },
     fixShortages(docId, shortages) {
       this.$store.dispatch('fixShortages', [docId, shortages]);
-      
     }
   }
 }
@@ -96,7 +99,7 @@ export default {
   }
   .p-toast {
     position: fixed;
-    width: 30rem;
+    width: 30rem !important;
   }
   /* width */
   ::-webkit-scrollbar {
