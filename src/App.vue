@@ -74,6 +74,7 @@ export default {
     },
     fixShortages(docId, shortages) {
       this.$store.dispatch('fixShortages', [docId, shortages]);
+      this.$toast.removeAllGroups();
     }
   }
 }
