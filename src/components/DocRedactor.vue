@@ -29,8 +29,10 @@
         </div>
       </div>
       <div class="field col-12 md:col-4">
-        <label for="supplier_doc_number" class="label">номер входящего документа</label><br>
-        <InputText id="supplier_doc_number" @change="onDocInfoChange" type="text" class="p-inputtext flex-inpyt" v-model="supplierDocNumber" />
+        <div v-if="doc.doc_type == 'Поступление'">
+          <label for="supplier_doc_number" class="label">номер входящего документа</label><br>
+          <InputText id="supplier_doc_number" @change="onDocInfoChange" type="text" class="p-inputtext flex-inpyt" v-model="supplierDocNumber" />
+        </div>
       </div>
       <div class="field col-12 md:col-4"></div>
 
@@ -613,6 +615,10 @@ export default {
             if(this.systemSettingMap.get(Property.OUR_COMPANY_ID) != 0) {
               value.recipient = this.getRecipientById(this.systemSettingMap.get(Property.OUR_COMPANY_ID));
             }
+          }
+          console.log(value)
+          if(value.doc_type == DocumentType.POSTING_DOC) {
+            value.doc_info = {}
           }
         }
         if(value.payment_type) {

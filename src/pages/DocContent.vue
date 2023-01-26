@@ -634,7 +634,9 @@ export default {
         ok = this.checkFieldWithName(ok, this.currentDocument.supplier, 'Заполните поставщика');
         ok = this.checkFieldWithName(ok, this.currentDocument.recipient, 'Заполните получателя');
         ok = this.checkFieldWithName(ok, this.currentDocument.storage_to, 'Заполните склад получателя');
-        if(!this.currentDocument.doc_info || this.currentDocument.doc_info.supplier_doc_number == '') {
+        console.log(this.currentDocument)
+        console.log(this.currentDocument.doc_info)
+        if(!this.currentDocument.doc_info || !this.currentDocument.doc_info.supplier_doc_number) {
           ok = false;
           this.$store.dispatch('showWarning', 'Заполните номер входящего документа');
         }
