@@ -341,7 +341,7 @@ export default {
             this.$emit('openBaseDoc', this.baseDocId);
         },
         setEnableRedactoring(user, value) {
-            this.disableRedactoring = (user.id != value.author.id && user.role != 'ADMIN');
+            this.disableRedactoring = (user.id != value.author.id && (user.role != 'ADMIN' && user.role != 'ACCOUNTANT'));
             if(value.date_time < this.startPeriod || value.date_time <= this.blockTime) {
                 this.disableRedactoring = true;
             }

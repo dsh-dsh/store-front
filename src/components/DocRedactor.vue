@@ -30,7 +30,6 @@
       </div>
       <div class="field col-12 md:col-4">
         <label for="supplier_doc_number" class="label">номер входящего документа</label><br>
-        <!-- <InputText id="supplier_doc_number" @change="disableHoldButton(), onDocInfoChange()" type="text" class="p-inputtext flex-inpyt" v-model="supplierDocNumber" /> -->
         <InputText id="supplier_doc_number" @change="onDocInfoChange" type="text" class="p-inputtext flex-inpyt" v-model="supplierDocNumber" />
       </div>
       <div class="field col-12 md:col-4"></div>
@@ -806,7 +805,7 @@ export default {
         console.log(event, inputName)
         if(inputName == 'date') {
           this.$emit('disableCurrentTime');
-          if(event < this.startPeriod || event <= this.blockTime) {
+          if(event < this.startPeriod || (event <= this.blockTime && this.systemSettingMap.get(Property.DOC_BLOCK_ENABLE) == 1)) {
             this.disableSaveButton(true);
           } else {
             this.disableSaveButton(false);

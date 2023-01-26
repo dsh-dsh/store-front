@@ -502,7 +502,8 @@ export default {
           command: () => {this.openCopyDocumentRedactor(this.data);}
         });
       }
-      if(this.user.role == 'ADMIN' || data.author.id == this.user.id) {
+      // if(this.user.role == 'ADMIN' || this.user.role == 'ACCOUNTANT' || data.author.id == this.user.id) {
+      if(this.isAdmin || this.isAccountant || data.author.id == this.user.id) {
         if(!this.blockDocs(data) ) {
           this.menuModel.push({
             label: this.data.is_hold? "Отменить проведение" : "Провести", 
@@ -511,7 +512,7 @@ export default {
           });
         }
       }
-      if(this.user.role == 'ADMIN' || data.author.id == this.user.id) {
+      if(this.isAdmin || this.isAccountant || data.author.id == this.user.id) {
         if(!this.blockDocs(data)) {
           this.menuModel.push({
             label: 'Изменить', icon: 'pi pi-pencil',
@@ -531,7 +532,7 @@ export default {
           });
         }
       }
-      if((this.user.role == 'ADMIN' || this.user.role == 'ACCOUNTANT')
+      if((this.isAdmin || this.isAccountant)
             && data.doc_type == DocumentType.POSTING_DOC) {
         let payItem;
         if(data.is_payed == false) {
@@ -612,6 +613,7 @@ export default {
     },
 		saveDocument() {
       this.displaySaveDialog = false;
+      if(!this.checkFields()) return;
       if(this.type == 'update') {
         this.$store.dispatch('updateDocument', [this.currentDocument, this.salectedSaveTime]);
       }	else {
@@ -625,6 +627,27 @@ export default {
         this.displayDocument = !this.closeDocAfterSave;
         this.closeDocAfterSave = true;
       }
+    },
+    checkFields() {
+      let ok = true;
+      ok = this.checkFieldWithName(ok, this.currentDocument.project, 'Заполните проект');
+      if(this.currentDocument.doc_type == DocumentType.POSTING_DOC) {
+        ok = this.checkFieldWithName(ok, this.currentDocument.supplier, 'Заполните поставщика');
+        ok = this.checkFieldWithName(ok, this.currentDocument.recipient, 'Заполните получателя');
+        ok = this.checkFieldWithName(ok, this.currentDocument.storage_to, 'Заполните склад получателя');
+        if(!this.currentDocument.doc_info || this.currentDocument.doc_info.supplier_doc_number == '') {
+          ok = false;
+          this.$store.dispatch('showWarning', 'Заполните номер входящего документа');
+        }
+      }
+      return ok;
+    },
+    checkFieldWithName(ok, field, message) {
+      if(field.id == 0 || field.name == '') {
+        this.$store.dispatch('showWarning', message);
+        return false;
+      }
+      return ok;
     },
     quickSaveDoc() {
       if(this.type == 'add') {
