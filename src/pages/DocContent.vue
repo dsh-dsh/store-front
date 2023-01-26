@@ -411,7 +411,6 @@ export default {
         this.currentDocument.id = val;
       },
       hasRalative(value) {
-        console.log(value)
         this.disabledHoldButton = !value;
       }
     },

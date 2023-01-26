@@ -200,7 +200,6 @@ export default {
             this.chosenItems = [];
         },
         onKeyUp(event) {
-            console.log(event);
             if(event.key == 'Backspace') {
                 this.itemNameFilter = this.itemNameFilter.substring(0, this.itemNameFilter.length-1);
             } else {

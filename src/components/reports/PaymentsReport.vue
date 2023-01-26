@@ -120,9 +120,6 @@ export default {
       formatCurrency(value) {
         return value.toLocaleString('re-RU', {style: 'currency', currency: 'RUB'});
       },
-      addPayment(value) {
-        console.log(value)
-      },
       addSupplierPayments(supplierName) {
         if(this.isDocsPayed(supplierName)) return;
         this.$store.dispatch('addSupplierPaymentsDoc', supplierName);

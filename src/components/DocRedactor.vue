@@ -214,7 +214,7 @@
         <template #header><div class="text-right mr-2" style="width: 100%">Кол-во факт</div></template>
         <template #body="{data}"><div class="text-right pr-2" style="width: 100%">{{ formatQuantity(data.quantity_fact) }}</div></template>
         <template #editor="{ data, field }">
-          <InputNumber @change="disableHoldButton($event, 'quantity_fact'), recalculateCompositeItem(data)" 
+          <InputNumber @change="disableHoldButton($event, 'quantity_fact')" 
               @focus="onFocusAmountFact" v-model="data[field]" inputmode="none" :minFractionDigits="3" :maxFractionDigits="3" :useGrouping="false" />
         </template>
       </Column>
@@ -802,7 +802,6 @@ export default {
         }
       },
       disableHoldButton(event, inputName) {
-        console.log(event, inputName)
         if(inputName == 'date') {
           this.$emit('disableCurrentTime');
           if(event < this.startPeriod || (event <= this.blockTime && this.systemSettingMap.get(Property.DOC_BLOCK_ENABLE) == 1)) {
@@ -1020,9 +1019,6 @@ export default {
       },
       onFocusAmountFact(event) {
         this.lastValue = event.target.value;
-      },
-      recalculateCompositeItem(data) {
-        console.log(this.lastValue, data);
       }
     }
 
