@@ -613,6 +613,7 @@ export default {
 		saveDocument() {
       this.displaySaveDialog = false;
       if(!this.checkFields()) return;
+      if(!this.checkDublicateItems()) return;
       if(this.type == 'update') {
         this.$store.dispatch('updateDocument', [this.currentDocument, this.salectedSaveTime]);
       }	else {
@@ -634,14 +635,24 @@ export default {
         ok = this.checkFieldWithName(ok, this.currentDocument.supplier, 'Заполните поставщика');
         ok = this.checkFieldWithName(ok, this.currentDocument.recipient, 'Заполните получателя');
         ok = this.checkFieldWithName(ok, this.currentDocument.storage_to, 'Заполните склад получателя');
-        console.log(this.currentDocument)
-        console.log(this.currentDocument.doc_info)
         if(!this.currentDocument.doc_info || !this.currentDocument.doc_info.supplier_doc_number) {
           ok = false;
           this.$store.dispatch('showWarning', 'Заполните номер входящего документа');
         }
       }
       return ok;
+    },
+    checkDublicateItems() {
+      if(!this.currentDocument.doc_items) return true;
+      let set = new Set();
+      for(let i = 0; i < this.currentDocument.doc_items.length; i++) { 
+        if(set.has(this.currentDocument.doc_items[i].item_id)) {
+          this.$store.dispatch('showWarning', 'Удалите повторяющиеся товары из докумета');
+          return false;
+        }
+        set.add(this.currentDocument.doc_items[i].item_id);
+      }
+      return true;
     },
     checkFieldWithName(ok, field, message) {
       if(field.id == 0 || field.name == '') {
