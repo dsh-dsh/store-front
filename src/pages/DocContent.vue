@@ -334,7 +334,7 @@ export default {
         this.$store.dispatch('getBlockTime')
       },
       choosenDocFilters(val) {
-        this.filters.doc_type.value = (this.filter == '' && val.length > 0) ? val : null;
+        this.filters.doc_type.value = (this.filter == 'default' && val.length > 0) ? val : null;
       },
       period(val) {
         this.startPeriod = new Date(val.start_date);
@@ -342,7 +342,7 @@ export default {
       filter(val) {
         this.$store.dispatch('getDocuments', val);
         // this.$store.dispatch('getBlockTime')
-        this.filters.doc_type.value = (this.filter == '' && this.choosenDocFilters.length > 0) ? this.choosenDocFilters : null;
+        this.filters.doc_type.value = (this.filter == 'default' && this.choosenDocFilters.length > 0) ? this.choosenDocFilters : null;
 
       },
       success() {
@@ -427,6 +427,8 @@ export default {
             let value = {'type': setting.type, 'property': 1};
             return value;
           })
+          
+      console.log(settings)
       this.$store.dispatch('setDocTypeFilterProperties', [this.user, settings]);
     },
     getName(value) {
