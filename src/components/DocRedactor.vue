@@ -616,7 +616,6 @@ export default {
               value.recipient = this.getRecipientById(this.systemSettingMap.get(Property.OUR_COMPANY_ID));
             }
           }
-          console.log(value)
           if(value.doc_type == DocumentType.POSTING_DOC) {
             value.doc_info = {}
           }

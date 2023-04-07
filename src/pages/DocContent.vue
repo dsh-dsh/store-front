@@ -427,8 +427,6 @@ export default {
             let value = {'type': setting.type, 'property': 1};
             return value;
           })
-          
-      console.log(settings)
       this.$store.dispatch('setDocTypeFilterProperties', [this.user, settings]);
     },
     getName(value) {
