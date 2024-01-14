@@ -222,7 +222,7 @@
   </OverlayPanel>
 
   <Dialog header="Не все документы загружены для проведения!" class="border" v-model:visible="showIgnoreMissingDocsDialog" 
-        :style="{width: '300px'}" :modal="true" :showHeader="false">
+        :style="{width: '300px'}" :modal="true" :showHeader="true">
     <h4>Все равно провести?</h4>
     <template #footer>
       <Button label="Нет" icon="pi pi-times" @click="skipHold1CDocs" class="p-button-text"/>
@@ -245,6 +245,7 @@ import InputSwitch from 'primevue/inputswitch';
 import {Property} from '@/js/Constants';
 import Slider from 'primevue/slider';
 import AutoComplete from 'primevue/autocomplete';
+import Dialog from 'primevue/dialog';
 
 export default {
   name: 'Settings',
@@ -259,7 +260,8 @@ export default {
     OverlayPanel,
     InputSwitch,
     Slider,
-    AutoComplete
+    AutoComplete,
+    Dialog
   },
   data() {
     return {
@@ -331,6 +333,9 @@ export default {
     },
     users() {
       return this.$store.state.cs.allUsers;
+    },
+    ignoreMissingDocsState() {
+        return this.$store.state.ignoreMissingDocsState;
     }
   },
   watch: {
@@ -345,7 +350,7 @@ export default {
       this.periodString = 'Закрыть период? (текущий период: ' 
             +  formatDate(new Date(val.start_date)) + ' - ' + formatDate(new Date(val.end_date)) + ')';
     },
-    showIgnoreMissingDocsDialog() {
+    ignoreMissingDocsState() {
       this.showIgnoreMissingDocsDialog = true;
     },
   },

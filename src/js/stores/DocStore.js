@@ -116,9 +116,6 @@ export const DocStore = {
 		},
 		setHasRelativeTrue(state) {
 			state.hasRalative = true;
-		},
-		setShowIgnoreMissingDocsDialog(state) {
-			state.showIgnoreMissingDocsDialog++;
 		}
     },
     actions: {
@@ -254,8 +251,12 @@ export const DocStore = {
 		async hold1CDocuments({commit, rootState}, ignoreMissingDocs = false) {
 			let headers = {'Authorization': rootState.token };
 			const response = await post('/api/v1/1c/hold?ignoreMissingDocs=' + ignoreMissingDocs, headers, null, rootState);
-			if(response.warning && response.type == 1) {commit('setShowIgnoreMissingDocsDialog');}
-			if(response.data == 'ok') { commit('setSuccess'); }
+			if(response.warning && response.type == 1) {
+				commit('setIgnoreMissingDocsState');
+			}
+			if(response.data == 'ok') {
+				commit('setSuccess'); 
+			}
 		},
 		async checkUnholden1CDocuments({commit, rootState}) {
 			const response = await get('/api/v1/1c/check', rootState);
