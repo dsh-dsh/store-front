@@ -116,6 +116,9 @@ export const DocStore = {
 		},
 		setHasRelativeTrue(state) {
 			state.hasRalative = true;
+		},
+		setShowIgnoreMissingDocsDialog(state) {
+			state.showIgnoreMissingDocsDialog++;
 		}
     },
     actions: {
@@ -248,9 +251,10 @@ export const DocStore = {
 			const response = await del('/api/v1/docs/hard/delete', headers, null, rootState);
 			if(response == 'ok') { commit('setSuccess'); }
 		},
-		async hold1CDocuments({commit, rootState}) {
+		async hold1CDocuments({commit, rootState}, ignoreMissingDocs = false) {
 			let headers = {'Authorization': rootState.token };
-			const response = await post('/api/v1/1c/hold', headers, null, rootState);
+			const response = await post('/api/v1/1c/hold?ignoreMissingDocs=' + ignoreMissingDocs, headers, null, rootState);
+			if(response.warning && response.type == 1) {commit('setShowIgnoreMissingDocsDialog');}
 			if(response.data == 'ok') { commit('setSuccess'); }
 		},
 		async checkUnholden1CDocuments({commit, rootState}) {

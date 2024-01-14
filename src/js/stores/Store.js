@@ -30,6 +30,7 @@ const store = createStore({
 			message: String,
 			toast: null,
 			token: "",
+			showIgnoreMissingDocsDialog: 0
 		}
     },
     mutations: {
@@ -52,7 +53,7 @@ const store = createStore({
 		},
 		setSuccess (state) {
 			state.success++;
-		},
+		}
     },
 
     actions: { 

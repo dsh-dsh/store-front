@@ -220,6 +220,16 @@
         <Column field="name" header="Name" sortable/>
     </DataTable>
   </OverlayPanel>
+
+  <Dialog header="Не все документы загружены для проведения!" class="border" v-model:visible="showIgnoreMissingDocsDialog" 
+        :style="{width: '300px'}" :modal="true" :showHeader="false">
+    <h4>Все равно провести?</h4>
+    <template #footer>
+      <Button label="Нет" icon="pi pi-times" @click="skipHold1CDocs" class="p-button-text"/>
+      <Button label="Да" icon="pi pi-check" @click="hold1CDocsIgnoreMissingDocs" class="p-button-text" autofocus />
+    </template>
+  </Dialog>
+
 </template>
 
 <script>
@@ -281,7 +291,8 @@ export default {
       selectedStringItems: [],
       filteredItems: null,
       selectedUserNames: [],
-      filteredUsers: null
+      filteredUsers: null,
+      showIgnoreMissingDocsDialog: false
     };
   },
   computed: {
@@ -320,7 +331,7 @@ export default {
     },
     users() {
       return this.$store.state.cs.allUsers;
-    },
+    }
   },
   watch: {
     user(val) {
@@ -333,6 +344,9 @@ export default {
     period(val) {
       this.periodString = 'Закрыть период? (текущий период: ' 
             +  formatDate(new Date(val.start_date)) + ' - ' + formatDate(new Date(val.end_date)) + ')';
+    },
+    showIgnoreMissingDocsDialog() {
+      this.showIgnoreMissingDocsDialog = true;
     },
   },
   mounted() {
@@ -424,9 +438,6 @@ export default {
         this.enableDocBlock = this.systemSettingMap.get(Property.DOC_BLOCK_ENABLE) == 1; //enableDocBlockSetting;
       }
     },
-    // logout() {
-    //   this.$store.dispatch('logout');
-    // },
     getProjectById(id) {
       return this.projects.find(project => project.id == id);
     },
@@ -465,8 +476,16 @@ export default {
     deleteDocs() {
       this.$store.dispatch('deleteDocs');
     },
+    hold1CDocsIgnoreMissingDocs() {
+      this.$store.dispatch('hold1CDocuments', true);
+      this.showIgnoreMissingDocsDialog = false;
+    },
     hold1CDocs() {
       this.$store.dispatch('hold1CDocuments');
+      this.showIgnoreMissingDocsDialog = false;
+    },
+    skipHold1CDocs() {
+      this.showIgnoreMissingDocsDialog = false;
     },
     setAddShortageForHold() {
       this.$store.dispatch('setSystemSetting', 
