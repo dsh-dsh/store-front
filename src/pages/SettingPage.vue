@@ -274,7 +274,7 @@ export default {
       storageType: "",
       activeIndex: -1,
       isAdmin: false,
-      isAccontant: false,
+      isAccountant: false,
       addShortageForHold: Boolean,
       averagePriceForPeriodClose: Boolean,
       averagePriceForDocs: Boolean,
