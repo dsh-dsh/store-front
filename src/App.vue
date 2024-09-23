@@ -52,7 +52,7 @@ export default {
   },
   mounted() {
     let user = JSON.parse(localStorage.getItem('user'));
-    this.isAdmin = user.role == 'ADMIN' ? true : false;
+    this.isAdmin = (user.role == 'ADMIN' || user.role == 'ACCOUNTANT') ? true :  false;
     this.$store.dispatch('getInitialData')
     this.$store.dispatch('installToast', this.$toast)
     this.$store.dispatch('getAllSystemSettings');
