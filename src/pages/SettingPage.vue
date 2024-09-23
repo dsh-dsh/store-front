@@ -52,11 +52,11 @@
       </div>
     </AccordionTab>
 
-    <AccordionTab v-if="isAdmin" header="Безвозвратное удаление документов">
+    <AccordionTab v-if="isAdmin || isAccountant" header="Безвозвратное удаление документов">
       <Button label="Удалить помеченные на удаление документы" @click="deleteDocs" class="p-button-sm p-button-text" />
     </AccordionTab>
 
-    <AccordionTab v-if="isAdmin" header="Закрытие периода">
+    <AccordionTab v-if="isAdmin || isAccountant" header="Закрытие периода">
       <div class="formgrid grid leftAlignment">
         <div class="col-12 md:col-6">
           <span>{{ periodString }}</span> 
@@ -78,7 +78,7 @@
       </div>
     </AccordionTab>
 
-    <AccordionTab v-if="isAdmin" header="Настройки проведения документов">
+    <AccordionTab v-if="isAdmin || isAccountant" header="Настройки проведения документов">
       <div class="formgrid grid leftAlignment">
         <div class="col-12 md:col-6">
           <span>Проводить чеки </span>
@@ -174,7 +174,7 @@
       </div>
     </AccordionTab>
 
-    <AccordionTab v-if="isAdmin" header="Настройки интерфеса (админ)">
+    <AccordionTab v-if="isAdmin || isAccountant" header="Настройки интерфеса (админ)">
       <div class="formgrid grid leftAlignment">
         <div class="col-12 md:col-4">
           <span>Запрашивать проведение при сохранении документа </span>
@@ -274,6 +274,7 @@ export default {
       storageType: "",
       activeIndex: -1,
       isAdmin: false,
+      isAccontant: false,
       addShortageForHold: Boolean,
       averagePriceForPeriodClose: Boolean,
       averagePriceForDocs: Boolean,
@@ -340,11 +341,8 @@ export default {
   },
   watch: {
     user(val) {
-      if(val.role == 'ADMIN') {
-        this.isAdmin = true;
-      } else {
-        this.isAdmin = false;
-      }
+      this.isAdmin = val.role == 'ADMIN' ? true :  false;
+      this.isAccountant = val.role == 'ACCOUNTANT' ? true :  false;
     },
     period(val) {
       this.periodString = 'Закрыть период? (текущий период: ' 
