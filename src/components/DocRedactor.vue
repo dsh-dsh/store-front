@@ -119,7 +119,7 @@
   </div>
 
   <div v-if="doc.check_info">
-    <Divider align="left">
+    <Divider>
       <div class="inline-flex align-items-center">
         <i class="pi pi-paperclip mr-2"></i>
         информация из чека ККМ
@@ -156,29 +156,29 @@
       </div>
       <div class="field col-12 md:col-3">
           <label for="check_payment_type" class="label">тип оплаты</label><br>
-          <div class="p-inputgroup" style="{width: 150px}">
+          <div class="p-inputgroup">
             <InputText id="check_payment_type" type="text" class="p-inputtext" v-model="doc.check_info.check_payment_type" />
             <Button icon="pi pi-check" class="p-button-warning" @click="onCheckPaymentTypeClick"/>
           </div>
       </div>
       <div class="field col-12 md:col-2">
-        <label for="isReturn" class="label">возврат</label>
+        <label for="isReturn" class="label">возврат&nbsp;&nbsp;</label>
         <InputSwitch id="isReturn" @change="disableHoldButton" v-model="doc.check_info.is_return" /> 
       </div>
       <div class="field col-12 md:col-2">
-        <label for="isKKMChecked" class="label">пробит</label>
+        <label for="isKKMChecked" class="label">пробит&nbsp;&nbsp;</label>
         <InputSwitch id="isKKMChecked" @change="disableHoldButton" v-model="doc.check_info.is_KKM_checked" /> 
       </div>
       <div class="field col-12 md:col-2">
-        <label for="is_Paid" class="label">оплачен</label>
+        <label for="is_Paid" class="label">оплачен&nbsp;&nbsp;</label>
         <InputSwitch id="is_Paid" @change="disableHoldButton" v-model="doc.check_info.is_payed" /> 
       </div>
       <div class="field col-12 md:col-2">
-        <label for="isPayedByCard" class="label">эквайринг</label>
+        <label for="isPayedByCard" class="label">эквайринг&nbsp;&nbsp;</label>
         <InputSwitch id="isPayedByCard" @change="disableHoldButton" v-model="doc.check_info.is_payed_by_card" /> 
       </div>
       <div class="field col-12 md:col-2">
-        <label for="isDelivery" class="label">доставка</label>
+        <label for="isDelivery" class="label">доставка&nbsp;&nbsp;</label>
         <InputSwitch id="isDelivery" @change="disableHoldButton" v-model="doc.check_info.is_delivery" /> 
       </div>
     </div>
