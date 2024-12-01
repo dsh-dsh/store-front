@@ -17,9 +17,9 @@
                 <Column field="name" header="Наименование" sortable />
                 <Column field="unit" header="Еденица" sortable />
                 <Column  v-for="storage of storages" :header="storage.name" :key="storage.id" style="max-width:7rem" >
-                <template #body="{data}">
-                    <div v-if="!complexItems" :class="boldClass(currentStorage, storage)"> {{getItemRestOnStorage(data, storage)}} </div>
-                </template>
+                    <template #body="{data}">
+                        <div v-if="!complexItems" :class="boldClass(currentStorage, storage)"> {{getItemRestOnStorage(data, storage)}} </div>
+                    </template>
                 </Column>
                 <Column v-if="!complexItems" field="price" header="цена" sortable  style="max-width:7rem" />
             </DataTable>
@@ -39,7 +39,9 @@
                     <DataTable v-if="multiplySelect" :value="chosenItems" class="p-datatable-sm" @rowSelect="onItemSelect"
                         :scrollable="true" scrollHeight="200px" :style="{width: '100%', height: '200px'}">
                         <Column field="item_name" header="Наименование" />
-                        <Column field="quantity" header="Количество"  style="max-width:7rem" />
+                        <Column v-if="!factQuantity" field="quantity" header="Количество"  style="max-width:7rem" />
+                        <Column v-if="factQuantity" field="quantity" header="Кол-во"  style="max-width:6rem" />
+                        <Column v-if="factQuantity" field="quantity_fact" header="Кол-во факт"  style="max-width:9rem" />
                         <Column field="price" header="цена"  style="max-width:7rem" />
                     </DataTable>
                 </div>
@@ -172,7 +174,14 @@ export default {
                 currentItem.quantity = this.newQuantity;
                 currentItem.amount = this.formatPrice(currentItem.quantity * currentItem.price);
             } else {
-                this.newItem.quantity = this.newQuantity;
+                if(this.factQuantity) {
+                    this.newItem.quantity_fact = this.newQuantity;
+                    let ci = this.items.find(item => item.id == this.newItem.item_id);
+                    this.newItem.quantity = ci.rest_list[0].quantity;
+                    this.newItem.amount_fact = this.formatPrice(this.newItem.quantity_fact * this.newItem.price);
+                } else {
+                    this.newItem.quantity = this.newQuantity;
+                }
                 this.newItem.amount = this.formatPrice(this.newItem.quantity * this.newItem.price);
                 this.chosenItems.push(this.newItem);
             }
@@ -186,14 +195,6 @@ export default {
         },
         addItemsToDoc() {
             if(this.chosenItems.length > 0) {
-                if(this.factQuantity) {
-                    for(let item of this.chosenItems) {
-                        item.quantity_fact = item.quantity;
-                        item.amount_fact = item.amount;
-                        item.quantity = 0;
-                        item.amount = 0;
-                    }
-                }
                 this.$emit('newItemList', this.chosenItems);
             }
             this.displayDialog = false;

@@ -986,6 +986,7 @@ export default {
         }
       },
       addItemsToDoc(newItemList) {
+        console.log(newItemList);
         if(newItemList.length == 0) return;
         let curItem;
         if (this.multiplySelectItems) {
@@ -993,6 +994,7 @@ export default {
             curItem = this.doc.doc_items.find(i => i.item_id == item.item_id);
             if (curItem && curItem.item_id) {
               if(this.isInventory) {
+                curItem.quantity = item.quantity;
                 curItem.quantity_fact = item.quantity_fact;
                 curItem.amount_fact = this.formatPrice(item.amount_fact);
               } else {
